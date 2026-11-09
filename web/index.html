@@ -102,33 +102,24 @@
       cursor: pointer;
     }
 
-    .logo-badge {
-      display: flex;
-      flex-direction: column;
+    .header-logo-img {
+      height: 44px;
+      width: auto;
+      max-width: 175px;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.2s ease;
     }
 
-    .logo-title {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing: 1.5px;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      gap: 3px;
+    .header-logo-img:hover {
+      transform: scale(1.02);
     }
 
-    .logo-title span.labs {
-      font-weight: 400;
-      letter-spacing: 3px;
-    }
-
-    .logo-subtitle {
-      font-size: 7px;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 2.8px;
-      margin-top: 3px;
+    @media (max-width: 600px) {
+      .header-logo-img {
+        height: 38px;
+        max-width: 140px;
+      }
     }
 
     .header-right {
@@ -1079,13 +1070,8 @@
   <!-- Header -->
   <header>
     <div class="header-container">
-      <div class="brand-logo" onclick="switchView('catalog')">
-        <div class="logo-badge">
-          <div class="logo-title">
-            PSL <span class="labs">LABS</span>
-          </div>
-          <div class="logo-subtitle">PREMIUM SYNTHESIS LINE</div>
-        </div>
+      <div class="brand-logo" onclick="switchView('catalog')" title="PSL Labs - Catálogo Oficial">
+        <img src="/brand/logo_transparent.png" onerror="this.onerror=null; this.src='/logo.png';" alt="PSL Labs - Premium Synthesis Line" class="header-logo-img">
       </div>
 
       <div class="header-right">

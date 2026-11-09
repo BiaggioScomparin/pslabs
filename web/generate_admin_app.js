@@ -564,8 +564,10 @@ const adminHtml = `<!DOCTYPE html>
   <!-- Auth Screen -->
   <div id="auth-overlay">
     <div class="auth-card">
-      <div class="auth-logo">PSL LABS</div>
-      <div class="auth-sub">PAINEL ADMINISTRATIVO</div>
+      <div style="margin-bottom: 16px; text-align: center;">
+        <img src="/brand/logo_transparent.png" onerror="this.onerror=null; this.src='/logo.png';" alt="PSL Labs" style="height: 48px; width: auto; max-width: 200px;">
+      </div>
+      <div class="auth-sub" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2.5px; margin-bottom: 14px;">PAINEL ADMINISTRATIVO</div>
       <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
         Digite o PIN de segurança para gerenciar estoque, pedidos e preços:
       </p>
@@ -581,10 +583,10 @@ const adminHtml = `<!DOCTYPE html>
     <!-- Sidebar Desktop -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
-        <div style="font-size: 20px; font-weight: 900; color: var(--primary); letter-spacing: 1px;">
-          PSL <span style="font-weight: 400; letter-spacing: 3px;">LABS</span>
-        </div>
-        <div style="font-size: 7.5px; font-weight: 700; color: var(--primary); letter-spacing: 2px;">PAINEL OPERACIONAL</div>
+        <a href="/" target="_blank" style="display: block; text-decoration: none;">
+          <img src="/brand/logo_transparent.png" onerror="this.onerror=null; this.src='/logo.png';" alt="PSL Labs" style="height: 38px; width: auto; max-width: 160px; display: block; margin-bottom: 6px;">
+        </a>
+        <div style="font-size: 8px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase;">Painel Operacional</div>
       </div>
 
       <nav class="sidebar-nav">
