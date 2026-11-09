@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="50%" stop-color="#0B0F19" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#1E293B" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00F0FF" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Ring (Vial Seal / Cap Badge) -->
+  <circle cx="150" cy="150" r="142" fill="url(#bgGrad)" stroke="url(#ringGrad)" stroke-width="4"/>
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#1E293B" stroke-dasharray="4,4" stroke-width="2"/>
+
+  <!-- Molecular Hex Nodes -->
+  <polygon points="150,38 238,89 238,191 150,242 62,191 62,89" fill="none" stroke="#1E293B" stroke-width="1.5"/>
+
+  <!-- Central Helix S Motif -->
+  <g transform="translate(110, 80)">
+    <!-- Stylized S -->
+    <path d="M 58 15 C 53 10 46 7 37 7 C 23 7 15 14 15 23 C 15 33 25 38 42 42 C 63 47 73 56 73 68 C 73 83 59 91 38 91 C 22 91 10 84 3 75 L 15 63 C 20 70 28 75 38 75 C 50 75 56 70 56 62 C 56 54 46 49 29 45 C 10 40 0 32 0 20 C 0 6 15 -1 36 -1 C 50 -1 61 4 68 10 Z" fill="#FFFFFF"/>
+    
+    <!-- Luminous DNA Strands -->
+    <g stroke="url(#cyanGrad)" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M 20 12 Q 38 28 56 46 T 20 80" />
+      <path d="M 56 12 Q 38 28 20 46 T 56 80" />
+      <line x1="26" y1="20" x2="50" y2="20" stroke-width="2"/>
+      <line x1="33" y1="36" x2="43" y2="36" stroke-width="2"/>
+      <line x1="33" y1="56" x2="43" y2="56" stroke-width="2"/>
+      <line x1="26" y1="72" x2="50" y2="72" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Curvilinear Text Top & Bottom -->
+  <text x="150" y="215" text-anchor="middle" font-family="'Inter', sans-serif" font-size="13" font-weight="800" letter-spacing="4" fill="#00E5FF">
+    PSL LABS
+  </text>
+  <text x="150" y="232" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="600" letter-spacing="3" fill="#94A3B8">
+    PURITY VERIFIED &gt;99%
+  </text>
+</svg>

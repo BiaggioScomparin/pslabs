@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" width="100%" height="100%">
+  <defs>
+    <linearGradient id="labelBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="cyanStripe" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Label Outer Border (Vial 60mm x 28mm proportion) -->
+  <rect width="600" height="280" rx="12" fill="url(#labelBg)" stroke="#334155" stroke-width="2"/>
+
+  <!-- Left Color Coding Stripe (Metabolismo / GLP-1 Cyan) -->
+  <rect x="0" y="0" width="14" height="280" rx="4" fill="url(#cyanStripe)" />
+
+  <!-- PSL Logo Small Header -->
+  <g transform="translate(35, 30)">
+    <text font-family="'Inter', sans-serif" font-size="20" font-weight="900" fill="#FFFFFF" letter-spacing="3">PSL <tspan fill="#94A3B8" font-weight="400">LABS</tspan></text>
+    <text y="16" font-family="'Inter', sans-serif" font-size="7.5" font-weight="700" fill="#38BDF8" letter-spacing="3.5">PREMIUM SYNTHESIS LINE</text>
+  </g>
+
+  <!-- Product Main Title -->
+  <g transform="translate(35, 105)">
+    <text font-family="'Inter', sans-serif" font-size="34" font-weight="800" fill="#FFFFFF" letter-spacing="1">RETATRUTIDE</text>
+    <text y="24" font-family="'Inter', sans-serif" font-size="12" font-weight="600" fill="#94A3B8" letter-spacing="1.5">LYOPHILIZED POWDER • PURITY &gt; 99.4% (HPLC)</text>
+  </g>
+
+  <!-- Dosage Badge High Contrast -->
+  <g transform="translate(35, 160)">
+    <rect width="110" height="42" rx="8" fill="#00F0FF" />
+    <text x="55" y="28" font-family="'Inter', sans-serif" font-size="22" font-weight="900" fill="#020617" text-anchor="middle">10 mg</text>
+  </g>
+
+  <!-- Technical Spec & Usage Notes -->
+  <g transform="translate(160, 166)">
+    <text font-family="'Inter', sans-serif" font-size="11" font-weight="500" fill="#CBD5E1">Reconstitute with Bacteriostatic Water</text>
+    <text y="18" font-family="'Inter', sans-serif" font-size="10" font-weight="400" fill="#64748B">Store at 2°C - 8°C (36°F - 46°F) after reconstitution</text>
+    <text y="34" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#38BDF8">PROTECT FROM LIGHT • FOR RESEARCH &amp; WELLNESS</text>
+  </g>
+
+  <!-- Right Section: Digital Verification & QR Code -->
+  <g transform="translate(465, 35)">
+    <!-- QR Box Mockup -->
+    <rect width="95" height="95" rx="8" fill="#FFFFFF" />
+    <!-- QR Finder patterns -->
+    <rect x="10" y="10" width="24" height="24" fill="#000000" />
+    <rect x="14" y="14" width="16" height="16" fill="#FFFFFF" />
+    <rect x="18" y="18" width="8" height="8" fill="#000000" />
+    <rect x="61" y="10" width="24" height="24" fill="#000000" />
+    <rect x="65" y="14" width="16" height="16" fill="#FFFFFF" />
+    <rect x="69" y="18" width="8" height="8" fill="#000000" />
+    <rect x="10" y="61" width="24" height="24" fill="#000000" />
+    <rect x="14" y="65" width="16" height="16" fill="#FFFFFF" />
+    <rect x="18" y="69" width="8" height="8" fill="#000000" />
+    <circle cx="47" cy="47" r="8" fill="#00E5FF" />
+
+    <text x="47" y="112" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#94A3B8" text-anchor="middle" letter-spacing="1">ESCANEAR PARA</text>
+    <text x="47" y="124" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#00E5FF" text-anchor="middle" letter-spacing="1">GUIA &amp; LAUDO HPLC</text>
+  </g>
+
+  <!-- Bottom Tracking Strip -->
+  <g transform="translate(35, 248)">
+    <line x1="0" y1="0" x2="525" y2="0" stroke="#1E293B" stroke-width="1.5" />
+    <text y="18" font-family="'Inter', monospace" font-size="10" fill="#64748B">LOT: PSL-2026-RT10</text>
+    <text x="180" y="18" font-family="'Inter', monospace" font-size="10" fill="#64748B">MFG: 10/2026</text>
+    <text x="320" y="18" font-family="'Inter', monospace" font-size="10" fill="#64748B">EXP: 10/2028</text>
+    <text x="480" y="18" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#10B981">HPLC &gt;99%</text>
+  </g>
+</svg>
