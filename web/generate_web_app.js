@@ -1267,7 +1267,7 @@ const htmlContent = `<!DOCTYPE html>
   <!-- Top Announcement Bar -->
   <div class="flash-banner">
     <span class="flash-pill">⚡ Flash SP</span>
-    <span>Entrega em até <strong>2h na Grande SP</strong> via Uber Moto • Sedex Brasil</span>
+    <span>Entrega em até <strong>2h na Grande SP</strong> via Uber Moto • Sedex Brasil <span style="opacity: 0.85; font-size: 10.5px; font-weight: 500;">(envio imediato sujeito à disponibilidade do estoque)</span></span>
   </div>
 
   <!-- Header -->
@@ -1528,7 +1528,7 @@ const htmlContent = `<!DOCTYPE html>
           <input type="radio" name="shipping" checked>
           <div>
             <div class="shipping-title">⚡ Uber Moto / Flash — São Paulo (Até 2h)</div>
-            <div class="shipping-desc">Capital e Grande SP (Mesmo dia)</div>
+            <div class="shipping-desc">Capital e Grande SP • <em>Envio imediato sujeito à disponibilidade do estoque</em></div>
           </div>
         </div>
 
@@ -1926,10 +1926,10 @@ const htmlContent = `<!DOCTYPE html>
 
       msg += "-----------------------------------------\\n";
       msg += "*TOTAL DO PEDIDO:* R$ " + total.toFixed(2).replace('.', ',') + "\\n\\n";
-      msg += "*FORMA DE ENTREGA:* " + (currentShipping === 'uber' ? "⚡ Uber Moto / Flash (São Paulo - até 2h)" : "📦 Correios Sedex (Todo Brasil)") + "\\n";
+      msg += "*FORMA DE ENTREGA:* " + (currentShipping === 'uber' ? "⚡ Uber Moto / Flash (São Paulo - até 2h - sujeito à disponibilidade de estoque)" : "📦 Correios Sedex (Todo Brasil)") + "\\n";
       msg += "*NOME:* " + clientName + "\\n";
       msg += "*ENDEREÇO / CIDADE:* " + clientAddress + "\\n\\n";
-      msg += "Gostaria de confirmar a disponibilidade e a chave Pix para pagamento!";
+      msg += "Gostaria de confirmar a disponibilidade de estoque para envio imediato e a chave Pix para pagamento!";
 
       const encoded = encodeURI(msg);
       window.open("https://wa.me/" + sellerWhatsapp + "?text=" + encoded, "_blank");
