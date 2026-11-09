@@ -25,10 +25,94 @@ function getCategoryLine(cat) {
   return "Imunidade & Vitalidade";
 }
 
-// Enhance product data with clean categories and default doses
+// Priority ranking for most searched / most used peptides
+function getPriorityRank(name, code, spec) {
+  const n = name.toUpperCase();
+  const c = code.toUpperCase();
+
+  // Tier 1: GLP-1 / Triplo Agonistas / Emagrecimento Top
+  if (n.includes("RETATRUTIDE") || c.startsWith("RT")) {
+    if (spec.includes("10mg")) return 1;
+    if (spec.includes("5mg")) return 2;
+    if (spec.includes("15mg")) return 3;
+    return 10;
+  }
+  if (n.includes("TIRZEPATIDE") || c.startsWith("TR")) {
+    if (spec.includes("10mg")) return 4;
+    if (spec.includes("5mg")) return 5;
+    if (spec.includes("15mg")) return 6;
+    if (spec.includes("20mg")) return 7;
+    return 15;
+  }
+  if (n.includes("SEMAGLUTIDE") || (c.startsWith("SM") && !c.startsWith("SMO"))) {
+    if (spec.includes("10mg")) return 8;
+    if (spec.includes("20mg")) return 9;
+    return 20;
+  }
+
+  // Tier 2: Regeneração & Tecidos (BPC-157 e TB-500)
+  if (n.includes("BPC") && n.includes("TB")) return 11; // Combo BPC+TB
+  if (n.includes("BPC 157") || n.includes("BPC-157") || c.startsWith("BC")) {
+    if (spec.includes("10mg")) return 12;
+    if (spec.includes("5mg")) return 13;
+    return 25;
+  }
+  if (n.includes("TB500") || n.includes("TB-500") || c.startsWith("BT")) {
+    if (spec.includes("10mg")) return 14;
+    return 26;
+  }
+
+  // Tier 3: Longevidade, Mitocôndria & Rejuvenescimento
+  if (n.includes("NAD+") || c.startsWith("NJ")) {
+    if (spec.includes("500mg")) return 16;
+    if (spec.includes("100mg")) return 17;
+    return 30;
+  }
+  if (n.includes("GHK-CU") || n.includes("GHK") || c.startsWith("CU")) {
+    if (spec.includes("100mg")) return 18;
+    return 32;
+  }
+  if (n.includes("EPITHALON") || c.startsWith("ET")) return 21;
+
+  // Tier 4: GH & Massa Magra
+  if (n.includes("CJC") && n.includes("IPA")) return 22; // Combo CJC+Ipamorelin
+  if (n.includes("TESAMORELIN") && n.includes("IPA")) return 23;
+  if (n.includes("IPAMORELIN") || c.startsWith("IP")) return 28;
+  if (n.includes("CJC1295") || c.startsWith("CD") || c.startsWith("CND")) return 35;
+  if (n.includes("TESAMORELIN") || c.startsWith("TSM")) return 36;
+  if (n.includes("SERMORELIN") || c.startsWith("SMO")) return 38;
+
+  // Tier 5: Cérebro & Nootrópicos
+  if (n.includes("SEMAX") && n.includes("SELANK")) return 24;
+  if (n.includes("SEMAX") || c.startsWith("SX")) return 29;
+  if (n.includes("SELANK") || c.startsWith("SK")) return 31;
+  if (n.includes("ADAMAX")) return 40;
+  if (n.includes("DSIP")) return 42;
+
+  // Tier 6: Foco Metabólico Avançado & Estética
+  if (n.includes("5-AMINO-1MQ") || c.includes("AM")) return 27;
+  if (n.includes("CAGRILINTIDE") || c.startsWith("CGL")) return 33;
+  if (n.includes("AOD9604") || c.startsWith("AD")) return 34;
+  if (n.includes("MOTS-C") || c.startsWith("MS")) return 37;
+  if (n.includes("PT141") || n.includes("PT-141") || c.startsWith("P41")) return 39;
+  if (n.includes("MELANOTAN")) return 45;
+  if (n.includes("GLOW") || n.includes("KLOW")) return 46;
+
+  // Tier 7: Imunidade & Outros
+  if (n.includes("THYMOSIN ALPHA") || c.startsWith("TA")) return 41;
+  if (n.includes("GLUTATHIONE") || c.startsWith("GTT")) return 43;
+  if (n.includes("SS-31") || c.startsWith("2S")) return 44;
+  if (n.includes("FOXO4")) return 50;
+  if (n.includes("KPV")) return 52;
+  if (n.includes("LEMON BOTTLE")) return 55;
+  if (n.includes("L-CARNITINE")) return 58;
+
+  return 100;
+}
+
+// Enhance product data with clean categories, default doses and popularity ranking
 const enhancedProducts = products.map(p => {
   const line = getCategoryLine(p.category);
-  // Extract number and unit
   const match = p.spec.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml)/i);
   let doseNum = 10;
   let doseUnit = "mg";
@@ -36,12 +120,25 @@ const enhancedProducts = products.map(p => {
     doseNum = parseFloat(match[1]);
     doseUnit = match[2].toLowerCase();
   }
+  const rank = getPriorityRank(p.name, p.code, p.spec);
+  const isTopSeller = rank <= 24;
+
   return {
     ...p,
     line: line,
     doseNum: doseNum,
-    doseUnit: doseUnit
+    doseUnit: doseUnit,
+    rank: rank,
+    isTopSeller: isTopSeller
   };
+});
+
+// Sort by popularity rank ascending (1 comes first)
+enhancedProducts.sort((a, b) => a.rank - b.rank);
+
+console.log("Top 10 most popular products:");
+enhancedProducts.slice(0, 10).forEach((p, idx) => {
+  console.log(`${idx + 1}. [${p.code}] ${p.name} (${p.spec}) - Rank: ${p.rank}`);
 });
 
 const htmlContent = `<!DOCTYPE html>
@@ -49,7 +146,7 @@ const htmlContent = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSL Labs — Premium Synthesis Line | Catálogo & Calculadora</title>
+  <title>PSL Labs — Premium Synthesis Line | Peptídeos de Alta Pureza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -354,6 +451,32 @@ const htmlContent = `<!DOCTYPE html>
       border-color: var(--primary);
     }
 
+    /* Section Subtitle */
+    .section-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+
+    .section-title-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .sort-indicator {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      background: var(--primary-light);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
     /* Products Grid */
     .products-grid {
       display: grid;
@@ -380,6 +503,11 @@ const htmlContent = `<!DOCTYPE html>
       border-color: var(--primary-border);
     }
 
+    .product-card.top-featured {
+      border-color: #A7F3D0;
+      background: linear-gradient(180deg, #FFFFFF 0%, #FAFCFB 100%);
+    }
+
     .card-top {
       margin-bottom: 14px;
     }
@@ -389,6 +517,8 @@ const htmlContent = `<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .line-tag {
@@ -401,12 +531,24 @@ const htmlContent = `<!DOCTYPE html>
       letter-spacing: 0.3px;
     }
 
-    .purity-badge {
+    .badge-top {
       font-size: 10.5px;
+      font-weight: 800;
+      color: #9A3412;
+      background: #FFEDD5;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .purity-badge {
+      font-size: 10px;
       font-weight: 700;
       color: #065F46;
       background: #D1FAE5;
-      padding: 3px 8px;
+      padding: 3px 7px;
       border-radius: 6px;
     }
 
@@ -422,15 +564,15 @@ const htmlContent = `<!DOCTYPE html>
       font-size: 12.5px;
       color: var(--gray-600);
       font-weight: 500;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .product-desc {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--gray-600);
       line-height: 1.45;
       margin-bottom: 16px;
-      min-height: 38px;
+      min-height: 36px;
     }
 
     .card-pricing {
@@ -926,7 +1068,6 @@ const htmlContent = `<!DOCTYPE html>
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     }
 
-    /* Config Modal (WhatsApp number) */
     .cfg-modal-btn {
       font-size: 11px;
       color: var(--gray-400);
@@ -1002,7 +1143,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="search-row">
           <div class="search-input-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" class="search-input" placeholder="Buscar por peptídeo ou dose (ex: BPC-157, Retatrutide, 10mg, NAD+)..." oninput="filterProducts()">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar por peptídeo ou dose (ex: Retatrutide, Tirzepatide, BPC-157, NAD+)..." oninput="filterProducts()">
           </div>
         </div>
         <div class="category-chips" id="category-chips">
@@ -1015,6 +1156,12 @@ const htmlContent = `<!DOCTYPE html>
           <button class="chip-btn" onclick="setCategory('Massa Magra & GH')">💪 Massa Magra & GH</button>
           <button class="chip-btn" onclick="setCategory('Imunidade & Vitalidade')">🛡️ Imunidade & Vitalidade</button>
         </div>
+      </div>
+
+      <!-- Section Title & Meta -->
+      <div class="section-meta-row">
+        <div class="section-title-tag" id="section-meta-text">Exibindo Peptídeos Mais Procurados e Populares</div>
+        <div class="sort-indicator">⭐ Ordenado por Relevância & Procura</div>
       </div>
 
       <!-- Products Grid -->
@@ -1035,12 +1182,14 @@ const htmlContent = `<!DOCTYPE html>
             <div class="input-group">
               <label class="input-label">1. Selecione o Peptídeo ou Concentração do Frasco</label>
               <select id="calc-peptide-select" class="select-box" onchange="onPeptideSelectChange()">
-                <option value="10">Retatrutide / Tirzepatide (10 mg)</option>
-                <option value="5">BPC-157 / Semax (5 mg)</option>
-                <option value="10" selected>BPC-157 / TB-500 (10 mg)</option>
-                <option value="20">BPC-157 / TB-500 Blend (20 mg)</option>
-                <option value="500">NAD+ (500 mg)</option>
+                <option value="10" selected>Retatrutide / Tirzepatide (10 mg) [Mais Procurado]</option>
+                <option value="5">Retatrutide / Tirzepatide (5 mg)</option>
+                <option value="10">BPC-157 / TB-500 (10 mg) [Mais Procurado]</option>
+                <option value="5">BPC-157 (5 mg)</option>
+                <option value="20">BPC-157 + TB-500 Blend (20 mg)</option>
+                <option value="500">NAD+ Longevidade (500 mg)</option>
                 <option value="100">GHK-Cu Blue Copper (100 mg)</option>
+                <option value="10">Semax / Selank (10 mg)</option>
                 <option value="custom">Outro valor manual...</option>
               </select>
             </div>
@@ -1100,18 +1249,13 @@ const htmlContent = `<!DOCTYPE html>
               <!-- Interactive Syringe SVG -->
               <div class="syringe-svg-wrap">
                 <svg id="syringe-svg" viewBox="0 0 320 80" width="100%" height="80">
-                  <!-- Syringe Barrel -->
                   <rect x="30" y="20" width="230" height="40" rx="4" fill="#FFFFFF" stroke="#334155" stroke-width="2"/>
-                  <!-- Fluid Level Fill -->
                   <rect id="syringe-fluid" x="30" y="22" width="46" height="36" fill="#10B981" opacity="0.75"/>
-                  <!-- Plunger Stem & Stopper -->
                   <rect id="syringe-plunger" x="76" y="16" width="6" height="48" fill="#145C46" rx="2"/>
                   <rect id="syringe-rod" x="78" y="36" width="140" height="8" fill="#94A3B8"/>
                   <rect id="syringe-thumb" x="218" y="22" width="12" height="36" rx="3" fill="#64748B"/>
-                  <!-- Needle Hub & Needle -->
                   <polygon points="30,28 16,36 16,44 30,52" fill="#94A3B8"/>
                   <line x1="16" y1="40" x2="0" y2="40" stroke="#64748B" stroke-width="2"/>
-                  <!-- Measurement Lines -->
                   <g stroke="#475569" stroke-width="1.5">
                     <line x1="30" y1="20" x2="30" y2="32"/>
                     <line x1="76" y1="20" x2="76" y2="30"/>
@@ -1120,7 +1264,6 @@ const htmlContent = `<!DOCTYPE html>
                     <line x1="214" y1="20" x2="214" y2="30"/>
                     <line x1="260" y1="20" x2="260" y2="32"/>
                   </g>
-                  <!-- Labels -->
                   <text x="30" y="14" font-size="9" font-weight="700" fill="#64748B" text-anchor="middle">0</text>
                   <text x="76" y="14" font-size="9" font-weight="700" fill="#145C46" text-anchor="middle">20</text>
                   <text x="145" y="14" font-size="9" font-weight="700" fill="#64748B" text-anchor="middle">50</text>
@@ -1228,10 +1371,10 @@ const htmlContent = `<!DOCTYPE html>
     const PSL_PRODUCTS = ${JSON.stringify(enhancedProducts)};
     
     // Application State
-    let currentTier = 'b2c'; // 'b2c' or 'b2b'
+    let currentTier = 'b2c';
     let currentCategory = 'TODOS';
     let currentShipping = 'uber';
-    let cart = {}; // { productCode: qty }
+    let cart = {};
     let sellerWhatsapp = localStorage.getItem('psl_seller_wa') || '5511999999999';
 
     function promptWhatsappNumber() {
@@ -1268,7 +1411,7 @@ const htmlContent = `<!DOCTYPE html>
       currentTier = tier;
       document.getElementById('tier-b2c').classList.toggle('active', tier === 'b2c');
       document.getElementById('tier-b2b').classList.toggle('active', tier === 'b2b');
-      renderProducts();
+      filterProducts();
       renderCart();
     }
 
@@ -1306,13 +1449,16 @@ const htmlContent = `<!DOCTYPE html>
         const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10):" : "Valor do Kit Pronto (1 Frasco):";
         const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ Água Bacteriostática Inclusa";
 
+        const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Mais Procurado</span>' : '';
+
         const card = document.createElement('div');
-        card.className = 'product-card';
+        card.className = 'product-card' + (item.isTopSeller ? ' top-featured' : '');
         card.innerHTML = \`
           <div class="card-top">
             <div class="card-badges">
               <span class="line-tag">\${item.line}</span>
-              <span class="purity-badge">Pureza &gt;99% HPLC</span>
+              \${topBadge}
+              <span class="purity-badge">&gt;99% HPLC</span>
             </div>
             <h3 class="product-title">\${item.name}</h3>
             <div class="product-spec">\${item.spec}</div>
@@ -1517,30 +1663,18 @@ const htmlContent = `<!DOCTYPE html>
       const doseUnit = document.getElementById('calc-dose-unit').value;
       const syringeMaxUi = parseFloat(document.getElementById('calc-syringe-type').value) || 100;
 
-      // Convert target dose to mg
       const targetDoseMg = doseUnit === 'mcg' ? targetDose / 1000 : targetDose;
-
-      // Concentration in mg/ml
       const concentrationMgPerMl = vialMg / waterMl;
-
-      // Required volume in ml
       const neededMl = targetDoseMg / concentrationMgPerMl;
-
-      // Units in U-100 syringe (100 units = 1.0 ml)
-      // For U-50, 50 units = 0.5 ml (still 100 units/ml)
       const units = neededMl * 100;
-
-      // Yield
       const totalDoses = Math.floor(vialMg / targetDoseMg);
 
-      // Display
       const roundedUnits = Math.round(units * 10) / 10;
       document.getElementById('res-units').textContent = roundedUnits + " UI";
       document.getElementById('res-units-desc').textContent = roundedUnits + " Unidades na seringa de insulina";
       document.getElementById('res-yield').innerHTML = "Rendimento do Frasco: <strong>" + totalDoses + " aplicações</strong>";
       document.getElementById('res-concentration').textContent = "Concentração: " + concentrationMgPerMl.toFixed(2) + " mg/ml (" + (concentrationMgPerMl * 10).toFixed(0) + " mcg a cada 10 UI)";
 
-      // Update Syringe SVG visualization
       updateSyringeSvg(roundedUnits, syringeMaxUi);
     }
 
@@ -1550,7 +1684,6 @@ const htmlContent = `<!DOCTYPE html>
       const rod = document.getElementById('syringe-rod');
       const thumb = document.getElementById('syringe-thumb');
 
-      // Clamped ratio between 0 and 1
       const ratio = Math.min(Math.max(units / maxUnits, 0), 1);
       const barrelWidth = 230;
       const filledWidth = Math.max(ratio * barrelWidth, 4);
@@ -1570,4 +1703,5 @@ const htmlContent = `<!DOCTYPE html>
 `;
 
 fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/web/index.html", htmlContent, "utf8");
-console.log("Web Application generated successfully with 117 products and interactive calculator.");
+fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/index.html", htmlContent, "utf8");
+console.log("Updated both web/index.html and root index.html with priority sorted products.");
