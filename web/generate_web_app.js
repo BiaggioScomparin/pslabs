@@ -1481,6 +1481,14 @@ const htmlContent = `<!DOCTYPE html>
       </div>
     </div>
 
+    <footer style="text-align: center; margin-top: 50px; padding: 20px 0; border-top: 1px solid var(--gray-200);">
+      <div style="font-size: 11.5px; color: var(--gray-400); margin-bottom: 6px;">
+        © 2026 PSL Labs — Premium Synthesis Line • Padrão Farmacêutico
+      </div>
+      <a href="/admin" style="font-size: 11px; color: var(--gray-400); text-decoration: none; opacity: 0.8;">
+        🔒 Painel Administrativo Operacional
+      </a>
+    </footer>
   </div>
 
   <!-- Mobile Bottom App Bar -->
@@ -1572,6 +1580,27 @@ const htmlContent = `<!DOCTYPE html>
     let selectedDoses = {}; // { compoundId: doseIndex }
     let cart = {}; // { productCode: qty }
     let sellerWhatsapp = localStorage.getItem('psl_seller_wa') || '5511999999999';
+
+    // Synchronize Custom Prices and Stock from Admin Panel
+    const customPrices = JSON.parse(localStorage.getItem('psl_custom_prices') || '{}');
+    const stockData = JSON.parse(localStorage.getItem('psl_stock_data') || '{}');
+
+    PSL_COMPOUNDS.forEach(comp => {
+      if (stockData[comp.id]) {
+        comp.stockStatus = stockData[comp.id].status;
+        comp.stockQty = stockData[comp.id].qty;
+      } else {
+        comp.stockStatus = 'in_stock';
+      }
+      comp.doses.forEach(dose => {
+        if (customPrices[dose.code + '_b2c']) {
+          dose.suggestedPriceB2C = customPrices[dose.code + '_b2c'];
+        }
+        if (customPrices[dose.code + '_b2b']) {
+          dose.b2bBoxPrice = customPrices[dose.code + '_b2b'];
+        }
+      });
+    });
 
     // Initialize default doses
     PSL_COMPOUNDS.forEach(c => {
@@ -1694,6 +1723,9 @@ const htmlContent = `<!DOCTYPE html>
         const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ 1 Frasco + Água Bacteriostática";
 
         const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Top</span>' : '';
+        const isOutOfStock = item.stockStatus === 'out_of_stock';
+        const isPreOrder = item.stockStatus === 'pre_order';
+        const stockBadge = isOutOfStock ? '<span class="badge" style="background:#FEE2E2;color:#991B1B;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;">🔴 Esgotado</span>' : (isPreOrder ? '<span class="badge" style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;">🟡 Sob Encomenda (3-5d)</span>' : '');
 
         let doseSelectorHtml = '';
         if (item.doses.length > 1) {
@@ -1747,6 +1779,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="card-badges">
               <span class="line-tag">\${item.line}</span>
               \${topBadge}
+              \${stockBadge}
               <span class="purity-badge">&gt;99% HPLC</span>
             </div>
             <h3 class="product-title">\${item.name}</h3>
@@ -1762,9 +1795,15 @@ const htmlContent = `<!DOCTYPE html>
             </div>
 
             <div class="card-actions">
-              <button class="btn-add" onclick="addCurrentCompoundToCart('\${item.id}')">
-                <span>Adicionar</span> +
-              </button>
+              \${isOutOfStock ? \`
+                <button class="btn-add" style="background:#94A3B8;cursor:not-allowed;" disabled>
+                  <span>Esgotado</span>
+                </button>
+              \` : \`
+                <button class="btn-add" onclick="addCurrentCompoundToCart('\${item.id}')">
+                  <span>\${isPreOrder ? 'Encomendar' : 'Adicionar'}</span> +
+                </button>
+              \`}
               <button class="btn-calc-shortcut" title="Calcular Diluição na Seringa" onclick="openCalcForCompound('\${item.id}')">
                 💉 Dose
               </button>
