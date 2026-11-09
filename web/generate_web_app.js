@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const products = require('../catalog/psl_products.json');
+const rawProducts = require('../catalog/psl_products.json');
 
 // Map products to clean objective lines
 function getCategoryLine(cat) {
@@ -25,121 +25,179 @@ function getCategoryLine(cat) {
   return "Imunidade & Vitalidade";
 }
 
-// Priority ranking for most searched / most used peptides
-function getPriorityRank(name, code, spec) {
-  const n = name.toUpperCase();
-  const c = code.toUpperCase();
+// Function to normalize parent compound name
+function getParentCompound(item) {
+  const n = item.name.trim();
 
-  // Tier 1: GLP-1 / Triplo Agonistas / Emagrecimento Top
-  if (n.includes("RETATRUTIDE") || c.startsWith("RT")) {
-    if (spec.includes("10mg")) return 1;
-    if (spec.includes("5mg")) return 2;
-    if (spec.includes("15mg")) return 3;
-    return 10;
-  }
-  if (n.includes("TIRZEPATIDE") || c.startsWith("TR")) {
-    if (spec.includes("10mg")) return 4;
-    if (spec.includes("5mg")) return 5;
-    if (spec.includes("15mg")) return 6;
-    if (spec.includes("20mg")) return 7;
-    return 15;
-  }
-  if (n.includes("SEMAGLUTIDE") || (c.startsWith("SM") && !c.startsWith("SMO"))) {
-    if (spec.includes("10mg")) return 8;
-    if (spec.includes("20mg")) return 9;
-    return 20;
-  }
+  // Combos
+  if (n.startsWith("BPC") && n.includes("TB")) return { id: "bpc-tb", name: "Blend BPC-157 + TB-500", desc: "Super combo de regeneração tecidual acelerada para articulações e músculos." };
+  if (n.includes("Retatrutide") && n.includes("Tirzepatide")) return { id: "reta-tirz", name: "Blend Retatrutide + Tirzepatide", desc: "Sinergia metabólica máxima de controle glicêmico e lipólise profunda." };
+  if (n.includes("Semax") && n.includes("Selank")) return { id: "semax-selank", name: "Blend Semax + Selank", desc: "Sinergia de foco cirúrgico e redução de cortisol sem sedação." };
+  if (n.includes("CJC1295+Ipamorelin") || (n.includes("CJC") && n.includes("Ipamorelin"))) return { id: "cjc-ipa", name: "Blend CJC-1295 + Ipamorelin", desc: "Estimulação sinérgica de GH e IGF-1 para ganho de massa magra e recuperação." };
+  if (n.includes("Tesamorelin") && n.includes("Ipamorelin")) return { id: "tesa-ipa", name: "Blend Tesamorelin + Ipamorelin", desc: "Foco em redução potente de gordura visceral profunda e estímulo de GH." };
 
-  // Tier 2: Regeneração & Tecidos (BPC-157 e TB-500)
-  if (n.includes("BPC") && n.includes("TB")) return 11; // Combo BPC+TB
-  if (n.includes("BPC 157") || n.includes("BPC-157") || c.startsWith("BC")) {
-    if (spec.includes("10mg")) return 12;
-    if (spec.includes("5mg")) return 13;
-    return 25;
-  }
-  if (n.includes("TB500") || n.includes("TB-500") || c.startsWith("BT")) {
-    if (spec.includes("10mg")) return 14;
-    return 26;
-  }
+  // Single Peptides
+  if (n.includes("Retatrutide")) return { id: "retatrutide", name: "Retatrutide", desc: "Triplo agonista (GLP-1, GIP, Glucagon) para máxima aceleração metabólica e saciedade." };
+  if (n.includes("Tirzepatide")) return { id: "tirzepatide", name: "Tirzepatide", desc: "Duplo agonista GLP-1 / GIP de alta eficácia na sensibilidade à insulina e queima de gordura." };
+  if (n.includes("Semaglutide")) return { id: "semaglutide", name: "Semaglutide", desc: "Agonista clássico de receptores GLP-1 com controle de apetite comprovado." };
+  if (n.includes("BPC 157") || n.includes("BPC-157")) return { id: "bpc157", name: "BPC-157", desc: "Peptídeo de cicatrização celular para ligamentos, tendões, articulações e mucosa gástrica." };
+  if (n.includes("TB500") || n.includes("TB-500")) return { id: "tb500", name: "TB-500 (Full Chain)", desc: "Regeneração tecidual sistêmica, angiogênese e redução de processos inflamatórios." };
+  if (n.includes("NAD+")) return { id: "nad", name: "NAD+", desc: "Combustível mitocondrial essencial para energia celular (ATP), reparo de DNA e sirtuínas." };
+  if (n.includes("GHK-Cu") || n.includes("GHK")) return { id: "ghk-cu", name: "GHK-Cu (Blue Copper)", desc: "Peptídeo de cobre para estímulo de colágeno, firmeza da pele e densidade capilar." };
+  if (n.includes("AHK-CU")) return { id: "ahk-cu", name: "AHK-Cu", desc: "Peptídeo formulado especificamente para fortalecimento e crescimento folicular capilar." };
+  if (n.includes("Epithalon")) return { id: "epithalon", name: "Epithalon", desc: "Bio-regulador da telomerase e pineal para reprogramação dos ritmos de longevidade." };
+  if (n.includes("Semax")) return { id: "semax", name: "Semax", desc: "Nootrópico avançado derivado de ACTH; potencializa BDNF, foco cognitivo e memória." };
+  if (n.includes("Selank")) return { id: "selank", name: "Selank", desc: "Ansiolítico peptídico que estabiliza o humor e reduz o estresse sem causar sonolência." };
+  if (n.includes("Adamax")) return { id: "adamax", name: "Adamax", desc: "Variante nootrópica avançada com biodisponibilidade aprimorada para alta performance mental." };
+  if (n.includes("DSIP")) return { id: "dsip", name: "DSIP", desc: "Peptídeo indutor do sono de ondas lentas delta, recuperação hormonal e neuromuscular." };
+  if (n.includes("5-AMINO-1MQ")) return { id: "5amino1mq", name: "5-AMINO-1MQ", desc: "Inibidor da enzima NNMT que reprograma o gasto energético e a queima lipídica celular." };
+  if (n.includes("MOTS-c")) return { id: "mots-c", name: "MOTS-c", desc: "Peptídeo codificado mitocondrialmente que imita os efeitos do exercício físico e melhora o endurance." };
+  if (n.includes("PT141") || n.includes("PT-141")) return { id: "pt141", name: "PT-141 (Bremelanotide)", desc: "Atuador central no SNC para estímulo direto da libido e vigor sexual masculino e feminino." };
+  if (n.includes("KPV")) return { id: "kpv", name: "KPV", desc: "Potente anti-inflamatório peptídico para proteção intestinal, microbioma e inflamação sistêmica." };
+  if (n.includes("VIP")) return { id: "vip", name: "VIP", desc: "Peptídeo intestinal vasoativo para imunomodulação, saúde pulmonar e regulação microvascular." };
+  if (n.includes("ARA290") || n.includes("ARA-290")) return { id: "ara290", name: "ARA-290", desc: "Alívio de dores neuropáticas e regeneração de pequenas fibras nervosas periféricas." };
+  if (n.includes("Cagrilintide")) return { id: "cagrilintide", name: "Cagrilintide", desc: "Análogo de amilina de longa ação para retardo do esvaziamento gástrico e saciedade extrema." };
+  if (n.includes("AOD9604") || n.includes("AOD")) return { id: "aod9604", name: "AOD-9604", desc: "Fragmento C-terminal do hGH que induz lipólise seletiva sem impactar a glicemia." };
+  if (n.includes("Tesamorelin")) return { id: "tesamorelin", name: "Tesamorelin", desc: "Análogo do GHRH com efeito comprovado na redução de gordura visceral e saúde cardiovascular." };
+  if (n.includes("Sermorelin")) return { id: "sermorelin", name: "Sermorelin", desc: "Secretagogo de GH clássico para restauração do bem-estar, tônus e anti-envelhecimento." };
+  if (n.includes("Ipamorelin")) return { id: "ipamorelin", name: "Ipamorelin", desc: "Agonista seletivo do receptor de grelina para liberação limpa de GH sem pico de prolactina/cortisol." };
+  if (n.includes("CJC1295 with DAC")) return { id: "cjc-dac", name: "CJC-1295 (com DAC)", desc: "Análogo de GHRH com meia-vida prolongada para liberação estável contínua de GH." };
+  if (n.includes("CJC1295 no DAC")) return { id: "cjc-nodac", name: "CJC-1295 (sem DAC)", desc: "GHRH pulsátil ideal para protocolos noturnos em conjunto com Ipamorelin." };
+  if (n.includes("SS-31")) return { id: "ss31", name: "SS-31 (Elamipretide)", desc: "Peptídeo cardiolipina-alvo para reparação da membrana interna mitocondrial e energia." };
+  if (n.includes("FOXO4")) return { id: "foxo4", name: "FOXO4-DRI", desc: "Peptídeo senolítico de última geração que induz apoptose em células senescentes envelhecidas." };
+  if (n.includes("Snap")) return { id: "snap8", name: "Snap-8", desc: "Octapeptídeo cosmético anti-rugas com efeito de relaxamento da expressão muscular facial." };
+  if (n.includes("Oxytocin")) return { id: "oxytocin", name: "Oxytocin", desc: "Neuropeptídeo do bem-estar, conexão afetiva, relaxamento e redução dos níveis de estresse." };
+  if (n.includes("Melanotan")) return { id: "melanotan2", name: "Melanotan II", desc: "Estimulante da melanogênese para bronzeamento uniforme com leve ação na libido." };
+  if (n.includes("Kisspeptin")) return { id: "kisspeptin", name: "Kisspeptin-10", desc: "Regulador mestre do eixo hipotálamo-hipófise-gonadal para modulação natural de LH/FSH." };
+  if (n.includes("Thymalin")) return { id: "thymalin", name: "Thymalin", desc: "Bio-regulador peptídico do timo para reativação do sistema imunológico celular." };
+  if (n.includes("Thymosin")) return { id: "thymosin-a1", name: "Thymosin Alpha 1", desc: "Modulador imunitário padrão-ouro para imunossupressão, defesa antiviral e longevidade celular." };
+  if (n.includes("Glutathione")) return { id: "glutathione", name: "Glutathione", desc: "Antioxidante mestre do organismo para desintoxicação hepática e eliminação de radicais livres." };
+  if (n.includes("IGF-1")) return { id: "igf1", name: "IGF-1 LR3", desc: "Fator de crescimento tipo insulina potente para retenção de nitrogênio e síntese proteica muscular." };
+  if (n.includes("L-carnitine")) return { id: "lcarnitine", name: "L-Carnitina Injetável", desc: "Auxilia no transporte de ácidos graxos para a mitocôndria para oxidação e geração de energia." };
+  if (n.includes("Lemon Bottle")) return { id: "lemonbottle", name: "Lemon Bottle", desc: "Solução lipolítica de alta concentração para gordura localizada e contorno corporal." };
+  if (n.includes("Lipo-c")) return { id: "lipoc", name: "Lipo-C", desc: "Formula lipotrópica para otimização da queima de gordura e suporte à saúde do fígado." };
+  if (n.includes("MIC")) return { id: "mic", name: "MIC (Lipo C com B12)", desc: "Combinação lipotrópica de Metionina, Inositol e Colina enriquecida com Vitamina B12." };
+  if (n.includes("vitamin B12")) return { id: "b12", name: "Vitamina B12", desc: "Cofator vital para produção de glóbulos vermelhos, energia metabólica e sistema nervoso." };
+  if (n.includes("GLOW") || n.includes("Klow")) return { id: "glow", name: "Kit Glow & Klow", desc: "Blend de rejuvenescimento estético para síntese de colágeno, viço e hidratação cutânea." };
 
-  // Tier 3: Longevidade, Mitocôndria & Rejuvenescimento
-  if (n.includes("NAD+") || c.startsWith("NJ")) {
-    if (spec.includes("500mg")) return 16;
-    if (spec.includes("100mg")) return 17;
-    return 30;
-  }
-  if (n.includes("GHK-CU") || n.includes("GHK") || c.startsWith("CU")) {
-    if (spec.includes("100mg")) return 18;
-    return 32;
-  }
-  if (n.includes("EPITHALON") || c.startsWith("ET")) return 21;
-
-  // Tier 4: GH & Massa Magra
-  if (n.includes("CJC") && n.includes("IPA")) return 22; // Combo CJC+Ipamorelin
-  if (n.includes("TESAMORELIN") && n.includes("IPA")) return 23;
-  if (n.includes("IPAMORELIN") || c.startsWith("IP")) return 28;
-  if (n.includes("CJC1295") || c.startsWith("CD") || c.startsWith("CND")) return 35;
-  if (n.includes("TESAMORELIN") || c.startsWith("TSM")) return 36;
-  if (n.includes("SERMORELIN") || c.startsWith("SMO")) return 38;
-
-  // Tier 5: Cérebro & Nootrópicos
-  if (n.includes("SEMAX") && n.includes("SELANK")) return 24;
-  if (n.includes("SEMAX") || c.startsWith("SX")) return 29;
-  if (n.includes("SELANK") || c.startsWith("SK")) return 31;
-  if (n.includes("ADAMAX")) return 40;
-  if (n.includes("DSIP")) return 42;
-
-  // Tier 6: Foco Metabólico Avançado & Estética
-  if (n.includes("5-AMINO-1MQ") || c.includes("AM")) return 27;
-  if (n.includes("CAGRILINTIDE") || c.startsWith("CGL")) return 33;
-  if (n.includes("AOD9604") || c.startsWith("AD")) return 34;
-  if (n.includes("MOTS-C") || c.startsWith("MS")) return 37;
-  if (n.includes("PT141") || n.includes("PT-141") || c.startsWith("P41")) return 39;
-  if (n.includes("MELANOTAN")) return 45;
-  if (n.includes("GLOW") || n.includes("KLOW")) return 46;
-
-  // Tier 7: Imunidade & Outros
-  if (n.includes("THYMOSIN ALPHA") || c.startsWith("TA")) return 41;
-  if (n.includes("GLUTATHIONE") || c.startsWith("GTT")) return 43;
-  if (n.includes("SS-31") || c.startsWith("2S")) return 44;
-  if (n.includes("FOXO4")) return 50;
-  if (n.includes("KPV")) return 52;
-  if (n.includes("LEMON BOTTLE")) return 55;
-  if (n.includes("L-CARNITINE")) return 58;
-
-  return 100;
+  return { id: n.toLowerCase().replace(/[^a-z0-9]+/g, '-'), name: n, desc: item.category };
 }
 
-// Enhance product data with clean categories, default doses and popularity ranking
-const enhancedProducts = products.map(p => {
-  const line = getCategoryLine(p.category);
-  const match = p.spec.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml)/i);
+// Popularity rankings for compounds
+function getCompoundRank(id) {
+  const ranking = {
+    "retatrutide": 1,
+    "tirzepatide": 2,
+    "semaglutide": 3,
+    "bpc-tb": 4,
+    "bpc157": 5,
+    "tb500": 6,
+    "nad": 7,
+    "ghk-cu": 8,
+    "cjc-ipa": 9,
+    "epithalon": 10,
+    "semax-selank": 11,
+    "semax": 12,
+    "selank": 13,
+    "5amino1mq": 14,
+    "pt141": 15,
+    "mots-c": 16,
+    "tesa-ipa": 17,
+    "tesamorelin": 18,
+    "ipamorelin": 19,
+    "cjc-dac": 20,
+    "cjc-nodac": 21,
+    "cagrilintide": 22,
+    "aod9604": 23,
+    "ahk-cu": 24,
+    "thymosin-a1": 25,
+    "glutathione": 26,
+    "adamax": 27,
+    "dsip": 28,
+    "kpv": 29,
+    "ss31": 30,
+    "foxo4": 31,
+    "melanotan2": 32,
+    "kisspeptin": 33,
+    "sermorelin": 34,
+    "vip": 35,
+    "ara290": 36,
+    "snap8": 37,
+    "oxytocin": 38,
+    "thymalin": 39,
+    "igf1": 40,
+    "reta-tirz": 41,
+    "lcarnitine": 42,
+    "lemonbottle": 43,
+    "lipoc": 44,
+    "mic": 45,
+    "b12": 46,
+    "glow": 47
+  };
+  return ranking[id] || 99;
+}
+
+// Group products
+const compoundMap = new Map();
+
+rawProducts.forEach(item => {
+  const meta = getParentCompound(item);
+  if (!compoundMap.has(meta.id)) {
+    compoundMap.set(meta.id, {
+      id: meta.id,
+      name: meta.name,
+      desc: meta.desc,
+      line: getCategoryLine(item.category),
+      rank: getCompoundRank(meta.id),
+      isTopSeller: getCompoundRank(meta.id) <= 10,
+      doses: []
+    });
+  }
+
+  // Parse dose label from spec
+  const match = item.spec.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml)/i);
+  let doseLabel = item.spec.split(' ')[0];
   let doseNum = 10;
   let doseUnit = "mg";
   if (match) {
     doseNum = parseFloat(match[1]);
     doseUnit = match[2].toLowerCase();
+    doseLabel = `${doseNum}${doseUnit}`;
   }
-  const rank = getPriorityRank(p.name, p.code, p.spec);
-  const isTopSeller = rank <= 24;
 
-  return {
-    ...p,
-    line: line,
+  compoundMap.get(meta.id).doses.push({
+    code: item.code,
+    label: doseLabel,
+    spec: item.spec,
     doseNum: doseNum,
     doseUnit: doseUnit,
-    rank: rank,
-    isTopSeller: isTopSeller
-  };
+    powderCostPerVial: item.powderCostPerVial,
+    totalCostB2C: item.totalCostB2C,
+    suggestedPriceB2C: item.suggestedPriceB2C,
+    b2bBoxPrice: item.b2bBoxPrice,
+    profitUnitB2C: item.profitUnitB2C,
+    marginPercent: item.marginPercent
+  });
 });
 
-// Sort by popularity rank ascending (1 comes first)
-enhancedProducts.sort((a, b) => a.rank - b.rank);
+const compoundList = Array.from(compoundMap.values());
 
-console.log("Top 10 most popular products:");
-enhancedProducts.slice(0, 10).forEach((p, idx) => {
-  console.log(`${idx + 1}. [${p.code}] ${p.name} (${p.spec}) - Rank: ${p.rank}`);
+// Sort doses in each compound by number
+compoundList.forEach(c => {
+  c.doses.sort((a, b) => a.doseNum - b.doseNum);
+  // Default to 10mg if available, or first
+  let defaultIdx = c.doses.findIndex(d => d.doseNum === 10);
+  if (defaultIdx === -1 && c.id === 'nad') defaultIdx = c.doses.findIndex(d => d.doseNum === 500);
+  if (defaultIdx === -1 && c.id === 'ghk-cu') defaultIdx = c.doses.findIndex(d => d.doseNum === 100);
+  if (defaultIdx === -1) defaultIdx = 0;
+  c.defaultDoseIndex = defaultIdx;
 });
+
+// Sort compounds by popularity rank
+compoundList.sort((a, b) => a.rank - b.rank);
+
+console.log(`Total compounds: ${compoundList.length}`);
+console.log("Top 5 compounds:", compoundList.slice(0, 5).map(c => `${c.name} (${c.doses.length} doses)`));
 
 const htmlContent = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -165,8 +223,7 @@ const htmlContent = `<!DOCTYPE html>
       --bg-page: #F8FAFC;
       --white: #FFFFFF;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 12px -2px rgba(20, 92, 70, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
-      --shadow-lg: 0 10px 25px -3px rgba(20, 92, 70, 0.12), 0 4px 10px -2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 14px -2px rgba(20, 92, 70, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 18px;
@@ -451,7 +508,7 @@ const htmlContent = `<!DOCTYPE html>
       border-color: var(--primary);
     }
 
-    /* Section Subtitle */
+    /* Section Meta */
     .section-meta-row {
       display: flex;
       justify-content: space-between;
@@ -480,15 +537,15 @@ const htmlContent = `<!DOCTYPE html>
     /* Products Grid */
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
     }
 
     .product-card {
       background: var(--white);
       border: 1px solid var(--gray-200);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 22px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
@@ -553,28 +610,88 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .product-title {
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 20px;
+      font-weight: 900;
       color: var(--dark);
-      line-height: 1.25;
+      line-height: 1.2;
       margin-bottom: 6px;
     }
 
-    .product-spec {
-      font-size: 12.5px;
-      color: var(--gray-600);
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-
     .product-desc {
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--gray-600);
       line-height: 1.45;
       margin-bottom: 16px;
-      min-height: 36px;
+      min-height: 38px;
     }
 
+    /* Dose Selector Section */
+    .dose-selector-box {
+      margin-bottom: 16px;
+      background: #F8FAFC;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+    }
+
+    .dose-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .dose-pills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .dose-pill {
+      padding: 5px 11px;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--dark);
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .dose-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .dose-pill.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(20, 92, 70, 0.2);
+    }
+
+    .dose-select-dropdown {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark);
+      outline: none;
+      background: var(--white);
+    }
+
+    .dose-select-dropdown:focus {
+      border-color: var(--primary);
+    }
+
+    /* Card Pricing Box */
     .card-pricing {
       background: var(--gray-100);
       padding: 12px 14px;
@@ -611,12 +728,12 @@ const htmlContent = `<!DOCTYPE html>
 
     .btn-add {
       flex: 1;
-      padding: 11px;
+      padding: 12px;
       border: none;
       background: var(--primary);
       color: var(--white);
       border-radius: var(--radius-md);
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.15s ease;
@@ -631,7 +748,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-calc-shortcut {
-      padding: 11px 14px;
+      padding: 12px 14px;
       border: 1.5px solid var(--primary-border);
       background: var(--white);
       color: var(--primary);
@@ -1143,11 +1260,11 @@ const htmlContent = `<!DOCTYPE html>
         <div class="search-row">
           <div class="search-input-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" class="search-input" placeholder="Buscar por peptídeo ou dose (ex: Retatrutide, Tirzepatide, BPC-157, NAD+)..." oninput="filterProducts()">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar por peptídeo ou dose (ex: Retatrutide, Tirzepatide, BPC-157, NAD+)..." oninput="filterCompounds()">
           </div>
         </div>
         <div class="category-chips" id="category-chips">
-          <button class="chip-btn active" onclick="setCategory('TODOS')">🔥 Todos (117)</button>
+          <button class="chip-btn active" onclick="setCategory('TODOS')">🔥 Todos os Peptídeos</button>
           <button class="chip-btn" onclick="setCategory('Metabolismo & Shape')">⚡ Metabolismo & Emagrecimento</button>
           <button class="chip-btn" onclick="setCategory('Regeneração & Articulações')">🩹 Regeneração & Articulações</button>
           <button class="chip-btn" onclick="setCategory('Longevidade & Biohacking')">🧬 Longevidade & Biohacking</button>
@@ -1160,8 +1277,8 @@ const htmlContent = `<!DOCTYPE html>
 
       <!-- Section Title & Meta -->
       <div class="section-meta-row">
-        <div class="section-title-tag" id="section-meta-text">Exibindo Peptídeos Mais Procurados e Populares</div>
-        <div class="sort-indicator">⭐ Ordenado por Relevância & Procura</div>
+        <div class="section-title-tag" id="section-meta-text">Catálogo Oficial PSL Labs — Selecione a Dosagem (MG)</div>
+        <div class="sort-indicator">⭐ Mais Procurados Primeiro</div>
       </div>
 
       <!-- Products Grid -->
@@ -1184,6 +1301,8 @@ const htmlContent = `<!DOCTYPE html>
               <select id="calc-peptide-select" class="select-box" onchange="onPeptideSelectChange()">
                 <option value="10" selected>Retatrutide / Tirzepatide (10 mg) [Mais Procurado]</option>
                 <option value="5">Retatrutide / Tirzepatide (5 mg)</option>
+                <option value="15">Retatrutide / Tirzepatide (15 mg)</option>
+                <option value="20">Tirzepatide / Retatrutide (20 mg)</option>
                 <option value="10">BPC-157 / TB-500 (10 mg) [Mais Procurado]</option>
                 <option value="5">BPC-157 (5 mg)</option>
                 <option value="20">BPC-157 + TB-500 Blend (20 mg)</option>
@@ -1368,14 +1487,20 @@ const htmlContent = `<!DOCTYPE html>
 
   <!-- Embedded Product Database -->
   <script>
-    const PSL_PRODUCTS = ${JSON.stringify(enhancedProducts)};
+    const PSL_COMPOUNDS = ${JSON.stringify(compoundList)};
     
     // Application State
     let currentTier = 'b2c';
     let currentCategory = 'TODOS';
     let currentShipping = 'uber';
-    let cart = {};
+    let selectedDoses = {}; // { compoundId: doseIndex }
+    let cart = {}; // { productCode: qty }
     let sellerWhatsapp = localStorage.getItem('psl_seller_wa') || '5511999999999';
+
+    // Initialize default doses
+    PSL_COMPOUNDS.forEach(c => {
+      selectedDoses[c.id] = c.defaultDoseIndex || 0;
+    });
 
     function promptWhatsappNumber() {
       const num = prompt("Digite o número do WhatsApp com DDD (apenas números, ex: 5511999999999):", sellerWhatsapp);
@@ -1411,7 +1536,7 @@ const htmlContent = `<!DOCTYPE html>
       currentTier = tier;
       document.getElementById('tier-b2c').classList.toggle('active', tier === 'b2c');
       document.getElementById('tier-b2b').classList.toggle('active', tier === 'b2b');
-      filterProducts();
+      filterCompounds();
       renderCart();
     }
 
@@ -1421,38 +1546,123 @@ const htmlContent = `<!DOCTYPE html>
       buttons.forEach(btn => {
         btn.classList.toggle('active', btn.textContent.includes(cat) || (cat === 'TODOS' && btn.textContent.includes('Todos')));
       });
-      filterProducts();
+      filterCompounds();
     }
 
-    function filterProducts() {
+    function filterCompounds() {
       const q = document.getElementById('search-input').value.toLowerCase().trim();
-      const filtered = PSL_PRODUCTS.filter(p => {
-        const matchesCategory = currentCategory === 'TODOS' || p.line === currentCategory;
-        const matchesSearch = !q || p.name.toLowerCase().includes(q) || p.spec.toLowerCase().includes(q) || p.code.toLowerCase().includes(q);
+      const filtered = PSL_COMPOUNDS.filter(c => {
+        const matchesCategory = currentCategory === 'TODOS' || c.line === currentCategory;
+        const matchesSearch = !q || c.name.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q) || c.doses.some(d => d.label.toLowerCase().includes(q) || d.code.toLowerCase().includes(q));
         return matchesCategory && matchesSearch;
       });
-      renderProducts(filtered);
+      renderCompounds(filtered);
     }
 
-    function renderProducts(list = PSL_PRODUCTS) {
+    function onSelectDose(compoundId, doseIdx) {
+      selectedDoses[compoundId] = parseInt(doseIdx);
+      updateCompoundCardUI(compoundId);
+    }
+
+    function updateCompoundCardUI(compoundId) {
+      const compound = PSL_COMPOUNDS.find(c => c.id === compoundId);
+      if (!compound) return;
+      const doseIdx = selectedDoses[compoundId] || 0;
+      const dose = compound.doses[doseIdx];
+
+      const card = document.getElementById('card-' + compoundId);
+      if (!card) return;
+
+      const isB2B = currentTier === 'b2b';
+      const price = isB2B ? dose.b2bBoxPrice : dose.suggestedPriceB2C;
+      const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10):" : "Valor do Kit Pronto (1 Frasco):";
+      const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ Água Bacteriostática Inclusa";
+
+      // Update price elements
+      const valEl = card.querySelector('.price-value');
+      const labelEl = card.querySelector('.price-label');
+      const subEl = card.querySelector('.price-sub');
+      if (valEl) valEl.textContent = "R$ " + price.toFixed(2).replace('.', ',');
+      if (labelEl) labelEl.textContent = priceLabel;
+      if (subEl) subEl.textContent = priceSub;
+
+      // Update active pill or dropdown
+      const pills = card.querySelectorAll('.dose-pill');
+      pills.forEach((p, idx) => {
+        p.classList.toggle('active', idx === doseIdx);
+      });
+      const dropdown = card.querySelector('.dose-select-dropdown');
+      if (dropdown) dropdown.value = doseIdx;
+    }
+
+    function renderCompounds(list = PSL_COMPOUNDS) {
       const grid = document.getElementById('products-grid');
       grid.innerHTML = '';
 
       if (list.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--gray-400);">Nenhum produto encontrado para sua busca.</div>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--gray-400);">Nenhum peptídeo encontrado para sua busca.</div>';
         return;
       }
 
       list.forEach(item => {
+        const doseIdx = selectedDoses[item.id] !== undefined ? selectedDoses[item.id] : (item.defaultDoseIndex || 0);
+        const currentDose = item.doses[doseIdx] || item.doses[0];
+
         const isB2B = currentTier === 'b2b';
-        const price = isB2B ? item.b2bBoxPrice : item.suggestedPriceB2C;
+        const price = isB2B ? currentDose.b2bBoxPrice : currentDose.suggestedPriceB2C;
         const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10):" : "Valor do Kit Pronto (1 Frasco):";
         const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ Água Bacteriostática Inclusa";
 
         const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Mais Procurado</span>' : '';
 
+        // Dose selector HTML: if <= 5 doses, show pills; if > 5, show dropdown with all doses
+        let doseSelectorHtml = '';
+        if (item.doses.length > 1) {
+          if (item.doses.length <= 5) {
+            let pillsHtml = item.doses.map((d, idx) => {
+              const activeCls = idx === doseIdx ? ' active' : '';
+              return \`<button class="dose-pill\${activeCls}" onclick="onSelectDose('\${item.id}', \${idx})">\${d.label}</button>\`;
+            }).join('');
+            doseSelectorHtml = \`
+              <div class="dose-selector-box">
+                <div class="dose-header">
+                  <span>Selecione a Dosagem:</span>
+                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} opções</span>
+                </div>
+                <div class="dose-pills-wrap">\${pillsHtml}</div>
+              </div>
+            \`;
+          } else {
+            let optionsHtml = item.doses.map((d, idx) => {
+              const selected = idx === doseIdx ? ' selected' : '';
+              return \`<option value="\${idx}"\${selected}>\${d.label} (\${d.spec})</option>\`;
+            }).join('');
+            doseSelectorHtml = \`
+              <div class="dose-selector-box">
+                <div class="dose-header">
+                  <span>Selecione a Dosagem:</span>
+                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} dosagens disponíveis</span>
+                </div>
+                <select class="dose-select-dropdown" onchange="onSelectDose('\${item.id}', this.value)">
+                  \${optionsHtml}
+                </select>
+              </div>
+            \`;
+          }
+        } else {
+          // Only 1 dose
+          doseSelectorHtml = \`
+            <div class="dose-selector-box" style="padding: 7px 12px;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--gray-600);">
+                Dosagem: <span style="color: var(--primary); font-weight: 800;">\${item.doses[0].label}</span>
+              </div>
+            </div>
+          \`;
+        }
+
         const card = document.createElement('div');
         card.className = 'product-card' + (item.isTopSeller ? ' top-featured' : '');
+        card.id = 'card-' + item.id;
         card.innerHTML = \`
           <div class="card-top">
             <div class="card-badges">
@@ -1461,8 +1671,8 @@ const htmlContent = `<!DOCTYPE html>
               <span class="purity-badge">&gt;99% HPLC</span>
             </div>
             <h3 class="product-title">\${item.name}</h3>
-            <div class="product-spec">\${item.spec}</div>
-            <p class="product-desc">\${item.category}</p>
+            <p class="product-desc">\${item.desc}</p>
+            \${doseSelectorHtml}
           </div>
 
           <div>
@@ -1473,10 +1683,10 @@ const htmlContent = `<!DOCTYPE html>
             </div>
 
             <div class="card-actions">
-              <button class="btn-add" onclick="addToCart('\${item.code}')">
+              <button class="btn-add" onclick="addCurrentCompoundToCart('\${item.id}')">
                 <span>Adicionar</span> +
               </button>
-              <button class="btn-calc-shortcut" title="Calcular Diluição na Seringa" onclick="openCalcForProduct('\${item.name}', \${item.doseNum}, '\${item.doseUnit}')">
+              <button class="btn-calc-shortcut" title="Calcular Diluição na Seringa" onclick="openCalcForCompound('\${item.id}')">
                 💉 Dose
               </button>
             </div>
@@ -1486,8 +1696,24 @@ const htmlContent = `<!DOCTYPE html>
       });
     }
 
+    function addCurrentCompoundToCart(compoundId) {
+      const compound = PSL_COMPOUNDS.find(c => c.id === compoundId);
+      if (!compound) return;
+      const doseIdx = selectedDoses[compoundId] || 0;
+      const dose = compound.doses[doseIdx];
+      addToCart(dose.code, compound.name, dose.label);
+    }
+
+    function openCalcForCompound(compoundId) {
+      const compound = PSL_COMPOUNDS.find(c => c.id === compoundId);
+      if (!compound) return;
+      const doseIdx = selectedDoses[compoundId] || 0;
+      const dose = compound.doses[doseIdx];
+      openCalcForProduct(compound.name, dose.doseNum, dose.doseUnit);
+    }
+
     // Cart Management
-    function addToCart(code) {
+    function addToCart(code, compoundName, doseLabel) {
       cart[code] = (cart[code] || 0) + 1;
       updateCartCount();
       renderCart();
@@ -1531,13 +1757,25 @@ const htmlContent = `<!DOCTYPE html>
       if (radioSedex) radioSedex.checked = type === 'sedex';
     }
 
+    // Find dose object across all compounds
+    function findDoseByCode(code) {
+      for (const comp of PSL_COMPOUNDS) {
+        for (const dose of comp.doses) {
+          if (dose.code === code) {
+            return { compound: comp, dose: dose };
+          }
+        }
+      }
+      return null;
+    }
+
     function renderCart() {
       const wrap = document.getElementById('cart-items-wrap');
       const totalDisplay = document.getElementById('cart-total-display');
       const codes = Object.keys(cart);
 
       if (codes.length === 0) {
-        wrap.innerHTML = '<div style="text-align: center; color: var(--gray-400); margin-top: 60px;">Seu carrinho está vazio.<br>Escolha os produtos no catálogo.</div>';
+        wrap.innerHTML = '<div style="text-align: center; color: var(--gray-400); margin-top: 60px;">Seu carrinho está vazio.<br>Escolha os peptídeos no catálogo.</div>';
         totalDisplay.textContent = 'R$ 0,00';
         return;
       }
@@ -1546,18 +1784,19 @@ const htmlContent = `<!DOCTYPE html>
       let html = '';
 
       codes.forEach(code => {
-        const item = PSL_PRODUCTS.find(p => p.code === code);
-        if (!item) return;
+        const itemInfo = findDoseByCode(code);
+        if (!itemInfo) return;
+        const { compound, dose } = itemInfo;
         const qty = cart[code];
         const isB2B = currentTier === 'b2b';
-        const unitPrice = isB2B ? item.b2bBoxPrice : item.suggestedPriceB2C;
+        const unitPrice = isB2B ? dose.b2bBoxPrice : dose.suggestedPriceB2C;
         const sub = unitPrice * qty;
         total += sub;
 
         html += \`
           <div class="cart-item">
             <div class="item-meta">
-              <div class="item-name">\${item.name} (\${item.doseNum}\${item.doseUnit})</div>
+              <div class="item-name">\${compound.name} (\${dose.label})</div>
               <div class="item-sub">\${isB2B ? 'Caixa com 10 frascos' : 'Kit Frasco c/ Água Bacteriostática'}</div>
               <div class="item-price">R$ \${unitPrice.toFixed(2).replace('.', ',')}</div>
             </div>
@@ -1592,12 +1831,14 @@ const htmlContent = `<!DOCTYPE html>
       msg += "*ITENS SELECIONADOS:*\\n";
 
       codes.forEach(code => {
-        const item = PSL_PRODUCTS.find(p => p.code === code);
+        const itemInfo = findDoseByCode(code);
+        if (!itemInfo) return;
+        const { compound, dose } = itemInfo;
         const qty = cart[code];
-        const unitPrice = isB2B ? item.b2bBoxPrice : item.suggestedPriceB2C;
+        const unitPrice = isB2B ? dose.b2bBoxPrice : dose.suggestedPriceB2C;
         const sub = unitPrice * qty;
         total += sub;
-        msg += "• " + qty + "x " + item.name + " " + item.doseNum + item.doseUnit + " = R$ " + sub.toFixed(2).replace('.', ',') + "\\n";
+        msg += "• " + qty + "x " + compound.name + " " + dose.label + " = R$ " + sub.toFixed(2).replace('.', ',') + "\\n";
       });
 
       msg += "-----------------------------------------\\n";
@@ -1695,7 +1936,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     // Initialize
-    renderProducts();
+    renderCompounds();
     calculateDose();
   </script>
 </body>
@@ -1704,4 +1945,4 @@ const htmlContent = `<!DOCTYPE html>
 
 fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/web/index.html", htmlContent, "utf8");
 fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/index.html", htmlContent, "utf8");
-console.log("Updated both web/index.html and root index.html with priority sorted products.");
+console.log("Successfully generated grouped compound cards with dynamic dosage selectors.");
