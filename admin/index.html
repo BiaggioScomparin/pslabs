@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo — PSL Labs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #145C46;
+      --primary-dark: #0D4131;
+      --primary-light: #E8F5EE;
+      --primary-border: #A3D4C1;
+      --accent: #10B981;
+      --dark: #0F172A;
+      --gray-700: #334155;
+      --gray-600: #475569;
+      --gray-400: #94A3B8;
+      --gray-200: #E2E8F0;
+      --gray-100: #F1F5F9;
+      --bg-page: #F8FAFC;
+      --white: #FFFFFF;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 14px -2px rgba(20, 92, 70, 0.08);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--dark);
+      line-height: 1.5;
+    }
+
+    /* Auth Overlay */
+    #auth-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #064E3B 0%, #145C46 50%, #064E3B 100%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
+    .auth-logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .auth-sub {
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 3.5px;
+      margin-bottom: 24px;
+    }
+
+    .auth-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
+      text-align: center;
+      letter-spacing: 4px;
+      margin-bottom: 16px;
+    }
+
+    .auth-input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-auth {
+      width: 100%;
+      height: 48px;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-auth:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Admin Layout */
+    .admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .admin-sidebar {
+      width: 250px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        display: none;
+      }
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .sidebar-nav {
+      padding: 16px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      color: var(--gray-600);
+      font-size: 13.5px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-link:hover {
+      background: var(--gray-100);
+      color: var(--dark);
+    }
+
+    .nav-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: #EF4444;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    /* Main Content Area */
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .admin-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .admin-content {
+      padding: 24px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Mobile Nav Bar for Admin */
+    .admin-mobile-tabs {
+      display: flex;
+      overflow-x: auto;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 8px 12px;
+      gap: 8px;
+      scrollbar-width: none;
+    }
+
+    @media (min-width: 769px) {
+      .admin-mobile-tabs {
+        display: none;
+      }
+    }
+
+    .m-tab-btn {
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-600);
+      cursor: pointer;
+    }
+
+    .m-tab-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    /* Dashboard Metric Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .metric-val {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .metric-sub {
+      font-size: 11.5px;
+      color: #059669;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Card Panels */
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-100);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    th {
+      background: #F8FAFC;
+      color: var(--gray-600);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-bottom: 1.5px solid var(--gray-200);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    tr:hover td {
+      background: #FAFCFB;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-in-stock { background: #DCFCE7; color: #166534; }
+    .badge-pre-order { background: #FEF3C7; color: #92400E; }
+    .badge-out-of-stock { background: #FEE2E2; color: #991B1B; }
+
+    /* Action Buttons */
+    .btn-sm {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-outline {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      color: var(--dark);
+    }
+    .btn-outline:hover { background: var(--gray-100); }
+
+    .btn-success {
+      background: #25D366;
+      color: var(--white);
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Tabs View Containers */
+    .view-tab {
+      display: none;
+    }
+    .view-tab.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth Screen -->
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-logo">PSL LABS</div>
+      <div class="auth-sub">PAINEL ADMINISTRATIVO</div>
+      <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
+        Digite o PIN de segurança para gerenciar estoque, pedidos e preços:
+      </p>
+      <input type="password" id="admin-pin-input" class="auth-input" placeholder="••••" maxlength="10">
+      <button class="btn-auth" onclick="verifyPin()">Entrar no Painel</button>
+      <div style="font-size: 11px; color: var(--gray-400); margin-top: 14px;">PIN Padrão Inicial: <strong>psl2026</strong></div>
+    </div>
+  </div>
+
+  <!-- Admin Interface -->
+  <div class="admin-wrapper" id="admin-app" style="display: none;">
+    
+    <!-- Sidebar Desktop -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div style="font-size: 20px; font-weight: 900; color: var(--primary); letter-spacing: 1px;">
+          PSL <span style="font-weight: 400; letter-spacing: 3px;">LABS</span>
+        </div>
+        <div style="font-size: 7.5px; font-weight: 700; color: var(--primary); letter-spacing: 2px;">PAINEL OPERACIONAL</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-link active" onclick="showTab('dashboard')">
+          <span>📊</span> Dashboard Geral
+        </button>
+        <button class="nav-link" onclick="showTab('pedidos')">
+          <span>📋</span> Pedidos & Envio
+        </button>
+        <button class="nav-link" onclick="showTab('estoque')">
+          <span>📦</span> Estoque & Disponibilidade
+        </button>
+        <button class="nav-link" onclick="showTab('precos')">
+          <span>💰</span> Gerenciar Preços
+        </button>
+        <button class="nav-link" onclick="showTab('crm')">
+          <span>👥</span> CRM & Recompra
+        </button>
+        <button class="nav-link" onclick="showTab('laudos')">
+          <span>🧪</span> Laudos HPLC (COA)
+        </button>
+        <button class="nav-link" onclick="showTab('config')">
+          <span>⚙️</span> Configurações
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" style="display: block; font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none; margin-bottom: 10px; text-align: center;">
+          ↗ Ver Loja / Catálogo
+        </a>
+        <button class="btn-logout" onclick="logout()">Encerrar Sessão</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      
+      <!-- Topbar -->
+      <div class="admin-topbar">
+        <div class="topbar-title" id="page-title">📊 Dashboard Geral</div>
+        <div style="display: flex; gap: 8px;">
+          <a href="/" target="_blank" class="btn-sm btn-outline">Abrir Loja ↗</a>
+          <button class="btn-sm btn-outline" onclick="logout()">Sair</button>
+        </div>
+      </div>
+
+      <!-- Mobile Tabs Bar -->
+      <div class="admin-mobile-tabs">
+        <button class="m-tab-btn active" onclick="showTab('dashboard')">📊 Métricas</button>
+        <button class="m-tab-btn" onclick="showTab('pedidos')">📋 Pedidos</button>
+        <button class="m-tab-btn" onclick="showTab('estoque')">📦 Estoque</button>
+        <button class="m-tab-btn" onclick="showTab('precos')">💰 Preços</button>
+        <button class="m-tab-btn" onclick="showTab('crm')">👥 Recompra</button>
+        <button class="m-tab-btn" onclick="showTab('config')">⚙️ Config</button>
+      </div>
+
+      <div class="admin-content">
+
+        <!-- TAB 1: DASHBOARD GERAL -->
+        <div id="tab-dashboard" class="view-tab active">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-label">Faturamento Estimado</div>
+              <div class="metric-val" id="stat-revenue">R$ 14.850,00</div>
+              <div class="metric-sub">▲ 18% este mês</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Lucro Líquido Real</div>
+              <div class="metric-val" style="color: #059669;" id="stat-profit">R$ 8.320,00</div>
+              <div class="metric-sub">Margem média real: 56%</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Pedidos Concluídos</div>
+              <div class="metric-val" id="stat-orders-count">42</div>
+              <div class="metric-sub">Ticket médio: R$ 353,50</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Itens Pronta-Entrega SP</div>
+              <div class="metric-val" id="stat-stock-total">68 frascos</div>
+              <div class="metric-sub">Disponível p/ Uber Moto Flash</div>
+            </div>
+          </div>
+
+          <!-- Top Sellers Panel -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🔥 Peptídeos Mais Vendidos (Giro Rápido)</div>
+              <span class="badge badge-in-stock">Estoque Saudável</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Peptídeo</th>
+                    <th>Dose Mais Procurada</th>
+                    <th>Frascos Vendidos</th>
+                    <th>Faturamento</th>
+                    <th>Lucro Gerado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Retatrutide</strong></td>
+                    <td>10mg</td>
+                    <td>16 frascos</td>
+                    <td>R$ 3.184,00</td>
+                    <td style="color: #059669; font-weight: 800;">R$ 1.776,00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tirzepatide</strong></td>
+                    <td>10mg</td>
+                    <td>14 frascos</td>
+                    <td>R$ 2.646,00</td>
+                    <td style="color: #059669; font-weight: 800;">R$ 1.500,80</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Blend BPC-157 + TB-500</strong></td>
+                    <td>10mg</td>
+                    <td>8 frascos</td>
+                    <td>R$ 1.992,00</td>
+                    <td style="color: #059669; font-weight: 800;">R$ 1.066,40</td>
+                  </tr>
+                  <tr>
+                    <td><strong>BPC-157</strong></td>
+                    <td>10mg</td>
+                    <td>7 frascos</td>
+                    <td>R$ 1.393,00</td>
+                    <td style="color: #059669; font-weight: 800;">R$ 777,00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>NAD+ Longevidade</strong></td>
+                    <td>500mg</td>
+                    <td>5 frascos</td>
+                    <td>R$ 895,00</td>
+                    <td style="color: #059669; font-weight: 800;">R$ 517,00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: GESTÃO DE PEDIDOS (PIPELINE) -->
+        <div id="tab-pedidos" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📋 Funil de Pedidos Recebidos</div>
+              <button class="btn-sm btn-primary" onclick="showNewOrderModal()">+ Registrar Pedido Manual</button>
+            </div>
+            
+            <div class="table-wrap">
+              <table id="orders-table">
+                <thead>
+                  <tr>
+                    <th>Data / ID</th>
+                    <th>Cliente</th>
+                    <th>Itens / Dose</th>
+                    <th>Entrega</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Ações Rápidas</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                  <!-- Generated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ESTOQUE & DISPONIBILIDADE (47 PEPTÍDEOS) -->
+        <div id="tab-estoque" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">📦 Controle de Estoque Pronta-Entrega (SP)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Altere o status para atualizar instantaneamente o catálogo do cliente.</div>
+              </div>
+              <input type="text" id="stock-search" placeholder="Filtrar composto..." oninput="filterStockTable()" style="padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px;">
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Composto</th>
+                    <th>Dosagens Cadastradas</th>
+                    <th>Qtd em SP</th>
+                    <th>Status na Loja</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="stock-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: GERENCIAR PREÇOS -->
+        <div id="tab-precos" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">💰 Editor de Preços (B2C & B2B)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Qualquer valor alterado aqui substitui os preços padrão no catálogo em tempo real.</div>
+              </div>
+              <button class="btn-sm btn-outline" onclick="resetDefaultPrices()">Restaurar Preços Originais</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Peptídeo</th>
+                    <th>Dosagem</th>
+                    <th>Custo Total Unitário</th>
+                    <th>Preço Consumidor (R$)</th>
+                    <th>Preço Atacado 10un (R$)</th>
+                    <th>Margem B2C</th>
+                    <th>Salvar</th>
+                  </tr>
+                </thead>
+                <tbody id="prices-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: CRM & ALERTA DE RECOMPRA -->
+        <div id="tab-crm" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">👥 Previsão de Recompra (LTV de Clientes)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Dispare mensagens preventivas antes que o frasco do cliente termine.</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Produto em Uso</th>
+                    <th>Data da Compra</th>
+                    <th>Previsão Término</th>
+                    <th>Status do Ciclo</th>
+                    <th>Ação no WhatsApp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Dr. Marcelo Mendes</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 98877-6655</span></td>
+                    <td>Retatrutide 10mg (1 Frasco)</td>
+                    <td>19/10/2026</td>
+                    <td><strong>Hoje (21 dias)</strong></td>
+                    <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">Frasco Terminando</span></td>
+                    <td>
+                      <button class="btn-sm btn-success" onclick="sendReorderReminder('Marcelo', 'Retatrutide 10mg', '5511988776655')">💬 Lembrete Recompra</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Camila Albuquerque</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 97766-5544</span></td>
+                    <td>GHK-Cu 100mg + BPC-157</td>
+                    <td>26/10/2026</td>
+                    <td>Em 7 dias</td>
+                    <td><span class="badge" style="background: #FEF3C7; color: #92400E;">Meio do Ciclo</span></td>
+                    <td>
+                      <button class="btn-sm btn-outline" onclick="sendSupportCheckin('Camila', 'GHK-Cu', '5511977665544')">💬 Checar Resultados</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lucas Silveira</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 96655-4433</span></td>
+                    <td>Tirzepatide 10mg (1 Frasco)</td>
+                    <td>01/11/2026</td>
+                    <td>Em 14 dias</td>
+                    <td><span class="badge badge-in-stock">Início do Ciclo</span></td>
+                    <td>
+                      <button class="btn-sm btn-outline" disabled style="opacity: 0.5;">Em andamento</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: LAUDOS HPLC -->
+        <div id="tab-laudos" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🧪 Certificados de Análise HPLC (Pureza &gt;99%)</div>
+            </div>
+            <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
+              Vincule os laudos laboratoriais de cada lote para exibição automática quando o cliente ou revendedor escanear o QR Code do frasco.
+            </p>
+            <div style="background: #F8FAFC; border: 2px dashed var(--gray-200); border-radius: var(--radius-md); padding: 30px; text-align: center;">
+              <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
+              <div style="font-weight: 700; margin-bottom: 4px;">Upload de Laudo HPLC / COA</div>
+              <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Formatos aceitos: PDF ou PNG (até 15MB)</div>
+              <button class="btn-sm btn-primary" onclick="alert('Selecione o arquivo de laudo do fornecedor no seu computador.')">Selecionar Laudo no Computador</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 7: CONFIGURAÇÕES -->
+        <div id="tab-config" class="view-tab">
+          <div class="panel" style="max-width: 600px;">
+            <div class="panel-header">
+              <div class="panel-title">⚙️ Configurações Operacionais</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Número de WhatsApp Oficial para Receber Pedidos</label>
+              <input type="text" id="cfg-wa" class="form-input" placeholder="Ex: 5511999999999">
+              <div style="font-size: 11px; color: var(--gray-400); margin-top: 4px;">Coloque código do país (55) + DDD + Telefone sem traços.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chave Pix Padrão da PSL Labs (CNPJ ou E-mail)</label>
+              <input type="text" id="cfg-pix" class="form-input" placeholder="Ex: financeiro@psllabs.com.br">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Alterar Senha / PIN de Acesso ao Painel</label>
+              <input type="password" id="cfg-new-pin" class="form-input" placeholder="Novo PIN">
+            </div>
+
+            <button class="btn-sm btn-primary" onclick="saveAdminSettings()" style="height: 42px; font-size: 14px; width: 100%;">
+              Salvar Configurações
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const INITIAL_COMPOUNDS = [{"id":"lcarnitine","name":"L-Carnitina Injetável","desc":"Auxilia no transporte de ácidos graxos para a mitocôndria para oxidação e geração de energia.","line":"Metabolismo & Shape","doses":[{"code":"LC600","label":"600mg","spec":"600mg por frasco, caixa com 10 frascos","doseNum":600,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"LC1200","label":"1200mg","spec":"1200mg por frasco, caixa com 10 frascos","doseNum":1200,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":219,"b2bBoxPrice":1220,"profitUnitB2C":112.6,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"lemonbottle","name":"Lemon Bottle","desc":"Solução lipolítica de alta concentração para gordura localizada e contorno corporal.","line":"Metabolismo & Shape","doses":[{"code":"LemonBottle","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"lipoc","name":"Lipo-C","desc":"Formula lipotrópica para otimização da queima de gordura e suporte à saúde do fígado.","line":"Metabolismo & Shape","doses":[{"code":"Lipo-C","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":239,"b2bBoxPrice":1320,"profitUnitB2C":126.4,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"mic","name":"MIC (Lipo C com B12)","desc":"Combinação lipotrópica de Metionina, Inositol e Colina enriquecida com Vitamina B12.","line":"Metabolismo & Shape","doses":[{"code":"MIC","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":219,"b2bBoxPrice":1220,"profitUnitB2C":112.6,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"bpc157","name":"BPC-157","desc":"Peptídeo de cicatrização celular para ligamentos, tendões, articulações e mucosa gástrica.","line":"Regeneração & Articulações","doses":[{"code":"BC5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":169,"b2bBoxPrice":760,"profitUnitB2C":90.3,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"BC10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"BC20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":219,"b2bBoxPrice":1220,"profitUnitB2C":112.6,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"tb500","name":"TB-500 (Full Chain)","desc":"Regeneração tecidual sistêmica, angiogênese e redução de processos inflamatórios.","line":"Regeneração & Articulações","doses":[{"code":"BT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":209,"b2bBoxPrice":1120,"profitUnitB2C":108.7,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"BT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":289,"b2bBoxPrice":1720,"profitUnitB2C":151.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"ghk-cu","name":"GHK-Cu (Blue Copper)","desc":"Peptídeo de cobre para estímulo de colágeno, firmeza da pele e densidade capilar.","line":"Estética & Pele","doses":[{"code":"CU50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":25.4,"totalCostB2C":66.4,"suggestedPriceB2C":139,"b2bBoxPrice":560,"profitUnitB2C":72.6,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"CU100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":30,"totalCostB2C":71,"suggestedPriceB2C":149,"b2bBoxPrice":630,"profitUnitB2C":78,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"ahk-cu","name":"AHK-Cu","desc":"Peptídeo formulado especificamente para fortalecimento e crescimento folicular capilar.","line":"Imunidade & Vitalidade","doses":[{"code":"AU20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":28.5,"totalCostB2C":69.5,"suggestedPriceB2C":149,"b2bBoxPrice":610,"profitUnitB2C":79.5,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"AU50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":159,"b2bBoxPrice":710,"profitUnitB2C":83.4,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"AU100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":179,"b2bBoxPrice":860,"profitUnitB2C":94.1,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"sermorelin","name":"Sermorelin","desc":"Secretagogo de GH clássico para restauração do bem-estar, tônus e anti-envelhecimento.","line":"Massa Magra & GH","doses":[{"code":"SMO5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":219,"b2bBoxPrice":1170,"profitUnitB2C":115.6,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"SMO10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":105.5,"totalCostB2C":146.5,"suggestedPriceB2C":299,"b2bBoxPrice":1880,"profitUnitB2C":152.5,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"tesamorelin","name":"Tesamorelin","desc":"Análogo do GHRH com efeito comprovado na redução de gordura visceral e saúde cardiovascular.","line":"Metabolismo & Shape","doses":[{"code":"TSM2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":179,"b2bBoxPrice":810,"profitUnitB2C":97.2,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"TSM5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":259,"b2bBoxPrice":1470,"profitUnitB2C":137.2,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"TSM10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":120.9,"totalCostB2C":161.9,"suggestedPriceB2C":339,"b2bBoxPrice":2130,"profitUnitB2C":177.1,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"TSM20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":160.2,"totalCostB2C":201.2,"suggestedPriceB2C":409,"b2bBoxPrice":2780,"profitUnitB2C":207.8,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"igf1","name":"IGF-1 LR3","desc":"Fator de crescimento tipo insulina potente para retenção de nitrogênio e síntese proteica muscular.","line":"Massa Magra & GH","doses":[{"code":"IG01","label":"100mcg","spec":"100mcg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mcg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":179,"b2bBoxPrice":810,"profitUnitB2C":97.2,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"IG1-1","label":"1mg","spec":"1mg por frasco, caixa com 10 frascos","doseNum":1,"doseUnit":"mg","powderCostPerVial":131.3,"totalCostB2C":172.3,"suggestedPriceB2C":359,"b2bBoxPrice":2300,"profitUnitB2C":186.7,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"tirzepatide","name":"Tirzepatide","desc":"Duplo agonista GLP-1 / GIP de alta eficácia na sensibilidade à insulina e queima de gordura.","line":"Metabolismo & Shape","doses":[{"code":"TR5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":33.1,"totalCostB2C":74.1,"suggestedPriceB2C":159,"b2bBoxPrice":680,"profitUnitB2C":84.9,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"TR10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":179,"b2bBoxPrice":810,"profitUnitB2C":97.2,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"TR15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":189,"b2bBoxPrice":960,"profitUnitB2C":98,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"TR20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":60.8,"totalCostB2C":101.8,"suggestedPriceB2C":219,"b2bBoxPrice":1140,"profitUnitB2C":117.2,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"TR30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":259,"b2bBoxPrice":1470,"profitUnitB2C":137.2,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"TR40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":269,"b2bBoxPrice":1620,"profitUnitB2C":137.9,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"TR50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":108.6,"totalCostB2C":149.6,"suggestedPriceB2C":309,"b2bBoxPrice":1930,"profitUnitB2C":159.4,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"TR60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":128.6,"totalCostB2C":169.6,"suggestedPriceB2C":349,"b2bBoxPrice":2260,"profitUnitB2C":179.4,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"TR80","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":144,"totalCostB2C":185,"suggestedPriceB2C":379,"b2bBoxPrice":2510,"profitUnitB2C":194,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"TR100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":164.8,"totalCostB2C":205.8,"suggestedPriceB2C":419,"b2bBoxPrice":2860,"profitUnitB2C":213.2,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"semaglutide","name":"Semaglutide","desc":"Agonista clássico de receptores GLP-1 com controle de apetite comprovado.","line":"Metabolismo & Shape","doses":[{"code":"SM10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":169,"b2bBoxPrice":760,"profitUnitB2C":90.3,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"SM20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":189,"b2bBoxPrice":960,"profitUnitB2C":98,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"SM30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":74.7,"totalCostB2C":115.7,"suggestedPriceB2C":239,"b2bBoxPrice":1370,"profitUnitB2C":123.3,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"SM40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":269,"b2bBoxPrice":1570,"profitUnitB2C":141,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"SM50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":114.7,"totalCostB2C":155.7,"suggestedPriceB2C":319,"b2bBoxPrice":2030,"profitUnitB2C":163.3,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"retatrutide","name":"Retatrutide","desc":"Triplo agonista (GLP-1, GIP, Glucagon) para máxima aceleração metabólica e saciedade.","line":"Metabolismo & Shape","doses":[{"code":"RT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":159,"b2bBoxPrice":710,"profitUnitB2C":83.4,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"RT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"RT15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":239,"b2bBoxPrice":1320,"profitUnitB2C":126.4,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"RT20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":259,"b2bBoxPrice":1470,"profitUnitB2C":137.2,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"RT30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":105.5,"totalCostB2C":146.5,"suggestedPriceB2C":299,"b2bBoxPrice":1880,"profitUnitB2C":152.5,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"RT40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":123.2,"totalCostB2C":164.2,"suggestedPriceB2C":339,"b2bBoxPrice":2170,"profitUnitB2C":174.8,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"RT50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":125.5,"totalCostB2C":166.5,"suggestedPriceB2C":339,"b2bBoxPrice":2210,"profitUnitB2C":172.5,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"RT60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":145.1,"totalCostB2C":186.1,"suggestedPriceB2C":379,"b2bBoxPrice":2530,"profitUnitB2C":192.9,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"RT80","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":153.2,"totalCostB2C":194.2,"suggestedPriceB2C":399,"b2bBoxPrice":2660,"profitUnitB2C":204.8,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"RT100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":217.9,"totalCostB2C":258.9,"suggestedPriceB2C":529,"b2bBoxPrice":3730,"profitUnitB2C":270.1,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"RT120","label":"120mg","spec":"120mg por frasco, caixa com 10 frascos","doseNum":120,"doseUnit":"mg","powderCostPerVial":287.2,"totalCostB2C":328.2,"suggestedPriceB2C":669,"b2bBoxPrice":4880,"profitUnitB2C":340.8,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"nad","name":"NAD+","desc":"Combustível mitocondrial essencial para energia celular (ATP), reparo de DNA e sirtuínas.","line":"Longevidade & Biohacking","doses":[{"code":"NJ100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":28.5,"totalCostB2C":69.5,"suggestedPriceB2C":149,"b2bBoxPrice":610,"profitUnitB2C":79.5,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"NJ500","label":"500mg","spec":"500mg por frasco, caixa com 10 frascos","doseNum":500,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":159,"b2bBoxPrice":710,"profitUnitB2C":83.4,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"NJ1000","label":"1000mg","spec":"1000mg por frasco, caixa com 10 frascos","doseNum":1000,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":179,"b2bBoxPrice":860,"profitUnitB2C":94.1,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"glow","name":"Kit Glow & Klow","desc":"Blend de rejuvenescimento estético para síntese de colágeno, viço e hidratação cutânea.","line":"Estética & Pele","doses":[{"code":"GLOW","label":"70mg","spec":"70mg por frasco, caixa com 10 frascos","doseNum":70,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"Klow","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":128.6,"totalCostB2C":169.6,"suggestedPriceB2C":349,"b2bBoxPrice":2260,"profitUnitB2C":179.4,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"dsip","name":"DSIP","desc":"Peptídeo indutor do sono de ondas lentas delta, recuperação hormonal e neuromuscular.","line":"Regeneração & Articulações","doses":[{"code":"DS5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":179,"b2bBoxPrice":860,"profitUnitB2C":94.1,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"DS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":219,"b2bBoxPrice":1220,"profitUnitB2C":112.6,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"selank","name":"Selank","desc":"Ansiolítico peptídico que estabiliza o humor e reduz o estresse sem causar sonolência.","line":"Cérebro & Foco","doses":[{"code":"SK5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":36.2,"totalCostB2C":77.2,"suggestedPriceB2C":169,"b2bBoxPrice":730,"profitUnitB2C":91.8,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"SK10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":189,"b2bBoxPrice":960,"profitUnitB2C":98,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"adamax","name":"Adamax","desc":"Variante nootrópica avançada com biodisponibilidade aprimorada para alta performance mental.","line":"Cérebro & Foco","doses":[{"code":"AX5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":209,"b2bBoxPrice":1060,"profitUnitB2C":111.8,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"AX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":93.2,"totalCostB2C":134.2,"suggestedPriceB2C":279,"b2bBoxPrice":1670,"profitUnitB2C":144.8,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"melanotan2","name":"Melanotan II","desc":"Estimulante da melanogênese para bronzeamento uniforme com leve ação na libido.","line":"Estética & Pele","doses":[{"code":"MT210","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":219,"b2bBoxPrice":1170,"profitUnitB2C":115.6,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"mots-c","name":"MOTS-c","desc":"Peptídeo codificado mitocondrialmente que imita os efeitos do exercício físico e melhora o endurance.","line":"Metabolismo & Shape","doses":[{"code":"MS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":209,"b2bBoxPrice":1060,"profitUnitB2C":111.8,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"MS15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":239,"b2bBoxPrice":1320,"profitUnitB2C":126.4,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"MS20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":269,"b2bBoxPrice":1620,"profitUnitB2C":137.9,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"MS40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":349,"b2bBoxPrice":2210,"profitUnitB2C":182.1,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"b12","name":"Vitamina B12","desc":"Cofator vital para produção de glóbulos vermelhos, energia metabólica e sistema nervoso.","line":"Imunidade & Vitalidade","doses":[{"code":"B12","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":31.6,"totalCostB2C":72.6,"suggestedPriceB2C":159,"b2bBoxPrice":660,"profitUnitB2C":86.4,"marginPercent":54,"stockQty":5,"status":"in_stock"}]},{"id":"pt141","name":"PT-141 (Bremelanotide)","desc":"Atuador central no SNC para estímulo direto da libido e vigor sexual masculino e feminino.","line":"Imunidade & Vitalidade","doses":[{"code":"P41","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":219,"b2bBoxPrice":1170,"profitUnitB2C":115.6,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"kpv","name":"KPV","desc":"Potente anti-inflamatório peptídico para proteção intestinal, microbioma e inflamação sistêmica.","line":"Imunidade & Vitalidade","doses":[{"code":"KPV2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":23.9,"totalCostB2C":64.9,"suggestedPriceB2C":139,"b2bBoxPrice":530,"profitUnitB2C":74.1,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"KPV5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":30,"totalCostB2C":71,"suggestedPriceB2C":149,"b2bBoxPrice":630,"profitUnitB2C":78,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"KPV10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"vip","name":"VIP","desc":"Peptídeo intestinal vasoativo para imunomodulação, saúde pulmonar e regulação microvascular.","line":"Imunidade & Vitalidade","doses":[{"code":"VP5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":120.9,"totalCostB2C":161.9,"suggestedPriceB2C":339,"b2bBoxPrice":2130,"profitUnitB2C":177.1,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"VP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":137,"totalCostB2C":178,"suggestedPriceB2C":369,"b2bBoxPrice":2400,"profitUnitB2C":191,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"ara290","name":"ARA-290","desc":"Alívio de dores neuropáticas e regeneração de pequenas fibras nervosas periféricas.","line":"Regeneração & Articulações","doses":[{"code":"RA10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":219,"b2bBoxPrice":1170,"profitUnitB2C":115.6,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"RA16","label":"16mg","spec":"16mg por frasco, caixa com 10 frascos","doseNum":16,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":269,"b2bBoxPrice":1570,"profitUnitB2C":141,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"bpc-tb","name":"Blend BPC-157 + TB-500","desc":"Super combo de regeneração tecidual acelerada para articulações e músculos.","line":"Regeneração & Articulações","doses":[{"code":"BB10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":74.7,"totalCostB2C":115.7,"suggestedPriceB2C":239,"b2bBoxPrice":1370,"profitUnitB2C":123.3,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"BB20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"BB30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":130.1,"totalCostB2C":171.1,"suggestedPriceB2C":349,"b2bBoxPrice":2280,"profitUnitB2C":177.9,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"BB40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":171.7,"totalCostB2C":212.7,"suggestedPriceB2C":439,"b2bBoxPrice":2970,"profitUnitB2C":226.3,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"semax-selank","name":"Blend Semax + Selank","desc":"Sinergia de foco cirúrgico e redução de cortisol sem sedação.","line":"Cérebro & Foco","doses":[{"code":"XS20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"cjc-ipa","name":"Blend CJC-1295 + Ipamorelin","desc":"Estimulação sinérgica de GH e IGF-1 para ganho de massa magra e recuperação.","line":"Massa Magra & GH","doses":[{"code":"CP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":269,"b2bBoxPrice":1570,"profitUnitB2C":141,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"CP20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":120.5,"totalCostB2C":161.5,"suggestedPriceB2C":329,"b2bBoxPrice":2130,"profitUnitB2C":167.5,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"reta-tirz","name":"Blend Retatrutide + Tirzepatide","desc":"Sinergia metabólica máxima de controle glicêmico e lipólise profunda.","line":"Imunidade & Vitalidade","doses":[{"code":"RET60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"tesa-ipa","name":"Blend Tesamorelin + Ipamorelin","desc":"Foco em redução potente de gordura visceral profunda e estímulo de GH.","line":"Metabolismo & Shape","doses":[{"code":"TI10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":269,"b2bBoxPrice":1620,"profitUnitB2C":137.9,"marginPercent":51,"stockQty":5,"status":"in_stock"},{"code":"TI15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":349,"b2bBoxPrice":2210,"profitUnitB2C":182.1,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"cagrilintide","name":"Cagrilintide","desc":"Análogo de amilina de longa ação para retardo do esvaziamento gástrico e saciedade extrema.","line":"Metabolismo & Shape","doses":[{"code":"CGL5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":93.2,"totalCostB2C":134.2,"suggestedPriceB2C":279,"b2bBoxPrice":1670,"profitUnitB2C":144.8,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"CGL10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"aod9604","name":"AOD-9604","desc":"Fragmento C-terminal do hGH que induz lipólise seletiva sem impactar a glicemia.","line":"Massa Magra & GH","doses":[{"code":"AD5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":239,"b2bBoxPrice":1320,"profitUnitB2C":126.4,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"AD10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":114.7,"totalCostB2C":155.7,"suggestedPriceB2C":319,"b2bBoxPrice":2030,"profitUnitB2C":163.3,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"5amino1mq","name":"5-AMINO-1MQ","desc":"Inibidor da enzima NNMT que reprograma o gasto energético e a queima lipídica celular.","line":"Metabolismo & Shape","doses":[{"code":"5AM","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":31.6,"totalCostB2C":72.6,"suggestedPriceB2C":159,"b2bBoxPrice":660,"profitUnitB2C":86.4,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"10AM","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":179,"b2bBoxPrice":810,"profitUnitB2C":97.2,"marginPercent":54,"stockQty":5,"status":"in_stock"},{"code":"50AM","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":209,"b2bBoxPrice":1060,"profitUnitB2C":111.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"epithalon","name":"Epithalon","desc":"Bio-regulador da telomerase e pineal para reprogramação dos ritmos de longevidade.","line":"Longevidade & Biohacking","doses":[{"code":"ET10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":189,"b2bBoxPrice":910,"profitUnitB2C":101,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"ET50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":108.6,"totalCostB2C":149.6,"suggestedPriceB2C":309,"b2bBoxPrice":1930,"profitUnitB2C":159.4,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"foxo4","name":"FOXO4-DRI","desc":"Peptídeo senolítico de última geração que induz apoptose em células senescentes envelhecidas.","line":"Longevidade & Biohacking","doses":[{"code":"F42","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":269,"b2bBoxPrice":1570,"profitUnitB2C":141,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"FOX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":345,"totalCostB2C":386,"suggestedPriceB2C":779,"b2bBoxPrice":5830,"profitUnitB2C":393,"marginPercent":50,"stockQty":5,"status":"in_stock"}]},{"id":"snap8","name":"Snap-8","desc":"Octapeptídeo cosmético anti-rugas com efeito de relaxamento da expressão muscular facial.","line":"Estética & Pele","doses":[{"code":"NP810","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":209,"b2bBoxPrice":1060,"profitUnitB2C":111.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"ss31","name":"SS-31 (Elamipretide)","desc":"Peptídeo cardiolipina-alvo para reparação da membrana interna mitocondrial e energia.","line":"Imunidade & Vitalidade","doses":[{"code":"2S10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":77.8,"totalCostB2C":118.8,"suggestedPriceB2C":249,"b2bBoxPrice":1420,"profitUnitB2C":130.2,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"2S20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":349,"b2bBoxPrice":2210,"profitUnitB2C":182.1,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"2S50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":167.1,"totalCostB2C":208.1,"suggestedPriceB2C":429,"b2bBoxPrice":2890,"profitUnitB2C":220.9,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"semax","name":"Semax","desc":"Nootrópico avançado derivado de ACTH; potencializa BDNF, foco cognitivo e memória.","line":"Cérebro & Foco","doses":[{"code":"SX5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":169,"b2bBoxPrice":760,"profitUnitB2C":90.3,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"SX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":48.5,"totalCostB2C":89.5,"suggestedPriceB2C":189,"b2bBoxPrice":940,"profitUnitB2C":99.5,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"oxytocin","name":"Oxytocin","desc":"Neuropeptídeo do bem-estar, conexão afetiva, relaxamento e redução dos níveis de estresse.","line":"Cérebro & Foco","doses":[{"code":"OT2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":25.4,"totalCostB2C":66.4,"suggestedPriceB2C":139,"b2bBoxPrice":560,"profitUnitB2C":72.6,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"OT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":169,"b2bBoxPrice":760,"profitUnitB2C":90.3,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"OT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":179,"b2bBoxPrice":860,"profitUnitB2C":94.1,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"ipamorelin","name":"Ipamorelin","desc":"Agonista seletivo do receptor de grelina para liberação limpa de GH sem pico de prolactina/cortisol.","line":"Massa Magra & GH","doses":[{"code":"IP5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":159,"b2bBoxPrice":710,"profitUnitB2C":83.4,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"IP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":53.1,"totalCostB2C":94.1,"suggestedPriceB2C":199,"b2bBoxPrice":1010,"profitUnitB2C":104.9,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"cjc-dac","name":"CJC-1295 (com DAC)","desc":"Análogo de GHRH com meia-vida prolongada para liberação estável contínua de GH.","line":"Massa Magra & GH","doses":[{"code":"CD5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":329,"b2bBoxPrice":2080,"profitUnitB2C":170.2,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"CD10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":155.5,"totalCostB2C":196.5,"suggestedPriceB2C":399,"b2bBoxPrice":2700,"profitUnitB2C":202.5,"marginPercent":51,"stockQty":5,"status":"in_stock"}]},{"id":"cjc-nodac","name":"CJC-1295 (sem DAC)","desc":"GHRH pulsátil ideal para protocolos noturnos em conjunto com Ipamorelin.","line":"Massa Magra & GH","doses":[{"code":"CND5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":209,"b2bBoxPrice":1120,"profitUnitB2C":108.7,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"CND10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":289,"b2bBoxPrice":1720,"profitUnitB2C":151.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"kisspeptin","name":"Kisspeptin-10","desc":"Regulador mestre do eixo hipotálamo-hipófise-gonadal para modulação natural de LH/FSH.","line":"Imunidade & Vitalidade","doses":[{"code":"KS5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":209,"b2bBoxPrice":1120,"profitUnitB2C":108.7,"marginPercent":52,"stockQty":5,"status":"in_stock"},{"code":"KS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":289,"b2bBoxPrice":1720,"profitUnitB2C":151.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]},{"id":"thymalin","name":"Thymalin","desc":"Bio-regulador peptídico do timo para reativação do sistema imunológico celular.","line":"Regeneração & Articulações","doses":[{"code":"TY10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":209,"b2bBoxPrice":1120,"profitUnitB2C":108.7,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"thymosin-a1","name":"Thymosin Alpha 1","desc":"Modulador imunitário padrão-ouro para imunossupressão, defesa antiviral e longevidade celular.","line":"Imunidade & Vitalidade","doses":[{"code":"TA5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":259,"b2bBoxPrice":1470,"profitUnitB2C":137.2,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"TA10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":123.2,"totalCostB2C":164.2,"suggestedPriceB2C":339,"b2bBoxPrice":2170,"profitUnitB2C":174.8,"marginPercent":52,"stockQty":5,"status":"in_stock"}]},{"id":"glutathione","name":"Glutathione","desc":"Antioxidante mestre do organismo para desintoxicação hepática e eliminação de radicais livres.","line":"Longevidade & Biohacking","doses":[{"code":"GTT600","label":"600mg","spec":"600mg por frasco, caixa com 10 frascos","doseNum":600,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":169,"b2bBoxPrice":760,"profitUnitB2C":90.3,"marginPercent":53,"stockQty":5,"status":"in_stock"},{"code":"GTT1500","label":"1500mg","spec":"1500mg por frasco, caixa com 10 frascos","doseNum":1500,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":209,"b2bBoxPrice":1060,"profitUnitB2C":111.8,"marginPercent":53,"stockQty":5,"status":"in_stock"}]}];
+    const DEFAULT_PIN = "psl2026";
+
+    // State
+    let activeTab = 'dashboard';
+    let stockData = JSON.parse(localStorage.getItem('psl_stock_data') || 'null');
+    let customPrices = JSON.parse(localStorage.getItem('psl_custom_prices') || '{}');
+    let orders = JSON.parse(localStorage.getItem('psl_orders') || 'null');
+
+    // Default orders demo if empty
+    if (!orders) {
+      orders = [
+        {
+          id: "PED-1082",
+          date: "Hoje, 11:40",
+          client: "Rodrigo Carvalho",
+          phone: "5511988887777",
+          items: "1x Retatrutide 10mg",
+          shipping: "⚡ Uber Moto Flash (SP)",
+          total: 199.00,
+          status: "separando", // 'aguardando_pix', 'separando', 'despachado_uber', 'sedex', 'concluido'
+          uberLink: "https://trip.uber.com/share/abc123xyz",
+          trackingCode: ""
+        },
+        {
+          id: "PED-1081",
+          date: "Hoje, 10:15",
+          client: "Dra. Patricia Lima",
+          phone: "5511977776666",
+          items: "1x BPC-157 10mg + 1x TB-500",
+          shipping: "⚡ Uber Moto Flash (SP)",
+          total: 498.00,
+          status: "despachado_uber",
+          uberLink: "https://trip.uber.com/share/def456uvw",
+          trackingCode: ""
+        },
+        {
+          id: "PED-1080",
+          date: "Ontem, 16:30",
+          client: "Clinica BioIntegrativa",
+          phone: "5521999998888",
+          items: "2x Caixa Tirzepatide 10mg (Atacado)",
+          shipping: "📦 Correios Sedex",
+          total: 1620.00,
+          status: "sedex",
+          uberLink: "",
+          trackingCode: "BR987654321SP"
+        }
+      ];
+      localStorage.setItem('psl_orders', JSON.stringify(orders));
+    }
+
+    // Default stock map
+    if (!stockData) {
+      stockData = {};
+      INITIAL_COMPOUNDS.forEach(c => {
+        stockData[c.id] = {
+          status: 'in_stock',
+          qty: 6
+        };
+      });
+      localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+    }
+
+    // Verify PIN Auth
+    function verifyPin() {
+      const pin = document.getElementById('admin-pin-input').value.trim();
+      const savedPin = localStorage.getItem('psl_admin_pin') || DEFAULT_PIN;
+      if (pin === savedPin) {
+        sessionStorage.setItem('psl_admin_auth', 'true');
+        document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'flex';
+        initAdmin();
+      } else {
+        alert("PIN Incorreto! Tente novamente.");
+        document.getElementById('admin-pin-input').value = '';
+      }
+    }
+
+    function checkAuth() {
+      if (sessionStorage.getItem('psl_admin_auth') === 'true') {
+        document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'flex';
+        initAdmin();
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('psl_admin_auth');
+      window.location.reload();
+    }
+
+    function showTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.view-tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.m-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById('tab-' + tabId);
+      if (targetView) targetView.classList.add('active');
+
+      // Update sidebar nav
+      const sideLinks = document.querySelectorAll('.nav-link');
+      sideLinks.forEach(l => {
+        if (l.getAttribute('onclick').includes(tabId)) l.classList.add('active');
+      });
+
+      // Update mobile tabs
+      const mTabs = document.querySelectorAll('.m-tab-btn');
+      mTabs.forEach(t => {
+        if (t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
+      });
+
+      const titles = {
+        dashboard: "📊 Dashboard Geral",
+        pedidos: "📋 Gestão de Pedidos & Rastreamento",
+        estoque: "📦 Estoque & Disponibilidade em SP",
+        precos: "💰 Editor de Preços Dinâmicos",
+        crm: "👥 CRM & Previsão de Recompra",
+        laudos: "🧪 Certificados de Análise HPLC",
+        config: "⚙️ Configurações da PSL Labs"
+      };
+      document.getElementById('page-title').textContent = titles[tabId] || "Painel ADM";
+    }
+
+    function initAdmin() {
+      renderOrders();
+      renderStock();
+      renderPrices();
+      loadSettings();
+    }
+
+    // Orders Logic
+    function renderOrders() {
+      const tbody = document.getElementById('orders-tbody');
+      tbody.innerHTML = '';
+
+      orders.forEach((o, idx) => {
+        const tr = document.createElement('tr');
+        
+        const statusBadges = {
+          aguardando_pix: '<span class="badge" style="background:#FEF3C7;color:#92400E;">Aguardando Pix</span>',
+          separando: '<span class="badge badge-in-stock">Separando Frasco</span>',
+          despachado_uber: '<span class="badge" style="background:#E0E7FF;color:#3730A3;">🛵 Uber Moto Flash</span>',
+          sedex: '<span class="badge" style="background:#E0F2FE;color:#0369A1;">📦 Postado Sedex</span>',
+          concluido: '<span class="badge" style="background:#DCFCE7;color:#166534;">✓ Concluído</span>'
+        };
+
+        tr.innerHTML = `
+          <td><strong>${o.id}</strong><br><span style="font-size:11px;color:var(--gray-400);">${o.date}</span></td>
+          <td><strong>${o.client}</strong><br><span style="font-size:11px;color:var(--gray-600);">${o.phone}</span></td>
+          <td>${o.items}</td>
+          <td>${o.shipping}</td>
+          <td><strong>R$ ${o.total.toFixed(2).replace('.', ',')}</strong></td>
+          <td>
+            <select onchange="updateOrderStatus(${idx}, this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;font-weight:700;">
+              <option value="aguardando_pix" ${o.status==='aguardando_pix'?'selected':''}>Aguardando Pix</option>
+              <option value="separando" ${o.status==='separando'?'selected':''}>Pix OK / Separando</option>
+              <option value="despachado_uber" ${o.status==='despachado_uber'?'selected':''}>Despachado Uber Flash</option>
+              <option value="sedex" ${o.status==='sedex'?'selected':''}>Postado Sedex</option>
+              <option value="concluido" ${o.status==='concluido'?'selected':''}>Concluído</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn-sm btn-success" title="Mandar Atualização no WhatsApp" onclick="notifyClientWhatsapp(${idx})">💬 Avisar Cliente</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateOrderStatus(idx, newStatus) {
+      orders[idx].status = newStatus;
+      if (newStatus === 'despachado_uber' && !orders[idx].uberLink) {
+        const link = prompt("Cole aqui o Link de Rastreio da Corrida do Uber Flash (opcional):");
+        if (link) orders[idx].uberLink = link.trim();
+      }
+      if (newStatus === 'sedex' && !orders[idx].trackingCode) {
+        const code = prompt("Digite o Código de Rastreio dos Correios (ex: BR123456789SP):");
+        if (code) orders[idx].trackingCode = code.trim();
+      }
+      localStorage.setItem('psl_orders', JSON.stringify(orders));
+      renderOrders();
+    }
+
+    function notifyClientWhatsapp(idx) {
+      const o = orders[idx];
+      let msg = "Olá " + o.client + "! Aqui é da equipe PSL Labs.\n\n";
+      if (o.status === 'separando') {
+        msg += "✓ Seu pagamento Pix foi confirmado com sucesso! Seu pedido (" + o.items + ") já está sendo embalado.";
+      } else if (o.status === 'despachado_uber') {
+        msg += "🛵 Seu motoboy do Uber Flash já retirou seu frasco e está a caminho!\n";
+        if (o.uberLink) msg += "Acompanhe o trajeto em tempo real: " + o.uberLink;
+      } else if (o.status === 'sedex') {
+        msg += "📦 Seu pedido foi postado nos Correios Sedex com proteção isotérmica!\n";
+        if (o.trackingCode) msg += "Código de rastreio: " + o.trackingCode;
+      } else {
+        msg += "Seu pedido de " + o.items + " foi entregue! Conte conosco para dúvidas na reconstituição.";
+      }
+      const cleanPhone = o.phone.replace(/\D/g, '');
+      window.open("https://wa.me/" + cleanPhone + "?text=" + encodeURI(msg), "_blank");
+    }
+
+    // Stock Management Logic
+    function renderStock() {
+      const tbody = document.getElementById('stock-tbody');
+      tbody.innerHTML = '';
+
+      INITIAL_COMPOUNDS.forEach(c => {
+        const current = stockData[c.id] || { status: 'in_stock', qty: 5 };
+        const tr = document.createElement('tr');
+        tr.id = 'stock-row-' + c.id;
+
+        const badgeClass = current.status === 'in_stock' ? 'badge-in-stock' : (current.status === 'pre_order' ? 'badge-pre-order' : 'badge-out-of-stock');
+        const badgeLabel = current.status === 'in_stock' ? '🟢 Em Estoque' : (current.status === 'pre_order' ? '🟡 Sob Encomenda' : '🔴 Esgotado');
+
+        tr.innerHTML = `
+          <td><strong>${c.name}</strong><br><span style="font-size:11px;color:var(--gray-400);">${c.line}</span></td>
+          <td>${c.doses.map(d => d.label).join(', ')}</td>
+          <td>
+            <input type="number" min="0" value="${current.qty}" onchange="updateStockQty('${c.id}', this.value)" style="width:60px;padding:4px;border:1px solid var(--gray-200);border-radius:6px;font-weight:700;text-align:center;"> frascos
+          </td>
+          <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+          <td>
+            <select onchange="updateStockStatus('${c.id}', this.value)" style="padding:5px 8px;border-radius:6px;border:1.5px solid var(--gray-200);font-weight:700;font-size:12px;">
+              <option value="in_stock" ${current.status==='in_stock'?'selected':''}>Disponível (Uber Flash)</option>
+              <option value="pre_order" ${current.status==='pre_order'?'selected':''}>Sob Encomenda (3-5d)</option>
+              <option value="out_of_stock" ${current.status==='out_of_stock'?'selected':''}>Esgotado</option>
+            </select>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateStockStatus(compoundId, newStatus) {
+      if (!stockData[compoundId]) stockData[compoundId] = { qty: 0 };
+      stockData[compoundId].status = newStatus;
+      localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+      renderStock();
+    }
+
+    function updateStockQty(compoundId, newQty) {
+      if (!stockData[compoundId]) stockData[compoundId] = { status: 'in_stock' };
+      stockData[compoundId].qty = parseInt(newQty) || 0;
+      if (stockData[compoundId].qty === 0) {
+        stockData[compoundId].status = 'out_of_stock';
+      }
+      localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+      renderStock();
+    }
+
+    function filterStockTable() {
+      const q = document.getElementById('stock-search').value.toLowerCase().trim();
+      INITIAL_COMPOUNDS.forEach(c => {
+        const row = document.getElementById('stock-row-' + c.id);
+        if (!row) return;
+        const matches = c.name.toLowerCase().includes(q) || c.line.toLowerCase().includes(q);
+        row.style.display = matches ? '' : 'none';
+      });
+    }
+
+    // Prices Management Logic
+    function renderPrices() {
+      const tbody = document.getElementById('prices-tbody');
+      tbody.innerHTML = '';
+
+      INITIAL_COMPOUNDS.forEach(c => {
+        c.doses.forEach(d => {
+          const customB2C = customPrices[d.code + '_b2c'] || d.suggestedPriceB2C;
+          const customB2B = customPrices[d.code + '_b2b'] || d.b2bBoxPrice;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${c.name}</strong></td>
+            <td><span class="badge" style="background:var(--primary-light);color:var(--primary);">${d.label}</span></td>
+            <td>R$ ${d.totalCostB2C.toFixed(2).replace('.', ',')}</td>
+            <td>
+              R$ <input type="number" id="p-b2c-${d.code}" value="${customB2C}" style="width:80px;padding:4px 6px;border:1px solid var(--gray-200);border-radius:6px;font-weight:800;color:var(--primary);">
+            </td>
+            <td>
+              R$ <input type="number" id="p-b2b-${d.code}" value="${customB2B}" style="width:90px;padding:4px 6px;border:1px solid var(--gray-200);border-radius:6px;font-weight:800;">
+            </td>
+            <td><span style="color:#059669;font-weight:700;">${d.marginPercent}%</span></td>
+            <td>
+              <button class="btn-sm btn-primary" onclick="saveCustomPrice('${d.code}')">Salvar</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    function saveCustomPrice(code) {
+      const b2cInput = document.getElementById('p-b2c-' + code);
+      const b2bInput = document.getElementById('p-b2b-' + code);
+      if (!b2cInput || !b2bInput) return;
+
+      customPrices[code + '_b2c'] = parseFloat(b2cInput.value) || 199;
+      customPrices[code + '_b2b'] = parseFloat(b2bInput.value) || 890;
+      localStorage.setItem('psl_custom_prices', JSON.stringify(customPrices));
+      alert("Preço do produto [" + code + "] atualizado com sucesso na loja!");
+    }
+
+    function resetDefaultPrices() {
+      if (confirm("Deseja restaurar todos os preços para os valores sugeridos originais?")) {
+        customPrices = {};
+        localStorage.removeItem('psl_custom_prices');
+        renderPrices();
+        alert("Preços originais restaurados!");
+      }
+    }
+
+    // CRM Actions
+    function sendReorderReminder(clientName, product, phone) {
+      const msg = "Olá " + clientName + "! Tudo bem?\n\nAqui é da PSL Labs. Pelo cronograma do seu " + product + ", seu frasco deve estar nos últimos dias de aplicação.\n\nComo nosso envio em SP via Uber Moto é no mesmo dia (sujeito ao estoque), quer que eu já separe seu próximo frasco para você não pausar o protocolo?";
+      window.open("https://wa.me/" + phone + "?text=" + encodeURI(msg), "_blank");
+    }
+
+    function sendSupportCheckin(clientName, product, phone) {
+      const msg = "Olá " + clientName + "! Passando para acompanhar seus resultados com o " + product + ". Como está sendo a experiência? Ficou alguma dúvida sobre a reconstituição ou conservação?";
+      window.open("https://wa.me/" + phone + "?text=" + encodeURI(msg), "_blank");
+    }
+
+    // Settings
+    function loadSettings() {
+      const wa = localStorage.getItem('psl_seller_wa') || '5511999999999';
+      const pix = localStorage.getItem('psl_pix_key') || 'financeiro@psllabs.com.br';
+      document.getElementById('cfg-wa').value = wa;
+      document.getElementById('cfg-pix').value = pix;
+    }
+
+    function saveAdminSettings() {
+      const wa = document.getElementById('cfg-wa').value.trim();
+      const pix = document.getElementById('cfg-pix').value.trim();
+      const newPin = document.getElementById('cfg-new-pin').value.trim();
+
+      if (wa) localStorage.setItem('psl_seller_wa', wa.replace(/\D/g, ''));
+      if (pix) localStorage.setItem('psl_pix_key', pix);
+      if (newPin && newPin.length >= 4) {
+        localStorage.setItem('psl_admin_pin', newPin);
+        alert("Configurações salvas e Novo PIN atualizado!");
+      } else {
+        alert("Configurações salvas com sucesso!");
+      }
+    }
+
+    // Run on load
+    checkAuth();
+  </script>
+</body>
+</html>
