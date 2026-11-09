@@ -154,7 +154,6 @@ rawProducts.forEach(item => {
     });
   }
 
-  // Parse dose label from spec
   const match = item.spec.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml)/i);
   let doseLabel = item.spec.split(' ')[0];
   let doseNum = 10;
@@ -182,10 +181,8 @@ rawProducts.forEach(item => {
 
 const compoundList = Array.from(compoundMap.values());
 
-// Sort doses in each compound by number
 compoundList.forEach(c => {
   c.doses.sort((a, b) => a.doseNum - b.doseNum);
-  // Default to 10mg if available, or first
   let defaultIdx = c.doses.findIndex(d => d.doseNum === 10);
   if (defaultIdx === -1 && c.id === 'nad') defaultIdx = c.doses.findIndex(d => d.doseNum === 500);
   if (defaultIdx === -1 && c.id === 'ghk-cu') defaultIdx = c.doses.findIndex(d => d.doseNum === 100);
@@ -193,21 +190,20 @@ compoundList.forEach(c => {
   c.defaultDoseIndex = defaultIdx;
 });
 
-// Sort compounds by popularity rank
 compoundList.sort((a, b) => a.rank - b.rank);
-
-console.log(`Total compounds: ${compoundList.length}`);
-console.log("Top 5 compounds:", compoundList.slice(0, 5).map(c => `${c.name} (${c.doses.length} doses)`));
 
 const htmlContent = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#145C46">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>PSL Labs — Premium Synthesis Line | Peptídeos de Alta Pureza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #145C46;
@@ -226,7 +222,8 @@ const htmlContent = `<!DOCTYPE html>
       --shadow-md: 0 4px 14px -2px rgba(20, 92, 70, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
       --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 18px;
+      --radius-lg: 16px;
+      --bottom-bar-height: 64px;
     }
 
     * {
@@ -234,6 +231,7 @@ const htmlContent = `<!DOCTYPE html>
       margin: 0;
       padding: 0;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -241,6 +239,34 @@ const htmlContent = `<!DOCTYPE html>
       color: var(--dark);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding-bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + 20px);
+    }
+
+    /* Top Announcement Bar */
+    .flash-banner {
+      background: linear-gradient(90deg, #064E3B 0%, #145C46 50%, #064E3B 100%);
+      color: var(--white);
+      padding: 8px 14px;
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1.3;
+    }
+
+    .flash-pill {
+      background: rgba(255, 255, 255, 0.22);
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
     /* Header */
@@ -256,17 +282,16 @@ const htmlContent = `<!DOCTYPE html>
     .header-container {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 14px 20px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
     }
 
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
       text-decoration: none;
       cursor: pointer;
     }
@@ -277,62 +302,33 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .logo-title {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--primary);
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       line-height: 1;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     .logo-title span.labs {
       font-weight: 400;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
     }
 
     .logo-subtitle {
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 700;
       color: var(--primary);
-      letter-spacing: 3.8px;
-      margin-top: 4px;
+      letter-spacing: 2.8px;
+      margin-top: 3px;
     }
 
-    .header-nav {
+    .header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    /* Tabs Pill */
-    .tab-pills {
-      display: flex;
-      background: var(--gray-100);
-      padding: 4px;
-      border-radius: 30px;
-    }
-
-    .tab-btn {
-      padding: 8px 18px;
-      border: none;
-      background: transparent;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--gray-600);
-      border-radius: 24px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tab-btn.active {
-      background: var(--primary);
-      color: var(--white);
-      box-shadow: 0 2px 8px rgba(20, 92, 70, 0.25);
+      gap: 8px;
     }
 
     /* Tier Switcher B2C vs B2B */
@@ -341,165 +337,246 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       background: var(--primary-light);
       border: 1px solid var(--primary-border);
-      border-radius: 30px;
-      padding: 3px;
+      border-radius: 24px;
+      padding: 2px;
     }
 
     .tier-btn {
-      padding: 6px 14px;
+      padding: 6px 11px;
       border: none;
       background: transparent;
-      border-radius: 20px;
-      font-size: 12px;
+      border-radius: 18px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--primary-dark);
       cursor: pointer;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     .tier-btn.active {
       background: var(--primary);
       color: var(--white);
+      box-shadow: 0 1px 4px rgba(20, 92, 70, 0.2);
     }
 
-    /* Cart Header Button */
-    .cart-btn {
-      background: var(--dark);
-      color: var(--white);
-      border: none;
-      padding: 9px 18px;
-      border-radius: 30px;
-      font-size: 13.5px;
-      font-weight: 700;
+    /* Desktop Navigation Tabs (Hidden on Mobile) */
+    .desktop-nav {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 40px;
+      }
+      .desktop-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tab-pills {
+        display: flex;
+        background: var(--gray-100);
+        padding: 4px;
+        border-radius: 30px;
+      }
+      .tab-btn {
+        padding: 8px 18px;
+        border: none;
+        background: transparent;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--gray-600);
+        border-radius: 24px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: var(--white);
+      }
+      .cart-btn-desktop {
+        background: var(--dark);
+        color: var(--white);
+        border: none;
+        padding: 9px 16px;
+        border-radius: 24px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+      }
+    }
+
+    /* Bottom Mobile Navigation Bar (Estilo App Nativo) */
+    .mobile-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--gray-200);
       display: flex;
       align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
+      justify-content: space-around;
+      z-index: 150;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    .cart-btn:hover {
-      transform: translateY(-1px);
+    @media (min-width: 768px) {
+      .mobile-bottom-bar {
+        display: none;
+      }
     }
 
-    .cart-badge {
-      background: var(--accent);
-      color: var(--white);
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 800;
-    }
-
-    /* Hero / Announcement Bar */
-    .flash-banner {
-      background: linear-gradient(90deg, #064E3B 0%, #145C46 50%, #064E3B 100%);
-      color: var(--white);
-      padding: 10px 20px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+    .bottom-bar-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: transparent;
+      color: var(--gray-600);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+      padding: 4px 0;
     }
 
-    .flash-pill {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
+    .bottom-bar-item.active {
+      color: var(--primary);
+    }
+
+    .bottom-bar-icon {
+      font-size: 20px;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .bottom-cart-badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 18px);
+      background: #EF4444;
+      color: var(--white);
+      font-size: 10px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      padding: 1px 5px;
+      border-radius: 10px;
+      min-width: 16px;
+      text-align: center;
     }
 
     /* Main Container */
     .main-wrap {
       max-width: 1280px;
-      margin: 24px auto;
-      padding: 0 20px 80px 20px;
+      margin: 12px auto;
+      padding: 0 12px;
     }
 
-    /* Controls Bar: Search & Categories */
+    @media (min-width: 768px) {
+      .main-wrap {
+        margin: 24px auto;
+        padding: 0 20px;
+      }
+    }
+
+    /* Controls: Search & Category Filter */
     .controls-panel {
       background: var(--white);
-      padding: 20px;
-      border-radius: var(--radius-lg);
+      padding: 12px;
+      border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--gray-200);
-      margin-bottom: 24px;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 12px;
       margin-bottom: 16px;
     }
 
+    @media (min-width: 768px) {
+      .controls-panel {
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 24px;
+      }
+    }
+
+    .search-row {
+      margin-bottom: 10px;
+    }
+
     .search-input-wrap {
-      flex: 1;
       position: relative;
+      width: 100%;
     }
 
     .search-input {
       width: 100%;
-      padding: 13px 18px 13px 44px;
+      padding: 12px 14px 12px 40px;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      font-size: 14.5px;
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* Evita auto-zoom no Safari iOS */
       outline: none;
-      transition: border-color 0.2s;
+      background: #FAFCFB;
     }
 
     .search-input:focus {
       border-color: var(--primary);
+      background: var(--white);
     }
 
     .search-icon {
       position: absolute;
-      left: 16px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--gray-400);
       font-size: 16px;
+      pointer-events: none;
     }
 
-    /* Category Chips */
+    /* Category Chips Mobile Scroll */
+    .category-chips-wrap {
+      position: relative;
+    }
+
     .category-chips {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
       padding-bottom: 4px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .category-chips::-webkit-scrollbar {
-      height: 4px;
-    }
-    .category-chips::-webkit-scrollbar-thumb {
-      background: var(--gray-200);
-      border-radius: 4px;
+      display: none;
     }
 
     .chip-btn {
       white-space: nowrap;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border: 1px solid var(--gray-200);
       background: var(--white);
       color: var(--gray-600);
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       border-radius: 20px;
       cursor: pointer;
+      flex-shrink: 0;
       transition: all 0.15s ease;
     }
 
-    .chip-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
+    .chip-btn:active {
+      transform: scale(0.96);
     }
 
     .chip-btn.active {
@@ -508,56 +585,60 @@ const htmlContent = `<!DOCTYPE html>
       border-color: var(--primary);
     }
 
-    /* Section Meta */
+    /* Section Meta Title */
     .section-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       padding: 0 4px;
-    }
-
-    .section-title-tag {
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--gray-600);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
     }
 
     .sort-indicator {
-      font-size: 12px;
       color: var(--primary);
-      font-weight: 600;
       background: var(--primary-light);
-      padding: 4px 10px;
-      border-radius: 12px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
     }
 
     /* Products Grid */
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 22px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
+    @media (min-width: 640px) {
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+      }
+    }
+
+    /* Card Mobile Optimized */
     .product-card {
       background: var(--white);
       border: 1px solid var(--gray-200);
-      border-radius: var(--radius-lg);
-      padding: 22px;
+      border-radius: var(--radius-md);
+      padding: 16px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.2s ease;
       position: relative;
-    }
-
-    .product-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--primary-border);
     }
 
     .product-card.top-featured {
@@ -565,82 +646,73 @@ const htmlContent = `<!DOCTYPE html>
       background: linear-gradient(180deg, #FFFFFF 0%, #FAFCFB 100%);
     }
 
-    .card-top {
-      margin-bottom: 14px;
-    }
-
     .card-badges {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      gap: 6px;
+      margin-bottom: 8px;
+      gap: 4px;
       flex-wrap: wrap;
     }
 
     .line-tag {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--primary);
       background: var(--primary-light);
-      padding: 4px 10px;
-      border-radius: 14px;
-      letter-spacing: 0.3px;
+      padding: 3px 8px;
+      border-radius: 12px;
     }
 
     .badge-top {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 800;
       color: #9A3412;
       background: #FFEDD5;
-      padding: 3px 8px;
+      padding: 2px 7px;
       border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 3px;
     }
 
     .purity-badge {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       color: #065F46;
       background: #D1FAE5;
-      padding: 3px 7px;
+      padding: 2px 6px;
       border-radius: 6px;
     }
 
     .product-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
       color: var(--dark);
       line-height: 1.2;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .product-desc {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--gray-600);
-      line-height: 1.45;
-      margin-bottom: 16px;
-      min-height: 38px;
+      line-height: 1.4;
+      margin-bottom: 12px;
     }
 
-    /* Dose Selector Section */
+    /* Dose Selector Box */
     .dose-selector-box {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       background: #F8FAFC;
       border: 1px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
     }
 
     .dose-header {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--gray-600);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      letter-spacing: 0.4px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
     }
@@ -648,11 +720,12 @@ const htmlContent = `<!DOCTYPE html>
     .dose-pills-wrap {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 5px;
     }
 
     .dose-pill {
-      padding: 5px 11px;
+      min-height: 34px;
+      padding: 4px 10px;
       border: 1.5px solid var(--gray-200);
       background: var(--white);
       color: var(--dark);
@@ -660,63 +733,60 @@ const htmlContent = `<!DOCTYPE html>
       font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .dose-pill:hover {
-      border-color: var(--primary);
-      color: var(--primary);
+    .dose-pill:active {
+      transform: scale(0.95);
     }
 
     .dose-pill.active {
       background: var(--primary);
       color: var(--white);
       border-color: var(--primary);
-      box-shadow: 0 2px 6px rgba(20, 92, 70, 0.2);
     }
 
     .dose-select-dropdown {
       width: 100%;
-      padding: 8px 10px;
+      height: 40px;
+      padding: 0 10px;
       border: 1.5px solid var(--gray-200);
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--dark);
       outline: none;
       background: var(--white);
     }
 
-    .dose-select-dropdown:focus {
-      border-color: var(--primary);
-    }
-
     /* Card Pricing Box */
     .card-pricing {
       background: var(--gray-100);
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
     }
 
     .price-label {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--gray-600);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .price-value {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--primary);
       line-height: 1.1;
-      margin: 2px 0;
+      margin: 1px 0;
     }
 
     .price-sub {
-      font-size: 11.5px;
+      font-size: 11px;
       color: #059669;
       font-weight: 600;
     }
@@ -728,112 +798,113 @@ const htmlContent = `<!DOCTYPE html>
 
     .btn-add {
       flex: 1;
-      padding: 12px;
+      height: 44px;
       border: none;
       background: var(--primary);
       color: var(--white);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: background 0.15s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
 
-    .btn-add:hover {
+    .btn-add:active {
       background: var(--primary-dark);
+      transform: scale(0.98);
     }
 
     .btn-calc-shortcut {
-      padding: 12px 14px;
+      height: 44px;
+      padding: 0 14px;
       border: 1.5px solid var(--primary-border);
       background: var(--white);
       color: var(--primary);
-      border-radius: var(--radius-md);
-      font-size: 13.5px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
-    .btn-calc-shortcut:hover {
+    .btn-calc-shortcut:active {
       background: var(--primary-light);
     }
 
-    /* Calculator View */
+    /* Calculator View Mobile */
     .calc-view {
       display: none;
     }
 
     .calc-container {
       background: var(--white);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
       border: 1px solid var(--gray-200);
-      box-shadow: var(--shadow-md);
-      padding: 32px;
-      max-width: 900px;
+      box-shadow: var(--shadow-sm);
+      padding: 18px 14px;
       margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+      .calc-container {
+        padding: 32px;
+        border-radius: var(--radius-lg);
+      }
     }
 
     .calc-header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .calc-title {
-      font-size: 26px;
+      font-size: 20px;
       font-weight: 900;
       color: var(--primary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .calc-subtitle {
-      font-size: 14.5px;
+      font-size: 13px;
       color: var(--gray-600);
-      max-width: 580px;
-      margin: 0 auto;
     }
 
     .calc-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      margin-bottom: 32px;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 768px) {
       .calc-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
       }
     }
 
     .input-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .input-label {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       color: var(--dark);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
     }
 
-    .input-label span.hint {
-      font-weight: 400;
-      color: var(--gray-400);
-    }
-
     .select-box, .text-box {
       width: 100%;
-      padding: 12px 14px;
+      height: 44px;
+      padding: 0 12px;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      font-size: 14.5px;
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* 16px no iOS previne zoom */
       font-weight: 600;
       outline: none;
       background: var(--white);
@@ -843,78 +914,71 @@ const htmlContent = `<!DOCTYPE html>
       border-color: var(--primary);
     }
 
-    /* Syringe SVG Visualizer */
+    /* Syringe Card */
     .syringe-card {
       background: var(--gray-100);
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      border-radius: var(--radius-sm);
+      padding: 16px 12px;
       text-align: center;
     }
 
     .result-badge {
       background: var(--primary);
       color: var(--white);
-      padding: 12px 24px;
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
-      width: 100%;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
     }
 
     .result-units {
-      font-size: 34px;
+      font-size: 30px;
       font-weight: 900;
-      letter-spacing: -0.5px;
     }
 
     .result-desc {
-      font-size: 13px;
+      font-size: 12px;
       opacity: 0.95;
     }
 
     .syringe-svg-wrap {
       width: 100%;
-      max-width: 380px;
-      margin: 14px 0;
+      margin: 10px 0;
     }
 
     .yield-stat {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--gray-600);
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
-    /* Step by step didactic guide */
+    /* Guide Steps */
     .guide-steps {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 24px;
-      padding-top: 24px;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
       border-top: 1px solid var(--gray-200);
     }
 
-    @media (max-width: 650px) {
+    @media (min-width: 650px) {
       .guide-steps {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
     .step-box {
-      background: var(--white);
-      padding: 16px;
-      border-radius: var(--radius-md);
+      background: #FAFCFB;
+      padding: 14px;
+      border-radius: var(--radius-sm);
       border: 1px solid var(--gray-200);
     }
 
     .step-num {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       background: var(--primary-light);
       color: var(--primary);
       border-radius: 50%;
@@ -922,31 +986,30 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 13px;
-      margin-bottom: 10px;
+      font-size: 12px;
+      margin-bottom: 6px;
     }
 
     .step-title {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
-      margin-bottom: 4px;
-      color: var(--dark);
+      margin-bottom: 2px;
     }
 
     .step-text {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--gray-600);
-      line-height: 1.45;
+      line-height: 1.4;
     }
 
-    /* Cart Modal / Drawer */
+    /* Cart Modal (Bottom Sheet on Mobile, Drawer on Desktop) */
     .cart-drawer-backdrop {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(4px);
       z-index: 200;
       display: none;
@@ -956,21 +1019,38 @@ const htmlContent = `<!DOCTYPE html>
 
     .cart-drawer {
       position: fixed;
-      top: 0;
-      right: -480px;
-      bottom: 0;
-      width: 100%;
-      max-width: 460px;
+      left: 0;
+      right: 0;
+      bottom: -100%;
+      max-height: 90vh;
       background: var(--white);
       z-index: 210;
-      box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
-      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (min-width: 768px) {
+      .cart-drawer {
+        top: 0;
+        bottom: 0;
+        left: auto;
+        right: -480px;
+        width: 460px;
+        max-height: 100vh;
+        border-radius: 0;
+        transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .cart-drawer.open {
+        right: 0;
+        bottom: 0;
+      }
     }
 
     .cart-drawer.open {
-      right: 0;
+      bottom: 0;
     }
 
     .cart-drawer-backdrop.open {
@@ -978,8 +1058,23 @@ const htmlContent = `<!DOCTYPE html>
       opacity: 1;
     }
 
+    /* Mobile Sheet Grab Handle */
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 2px;
+      margin: 8px auto 2px auto;
+    }
+
+    @media (min-width: 768px) {
+      .sheet-handle {
+        display: none;
+      }
+    }
+
     .cart-header {
-      padding: 20px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--gray-200);
       display: flex;
       justify-content: space-between;
@@ -987,7 +1082,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .cart-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--dark);
     }
@@ -995,24 +1090,32 @@ const htmlContent = `<!DOCTYPE html>
     .btn-close-cart {
       background: transparent;
       border: none;
-      font-size: 22px;
+      font-size: 20px;
       color: var(--gray-400);
+      padding: 4px 8px;
       cursor: pointer;
     }
 
     .cart-body {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
+      padding: 14px 18px;
+      max-height: 45vh;
+    }
+
+    @media (min-width: 768px) {
+      .cart-body {
+        max-height: none;
+      }
     }
 
     .cart-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 0;
+      padding: 10px 0;
       border-bottom: 1px solid var(--gray-100);
-      gap: 12px;
+      gap: 10px;
     }
 
     .item-meta {
@@ -1020,18 +1123,17 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .item-name {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
-      color: var(--dark);
     }
 
     .item-sub {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--gray-600);
     }
 
     .item-price {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 800;
       color: var(--primary);
     }
@@ -1039,41 +1141,39 @@ const htmlContent = `<!DOCTYPE html>
     .qty-controls {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn-qty {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border: 1px solid var(--gray-200);
       background: var(--white);
       border-radius: 6px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .cart-footer {
-      padding: 20px;
+      padding: 14px 18px calc(14px + env(safe-area-inset-bottom)) 18px;
       border-top: 1px solid var(--gray-200);
       background: var(--bg-page);
-    }
-
-    .shipping-select-wrap {
-      margin-bottom: 16px;
     }
 
     .shipping-option {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
+      gap: 8px;
+      padding: 8px 10px;
       background: var(--white);
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      margin-bottom: 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
     .shipping-option.selected {
@@ -1081,29 +1181,26 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--primary-light);
     }
 
-    .shipping-text {
-      flex: 1;
-    }
-
     .shipping-title {
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--dark);
     }
 
     .shipping-desc {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--gray-600);
     }
 
     .client-input {
       width: 100%;
-      padding: 10px 12px;
+      height: 42px;
+      padding: 0 12px;
       border: 1px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: 13px;
-      margin-bottom: 8px;
+      font-size: 15px;
+      margin-bottom: 6px;
       outline: none;
+      background: var(--white);
     }
 
     .client-input:focus {
@@ -1114,86 +1211,52 @@ const htmlContent = `<!DOCTYPE html>
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      padding-top: 10px;
+      margin-bottom: 10px;
+      padding-top: 6px;
     }
 
     .cart-total-label {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      color: var(--dark);
     }
 
     .cart-total-val {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--primary);
     }
 
     .btn-checkout-whatsapp {
       width: 100%;
+      height: 48px;
       background: #25D366;
       color: var(--white);
       border: none;
-      padding: 15px;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       font-size: 15px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: background 0.15s ease;
-      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+      gap: 8px;
+      box-shadow: 0 3px 12px rgba(37, 211, 102, 0.3);
     }
 
-    .btn-checkout-whatsapp:hover {
+    .btn-checkout-whatsapp:active {
       background: #1EBE5D;
-    }
-
-    /* Floating WhatsApp Icon */
-    .whatsapp-support-pill {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      border-radius: 30px;
-      padding: 10px 18px;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--dark);
-      text-decoration: none;
-      z-index: 90;
-      transition: transform 0.15s ease;
-    }
-
-    .whatsapp-support-pill:hover {
-      transform: translateY(-2px);
-    }
-
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      background: #10B981;
-      border-radius: 50%;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      transform: scale(0.98);
     }
 
     .cfg-modal-btn {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--gray-400);
       background: none;
       border: none;
       cursor: pointer;
       text-decoration: underline;
       display: block;
-      margin-top: 8px;
+      margin-top: 6px;
       text-align: center;
       width: 100%;
     }
@@ -1203,10 +1266,8 @@ const htmlContent = `<!DOCTYPE html>
 
   <!-- Top Announcement Bar -->
   <div class="flash-banner">
-    <span class="flash-pill">⚡ PSL Flash SP</span>
-    <span>Entrega no mesmo dia em até <strong>2 Horas</strong> em São Paulo (Capital e Grande SP) via Uber Moto / Flash!</span>
-    <span style="opacity: 0.6;">•</span>
-    <span>Envios diários via Sedex para todo o Brasil</span>
+    <span class="flash-pill">⚡ Flash SP</span>
+    <span>Entrega em até <strong>2h na Grande SP</strong> via Uber Moto • Sedex Brasil</span>
   </div>
 
   <!-- Header -->
@@ -1221,31 +1282,31 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </div>
 
-      <div class="header-nav">
-        <!-- Main Navigation Pills -->
-        <div class="tab-pills">
-          <button class="tab-btn active" id="tab-nav-catalog" onclick="switchView('catalog')">
-            📦 Catálogo
-          </button>
-          <button class="tab-btn" id="tab-nav-calc" onclick="switchView('calc')">
-            💉 Calculadora de Doses
+      <div class="header-right">
+        <!-- Desktop Navigation Tabs -->
+        <div class="desktop-nav">
+          <div class="tab-pills">
+            <button class="tab-btn active" id="tab-nav-catalog" onclick="switchView('catalog')">
+              📦 Catálogo
+            </button>
+            <button class="tab-btn" id="tab-nav-calc" onclick="switchView('calc')">
+              💉 Calculadora
+            </button>
+          </div>
+          <button class="cart-btn-desktop" onclick="toggleCart(true)">
+            🛒 Pedido (<span id="cart-badge-count-desktop">0</span>)
           </button>
         </div>
 
         <!-- Tier Switcher B2C vs B2B -->
         <div class="tier-box">
           <button class="tier-btn active" id="tier-b2c" onclick="setTier('b2c')">
-            👤 Consumidor (1 Frasco)
+            👤 1 Frasco
           </button>
           <button class="tier-btn" id="tier-b2b" onclick="setTier('b2b')">
-            💼 Atacado (Caixa c/ 10)
+            💼 Atacado (10 un)
           </button>
         </div>
-
-        <!-- Cart Button -->
-        <button class="cart-btn" onclick="toggleCart(true)">
-          🛒 Pedido <span class="cart-badge" id="cart-badge-count">0</span>
-        </button>
       </div>
     </div>
   </header>
@@ -1260,25 +1321,27 @@ const htmlContent = `<!DOCTYPE html>
         <div class="search-row">
           <div class="search-input-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" class="search-input" placeholder="Buscar por peptídeo ou dose (ex: Retatrutide, Tirzepatide, BPC-157, NAD+)..." oninput="filterCompounds()">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar peptídeo (ex: Retatrutide, BPC-157)..." oninput="filterCompounds()">
           </div>
         </div>
-        <div class="category-chips" id="category-chips">
-          <button class="chip-btn active" onclick="setCategory('TODOS')">🔥 Todos os Peptídeos</button>
-          <button class="chip-btn" onclick="setCategory('Metabolismo & Shape')">⚡ Metabolismo & Emagrecimento</button>
-          <button class="chip-btn" onclick="setCategory('Regeneração & Articulações')">🩹 Regeneração & Articulações</button>
-          <button class="chip-btn" onclick="setCategory('Longevidade & Biohacking')">🧬 Longevidade & Biohacking</button>
-          <button class="chip-btn" onclick="setCategory('Cérebro & Foco')">🧠 Cérebro, Foco & Humor</button>
-          <button class="chip-btn" onclick="setCategory('Estética & Pele')">✨ Estética, Pele & Colágeno</button>
-          <button class="chip-btn" onclick="setCategory('Massa Magra & GH')">💪 Massa Magra & GH</button>
-          <button class="chip-btn" onclick="setCategory('Imunidade & Vitalidade')">🛡️ Imunidade & Vitalidade</button>
+        <div class="category-chips-wrap">
+          <div class="category-chips" id="category-chips">
+            <button class="chip-btn active" onclick="setCategory('TODOS')">🔥 Todos</button>
+            <button class="chip-btn" onclick="setCategory('Metabolismo & Shape')">⚡ Emagrecimento & GLP-1</button>
+            <button class="chip-btn" onclick="setCategory('Regeneração & Articulações')">🩹 Regeneração & Articulações</button>
+            <button class="chip-btn" onclick="setCategory('Longevidade & Biohacking')">🧬 Longevidade & NAD+</button>
+            <button class="chip-btn" onclick="setCategory('Cérebro & Foco')">🧠 Cérebro & Foco</button>
+            <button class="chip-btn" onclick="setCategory('Estética & Pele')">✨ Estética & Pele</button>
+            <button class="chip-btn" onclick="setCategory('Massa Magra & GH')">💪 Massa Magra & GH</button>
+            <button class="chip-btn" onclick="setCategory('Imunidade & Vitalidade')">🛡️ Imunidade</button>
+          </div>
         </div>
       </div>
 
       <!-- Section Title & Meta -->
       <div class="section-meta-row">
-        <div class="section-title-tag" id="section-meta-text">Catálogo Oficial PSL Labs — Selecione a Dosagem (MG)</div>
-        <div class="sort-indicator">⭐ Mais Procurados Primeiro</div>
+        <span id="section-meta-text">Catálogo Oficial PSL Labs</span>
+        <span class="sort-indicator">⭐ Mais Procurados</span>
       </div>
 
       <!-- Products Grid -->
@@ -1289,21 +1352,21 @@ const htmlContent = `<!DOCTYPE html>
     <div id="calc-view" class="calc-view">
       <div class="calc-container">
         <div class="calc-header">
-          <h2 class="calc-title">💉 Calculadora de Reconstituição & Doses</h2>
-          <p class="calc-subtitle">Elimine qualquer dúvida de diluição e saiba exatamente quantos tracinhos puxar na sua seringa de insulina com segurança.</p>
+          <h2 class="calc-title">💉 Calculadora de Reconstituição</h2>
+          <p class="calc-subtitle">Saiba exatamente quantos tracinhos puxar na seringa de insulina com segurança.</p>
         </div>
 
         <div class="calc-grid">
           <!-- Left: Inputs -->
           <div class="calc-inputs">
             <div class="input-group">
-              <label class="input-label">1. Selecione o Peptídeo ou Concentração do Frasco</label>
+              <label class="input-label">1. Concentração do Frasco</label>
               <select id="calc-peptide-select" class="select-box" onchange="onPeptideSelectChange()">
-                <option value="10" selected>Retatrutide / Tirzepatide (10 mg) [Mais Procurado]</option>
+                <option value="10" selected>Retatrutide / Tirzepatide (10 mg) [Top]</option>
                 <option value="5">Retatrutide / Tirzepatide (5 mg)</option>
                 <option value="15">Retatrutide / Tirzepatide (15 mg)</option>
                 <option value="20">Tirzepatide / Retatrutide (20 mg)</option>
-                <option value="10">BPC-157 / TB-500 (10 mg) [Mais Procurado]</option>
+                <option value="10">BPC-157 / TB-500 (10 mg) [Top]</option>
                 <option value="5">BPC-157 (5 mg)</option>
                 <option value="20">BPC-157 + TB-500 Blend (20 mg)</option>
                 <option value="500">NAD+ Longevidade (500 mg)</option>
@@ -1314,29 +1377,26 @@ const htmlContent = `<!DOCTYPE html>
             </div>
 
             <div class="input-group" id="manual-mg-wrap" style="display: none;">
-              <label class="input-label">Quantidade de pó no frasco (mg)</label>
+              <label class="input-label">Pó no frasco (mg)</label>
               <input type="number" id="calc-vial-mg" class="text-box" value="10" min="0.1" step="0.1" oninput="calculateDose()">
             </div>
 
             <div class="input-group">
               <label class="input-label">
-                2. Volume de Água Bacteriostática adicionada
-                <span class="hint">ml</span>
+                2. Água Bacteriostática Adicionada
+                <span class="hint">Volume (ml)</span>
               </label>
               <select id="calc-water-ml" class="select-box" onchange="calculateDose()">
                 <option value="1">1.0 ml (Mais concentrado)</option>
-                <option value="2" selected>2.0 ml (Padrão recomendado)</option>
+                <option value="2" selected>2.0 ml (Recomendado)</option>
                 <option value="2.5">2.5 ml</option>
-                <option value="3">3.0 ml (Mais suave)</option>
+                <option value="3">3.0 ml (Mais diluído)</option>
                 <option value="5">5.0 ml</option>
               </select>
             </div>
 
             <div class="input-group">
-              <label class="input-label">
-                3. Dose Desejada por Aplicação
-                <span class="hint" id="calc-dose-unit-hint">mcg ou mg</span>
-              </label>
+              <label class="input-label">3. Dose Desejada por Aplicação</label>
               <div style="display: flex; gap: 8px;">
                 <input type="number" id="calc-dose-amount" class="text-box" value="500" min="1" step="1" oninput="calculateDose()">
                 <select id="calc-dose-unit" class="select-box" style="width: 100px;" onchange="calculateDose()">
@@ -1347,11 +1407,11 @@ const htmlContent = `<!DOCTYPE html>
             </div>
 
             <div class="input-group">
-              <label class="input-label">4. Tipo de Seringa de Insulina Utilizada</label>
+              <label class="input-label">4. Tipo de Seringa de Insulina</label>
               <select id="calc-syringe-type" class="select-box" onchange="calculateDose()">
-                <option value="100" selected>Seringa U-100 (1.0 ml = 100 Unidades)</option>
-                <option value="50">Seringa U-50 (0.5 ml = 50 Unidades)</option>
-                <option value="30">Seringa U-30 (0.3 ml = 30 Unidades)</option>
+                <option value="100" selected>Seringa U-100 (1.0 ml = 100 UI)</option>
+                <option value="50">Seringa U-50 (0.5 ml = 50 UI)</option>
+                <option value="30">Seringa U-30 (0.3 ml = 30 UI)</option>
               </select>
             </div>
           </div>
@@ -1360,14 +1420,14 @@ const htmlContent = `<!DOCTYPE html>
           <div class="calc-results">
             <div class="syringe-card">
               <div class="result-badge">
-                <div class="price-label" style="color: rgba(255,255,255,0.8);">Puxe na sua seringa até:</div>
+                <div class="price-label" style="color: rgba(255,255,255,0.85);">Puxe na seringa até:</div>
                 <div class="result-units" id="res-units">10 UI</div>
                 <div class="result-desc" id="res-units-desc">10 Unidades de Insulina</div>
               </div>
 
-              <!-- Interactive Syringe SVG -->
+              <!-- Interactive Syringe SVG (Responsive) -->
               <div class="syringe-svg-wrap">
-                <svg id="syringe-svg" viewBox="0 0 320 80" width="100%" height="80">
+                <svg id="syringe-svg" viewBox="0 0 320 80" width="100%" height="auto" style="max-height: 80px;">
                   <rect x="30" y="20" width="230" height="40" rx="4" fill="#FFFFFF" stroke="#334155" stroke-width="2"/>
                   <rect id="syringe-fluid" x="30" y="22" width="46" height="36" fill="#10B981" opacity="0.75"/>
                   <rect id="syringe-plunger" x="76" y="16" width="6" height="48" fill="#145C46" rx="2"/>
@@ -1391,31 +1451,31 @@ const htmlContent = `<!DOCTYPE html>
               </div>
 
               <div class="yield-stat" id="res-yield">
-                Rendimento do Frasco: <strong>20 aplicações</strong>
+                Rendimento: <strong>20 aplicações</strong>
               </div>
-              <div style="font-size: 11.5px; color: #059669; font-weight: 600; margin-top: 4px;" id="res-concentration">
-                Concentração: 5.0 mg por ml (ou 500 mcg a cada 10 UI)
+              <div style="font-size: 11px; color: #059669; font-weight: 600; margin-top: 4px;" id="res-concentration">
+                5.0 mg/ml (500 mcg a cada 10 UI)
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 3-Step Didactic Protocol -->
+        <!-- 3-Step Protocol -->
         <div class="guide-steps">
           <div class="step-box">
             <div class="step-num">1</div>
-            <div class="step-title">Injeção Suave da Água</div>
-            <div class="step-text">Introduza a água bacteriostática escorrendo lentamente pelas paredes do vidro do frasco. Nunca jogue o jato direto sobre o pó.</div>
+            <div class="step-title">Injeção Suave</div>
+            <div class="step-text">Deixe a água escorrer devagar pela parede do frasco. Nunca jogue o jato direto sobre o pó.</div>
           </div>
           <div class="step-box">
             <div class="step-num">2</div>
-            <div class="step-title">Dissolução sem Chacoalhar</div>
-            <div class="step-text">Faça movimentos circulares suaves e lentos com o frasco. Peptídeos são frágeis e quebram se forem agitados com força.</div>
+            <div class="step-title">Não Chacoalhe</div>
+            <div class="step-text">Faça giros lentos e circulares. Peptídeos são frágeis e quebram se forem agitados com força.</div>
           </div>
           <div class="step-box">
             <div class="step-num">3</div>
-            <div class="step-title">Refrigeração Imediata</div>
-            <div class="step-text">Após reconstituído, guarde obrigatoriamente na geladeira entre 2°C e 8°C. Não congele a solução já diluída.</div>
+            <div class="step-title">Geladeira (2°C a 8°C)</div>
+            <div class="step-text">Guarde sempre na porta/meio da geladeira. Nunca congele a solução já diluída.</div>
           </div>
         </div>
       </div>
@@ -1423,49 +1483,71 @@ const htmlContent = `<!DOCTYPE html>
 
   </div>
 
-  <!-- Cart Drawer -->
+  <!-- Mobile Bottom App Bar -->
+  <nav class="mobile-bottom-bar">
+    <button class="bottom-bar-item active" id="btn-m-catalog" onclick="switchView('catalog')">
+      <span class="bottom-bar-icon">📦</span>
+      <span>Catálogo</span>
+    </button>
+    <button class="bottom-bar-item" id="btn-m-calc" onclick="switchView('calc')">
+      <span class="bottom-bar-icon">💉</span>
+      <span>Calculadora</span>
+    </button>
+    <button class="bottom-bar-item" onclick="toggleCart(true)">
+      <span class="bottom-bar-icon">🛒</span>
+      <span>Pedido</span>
+      <span class="bottom-cart-badge" id="cart-badge-count-mobile">0</span>
+    </button>
+    <button class="bottom-bar-item" onclick="directSupportWhatsApp()">
+      <span class="bottom-bar-icon">💬</span>
+      <span>Dúvidas</span>
+    </button>
+  </nav>
+
+  <!-- Cart Modal / Bottom Sheet -->
   <div class="cart-drawer-backdrop" id="cart-backdrop" onclick="toggleCart(false)"></div>
   <div class="cart-drawer" id="cart-drawer">
+    <div class="sheet-handle"></div>
     <div class="cart-header">
       <div class="cart-title">🛍️ Seu Pedido PSL Labs</div>
       <button class="btn-close-cart" onclick="toggleCart(false)">✕</button>
     </div>
 
     <div class="cart-body" id="cart-items-wrap">
-      <div style="text-align: center; color: var(--gray-400); margin-top: 60px;">
+      <div style="text-align: center; color: var(--gray-400); margin-top: 40px; font-size: 13px;">
         Seu carrinho está vazio.<br>Escolha os peptídeos no catálogo.
       </div>
     </div>
 
     <div class="cart-footer">
       <!-- Shipping Selector -->
-      <div class="shipping-select-wrap">
-        <label class="input-label" style="margin-bottom: 6px;">Forma de Entrega Desejada:</label>
+      <div style="margin-bottom: 10px;">
+        <label class="input-label" style="margin-bottom: 4px; font-size: 11.5px;">Forma de Entrega:</label>
         
         <div class="shipping-option selected" id="ship-uber" onclick="setShipping('uber')">
           <input type="radio" name="shipping" checked>
-          <div class="shipping-text">
+          <div>
             <div class="shipping-title">⚡ Uber Moto / Flash — São Paulo (Até 2h)</div>
-            <div class="shipping-desc">Capital e Grande SP (Taxa calculada no fechamento)</div>
+            <div class="shipping-desc">Capital e Grande SP (Mesmo dia)</div>
           </div>
         </div>
 
         <div class="shipping-option" id="ship-sedex" onclick="setShipping('sedex')">
           <input type="radio" name="shipping">
-          <div class="shipping-text">
+          <div>
             <div class="shipping-title">📦 Correios Sedex — Todo o Brasil (2 a 5 dias)</div>
-            <div class="shipping-desc">Embalagem protetora e código de rastreio</div>
+            <div class="shipping-desc">Com proteção isotérmica e rastreio</div>
           </div>
         </div>
       </div>
 
       <!-- Client Info Form -->
       <input type="text" id="client-name" class="client-input" placeholder="Seu Nome Completo">
-      <input type="text" id="client-address" class="client-input" placeholder="Endereço / Bairro ou CEP de Entrega">
+      <input type="text" id="client-address" class="client-input" placeholder="Endereço / Bairro ou CEP">
 
       <!-- Total & Action -->
       <div class="cart-total-row">
-        <span class="cart-total-label">Total do Pedido:</span>
+        <span class="cart-total-label">Total:</span>
         <span class="cart-total-val" id="cart-total-display">R$ 0,00</span>
       </div>
 
@@ -1474,16 +1556,10 @@ const htmlContent = `<!DOCTYPE html>
       </button>
 
       <button class="cfg-modal-btn" onclick="promptWhatsappNumber()">
-        ⚙️ Configurar número de WhatsApp de recebimento
+        ⚙️ Configurar WhatsApp de recebimento
       </button>
     </div>
   </div>
-
-  <!-- WhatsApp Floating Pill -->
-  <a href="javascript:void(0)" class="whatsapp-support-pill" onclick="directSupportWhatsApp()">
-    <span class="status-dot"></span>
-    <span>Dúvidas? Fale com a PSL Labs</span>
-  </a>
 
   <!-- Embedded Product Database -->
   <script>
@@ -1516,17 +1592,23 @@ const htmlContent = `<!DOCTYPE html>
       const calcView = document.getElementById('calc-view');
       const tabCat = document.getElementById('tab-nav-catalog');
       const tabCalc = document.getElementById('tab-nav-calc');
+      const btnMCat = document.getElementById('btn-m-catalog');
+      const btnMCalc = document.getElementById('btn-m-calc');
 
       if (view === 'catalog') {
         catView.style.display = 'block';
         calcView.style.display = 'none';
-        tabCat.classList.add('active');
-        tabCalc.classList.remove('active');
+        if (tabCat) tabCat.classList.add('active');
+        if (tabCalc) tabCalc.classList.remove('active');
+        if (btnMCat) btnMCat.classList.add('active');
+        if (btnMCalc) btnMCalc.classList.remove('active');
       } else {
         catView.style.display = 'none';
         calcView.style.display = 'block';
-        tabCat.classList.remove('active');
-        tabCalc.classList.add('active');
+        if (tabCat) tabCat.classList.remove('active');
+        if (tabCalc) tabCalc.classList.add('active');
+        if (btnMCat) btnMCat.classList.remove('active');
+        if (btnMCalc) btnMCalc.classList.add('active');
         calculateDose();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1578,7 +1660,6 @@ const htmlContent = `<!DOCTYPE html>
       const priceLabel = isB2B ? "Preço de Atacado (Caixa c/ 10 Frascos):" : "Valor Unitário (1 Frasco):";
       const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco (Caixa c/ 10)" : "✓ 1 Frasco Liofilizado + Água Bacteriostática";
 
-      // Update price elements
       const valEl = card.querySelector('.price-value');
       const labelEl = card.querySelector('.price-label');
       const subEl = card.querySelector('.price-sub');
@@ -1586,7 +1667,6 @@ const htmlContent = `<!DOCTYPE html>
       if (labelEl) labelEl.textContent = priceLabel;
       if (subEl) subEl.textContent = priceSub;
 
-      // Update active pill or dropdown
       const pills = card.querySelectorAll('.dose-pill');
       pills.forEach((p, idx) => {
         p.classList.toggle('active', idx === doseIdx);
@@ -1600,7 +1680,7 @@ const htmlContent = `<!DOCTYPE html>
       grid.innerHTML = '';
 
       if (list.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--gray-400);">Nenhum peptídeo encontrado para sua busca.</div>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--gray-400); font-size: 13.5px;">Nenhum peptídeo encontrado para sua busca.</div>';
         return;
       }
 
@@ -1610,12 +1690,11 @@ const htmlContent = `<!DOCTYPE html>
 
         const isB2B = currentTier === 'b2b';
         const price = isB2B ? currentDose.b2bBoxPrice : currentDose.suggestedPriceB2C;
-        const priceLabel = isB2B ? "Preço de Atacado (Caixa c/ 10 Frascos):" : "Valor Unitário (1 Frasco):";
-        const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco (Caixa c/ 10)" : "✓ 1 Frasco Liofilizado + Água Bacteriostática";
+        const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10 Frascos):" : "Valor Unitário (1 Frasco):";
+        const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ 1 Frasco + Água Bacteriostática";
 
-        const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Mais Procurado</span>' : '';
+        const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Top</span>' : '';
 
-        // Dose selector HTML: if <= 5 doses, show pills; if > 5, show dropdown with all doses
         let doseSelectorHtml = '';
         if (item.doses.length > 1) {
           if (item.doses.length <= 5) {
@@ -1626,7 +1705,7 @@ const htmlContent = `<!DOCTYPE html>
             doseSelectorHtml = \`
               <div class="dose-selector-box">
                 <div class="dose-header">
-                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10 frascos' : '1 Frasco'}):</span>
+                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10' : '1 Frasco'}):</span>
                   <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} opções</span>
                 </div>
                 <div class="dose-pills-wrap">\${pillsHtml}</div>
@@ -1641,8 +1720,8 @@ const htmlContent = `<!DOCTYPE html>
             doseSelectorHtml = \`
               <div class="dose-selector-box">
                 <div class="dose-header">
-                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10 frascos' : '1 Frasco'}):</span>
-                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} dosagens</span>
+                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10' : '1 Frasco'}):</span>
+                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} opções</span>
                 </div>
                 <select class="dose-select-dropdown" onchange="onSelectDose('\${item.id}', this.value)">
                   \${optionsHtml}
@@ -1651,11 +1730,10 @@ const htmlContent = `<!DOCTYPE html>
             \`;
           }
         } else {
-          // Only 1 dose
           doseSelectorHtml = \`
-            <div class="dose-selector-box" style="padding: 8px 12px;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--gray-600);">
-                Dosagem: <span style="color: var(--primary); font-weight: 800;">\${item.doses[0].label}</span> — <span style="color: var(--dark); font-weight: 600;">\${isB2B ? "Caixa com 10 Frascos" : "1 Frasco"}</span>
+            <div class="dose-selector-box" style="padding: 6px 10px;">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--gray-600);">
+                Dosagem: <span style="color: var(--primary); font-weight: 800;">\${item.doses[0].label}</span> — <span style="color: var(--dark); font-weight: 600;">\${isB2B ? "Caixa c/ 10" : "1 Frasco"}</span>
               </div>
             </div>
           \`;
@@ -1733,7 +1811,10 @@ const htmlContent = `<!DOCTYPE html>
 
     function updateCartCount() {
       const count = Object.values(cart).reduce((a, b) => a + b, 0);
-      document.getElementById('cart-badge-count').textContent = count;
+      const bDesktop = document.getElementById('cart-badge-count-desktop');
+      const bMobile = document.getElementById('cart-badge-count-mobile');
+      if (bDesktop) bDesktop.textContent = count;
+      if (bMobile) bMobile.textContent = count;
     }
 
     function toggleCart(open) {
@@ -1742,9 +1823,11 @@ const htmlContent = `<!DOCTYPE html>
       if (open) {
         drawer.classList.add('open');
         backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
       } else {
         drawer.classList.remove('open');
         backdrop.classList.remove('open');
+        document.body.style.overflow = '';
       }
     }
 
@@ -1758,7 +1841,6 @@ const htmlContent = `<!DOCTYPE html>
       if (radioSedex) radioSedex.checked = type === 'sedex';
     }
 
-    // Find dose object across all compounds
     function findDoseByCode(code) {
       for (const comp of PSL_COMPOUNDS) {
         for (const dose of comp.doses) {
@@ -1776,7 +1858,7 @@ const htmlContent = `<!DOCTYPE html>
       const codes = Object.keys(cart);
 
       if (codes.length === 0) {
-        wrap.innerHTML = '<div style="text-align: center; color: var(--gray-400); margin-top: 60px;">Seu carrinho está vazio.<br>Escolha os peptídeos no catálogo.</div>';
+        wrap.innerHTML = '<div style="text-align: center; color: var(--gray-400); margin-top: 40px; font-size: 13px;">Seu carrinho está vazio.<br>Escolha os peptídeos no catálogo.</div>';
         totalDisplay.textContent = 'R$ 0,00';
         return;
       }
@@ -1798,7 +1880,7 @@ const htmlContent = `<!DOCTYPE html>
           <div class="cart-item">
             <div class="item-meta">
               <div class="item-name">\${compound.name} (\${dose.label})</div>
-              <div class="item-sub">\${isB2B ? 'Caixa fechada com 10 frascos' : '1 Frasco Liofilizado + Água Bacteriostática'}</div>
+              <div class="item-sub">\${isB2B ? 'Caixa fechada com 10 frascos' : '1 Frasco Liofilizado + Água'}</div>
               <div class="item-price">R$ \${unitPrice.toFixed(2).replace('.', ',')}</div>
             </div>
             <div class="qty-controls">
@@ -1914,8 +1996,8 @@ const htmlContent = `<!DOCTYPE html>
       const roundedUnits = Math.round(units * 10) / 10;
       document.getElementById('res-units').textContent = roundedUnits + " UI";
       document.getElementById('res-units-desc').textContent = roundedUnits + " Unidades na seringa de insulina";
-      document.getElementById('res-yield').innerHTML = "Rendimento do Frasco: <strong>" + totalDoses + " aplicações</strong>";
-      document.getElementById('res-concentration').textContent = "Concentração: " + concentrationMgPerMl.toFixed(2) + " mg/ml (" + (concentrationMgPerMl * 10).toFixed(0) + " mcg a cada 10 UI)";
+      document.getElementById('res-yield').innerHTML = "Rendimento: <strong>" + totalDoses + " aplicações</strong>";
+      document.getElementById('res-concentration').textContent = concentrationMgPerMl.toFixed(2) + " mg/ml (" + (concentrationMgPerMl * 10).toFixed(0) + " mcg a cada 10 UI)";
 
       updateSyringeSvg(roundedUnits, syringeMaxUi);
     }
@@ -1946,4 +2028,4 @@ const htmlContent = `<!DOCTYPE html>
 
 fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/web/index.html", htmlContent, "utf8");
 fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/index.html", htmlContent, "utf8");
-console.log("Successfully generated grouped compound cards with dynamic dosage selectors.");
+console.log("Mobile-first application successfully generated.");
