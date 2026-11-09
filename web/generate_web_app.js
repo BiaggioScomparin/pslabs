@@ -1235,10 +1235,10 @@ const htmlContent = `<!DOCTYPE html>
         <!-- Tier Switcher B2C vs B2B -->
         <div class="tier-box">
           <button class="tier-btn active" id="tier-b2c" onclick="setTier('b2c')">
-            👤 Consumidor (Kit)
+            👤 Consumidor (1 Frasco)
           </button>
           <button class="tier-btn" id="tier-b2b" onclick="setTier('b2b')">
-            💼 Atacado (10 un)
+            💼 Atacado (Caixa c/ 10)
           </button>
         </div>
 
@@ -1575,8 +1575,8 @@ const htmlContent = `<!DOCTYPE html>
 
       const isB2B = currentTier === 'b2b';
       const price = isB2B ? dose.b2bBoxPrice : dose.suggestedPriceB2C;
-      const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10):" : "Valor do Kit Pronto (1 Frasco):";
-      const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ Água Bacteriostática Inclusa";
+      const priceLabel = isB2B ? "Preço de Atacado (Caixa c/ 10 Frascos):" : "Valor Unitário (1 Frasco):";
+      const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco (Caixa c/ 10)" : "✓ 1 Frasco Liofilizado + Água Bacteriostática";
 
       // Update price elements
       const valEl = card.querySelector('.price-value');
@@ -1610,8 +1610,8 @@ const htmlContent = `<!DOCTYPE html>
 
         const isB2B = currentTier === 'b2b';
         const price = isB2B ? currentDose.b2bBoxPrice : currentDose.suggestedPriceB2C;
-        const priceLabel = isB2B ? "Preço Atacado (Caixa c/ 10):" : "Valor do Kit Pronto (1 Frasco):";
-        const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco" : "✓ Água Bacteriostática Inclusa";
+        const priceLabel = isB2B ? "Preço de Atacado (Caixa c/ 10 Frascos):" : "Valor Unitário (1 Frasco):";
+        const priceSub = isB2B ? "R$ " + (price / 10).toFixed(2) + " por frasco (Caixa c/ 10)" : "✓ 1 Frasco Liofilizado + Água Bacteriostática";
 
         const topBadge = item.isTopSeller ? '<span class="badge-top">🔥 Mais Procurado</span>' : '';
 
@@ -1626,7 +1626,7 @@ const htmlContent = `<!DOCTYPE html>
             doseSelectorHtml = \`
               <div class="dose-selector-box">
                 <div class="dose-header">
-                  <span>Selecione a Dosagem:</span>
+                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10 frascos' : '1 Frasco'}):</span>
                   <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} opções</span>
                 </div>
                 <div class="dose-pills-wrap">\${pillsHtml}</div>
@@ -1635,13 +1635,14 @@ const htmlContent = `<!DOCTYPE html>
           } else {
             let optionsHtml = item.doses.map((d, idx) => {
               const selected = idx === doseIdx ? ' selected' : '';
-              return \`<option value="\${idx}"\${selected}>\${d.label} (\${d.spec})</option>\`;
+              const doseSub = isB2B ? "Caixa c/ 10 frascos" : "1 Frasco";
+              return \`<option value="\${idx}"\${selected}>\${d.label} (\${doseSub})</option>\`;
             }).join('');
             doseSelectorHtml = \`
               <div class="dose-selector-box">
                 <div class="dose-header">
-                  <span>Selecione a Dosagem:</span>
-                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} dosagens disponíveis</span>
+                  <span>Dosagem (\${isB2B ? 'Caixa c/ 10 frascos' : '1 Frasco'}):</span>
+                  <span style="color: var(--primary); font-weight: 800;">\${item.doses.length} dosagens</span>
                 </div>
                 <select class="dose-select-dropdown" onchange="onSelectDose('\${item.id}', this.value)">
                   \${optionsHtml}
@@ -1652,9 +1653,9 @@ const htmlContent = `<!DOCTYPE html>
         } else {
           // Only 1 dose
           doseSelectorHtml = \`
-            <div class="dose-selector-box" style="padding: 7px 12px;">
+            <div class="dose-selector-box" style="padding: 8px 12px;">
               <div style="font-size: 12px; font-weight: 700; color: var(--gray-600);">
-                Dosagem: <span style="color: var(--primary); font-weight: 800;">\${item.doses[0].label}</span>
+                Dosagem: <span style="color: var(--primary); font-weight: 800;">\${item.doses[0].label}</span> — <span style="color: var(--dark); font-weight: 600;">\${isB2B ? "Caixa com 10 Frascos" : "1 Frasco"}</span>
               </div>
             </div>
           \`;
@@ -1797,7 +1798,7 @@ const htmlContent = `<!DOCTYPE html>
           <div class="cart-item">
             <div class="item-meta">
               <div class="item-name">\${compound.name} (\${dose.label})</div>
-              <div class="item-sub">\${isB2B ? 'Caixa com 10 frascos' : 'Kit Frasco c/ Água Bacteriostática'}</div>
+              <div class="item-sub">\${isB2B ? 'Caixa fechada com 10 frascos' : '1 Frasco Liofilizado + Água Bacteriostática'}</div>
               <div class="item-price">R$ \${unitPrice.toFixed(2).replace('.', ',')}</div>
             </div>
             <div class="qty-controls">
@@ -1826,7 +1827,7 @@ const htmlContent = `<!DOCTYPE html>
       let total = 0;
 
       let msg = "*NOVO PEDIDO — PSL LABS (Premium Synthesis Line)*\\n";
-      msg += "*Modalidade:* " + (isB2B ? "Revendedor / Atacado (Caixa c/ 10)" : "Consumidor Final (Kit Pronto)") + "\\n";
+      msg += "*Modalidade:* " + (isB2B ? "Revendedor / Atacado (Caixa com 10 Frascos)" : "Consumidor Final (1 Frasco por item)") + "\\n";
       msg += "-----------------------------------------\\n";
       msg += "*ITENS SELECIONADOS:*\\n";
 
@@ -1838,7 +1839,7 @@ const htmlContent = `<!DOCTYPE html>
         const unitPrice = isB2B ? dose.b2bBoxPrice : dose.suggestedPriceB2C;
         const sub = unitPrice * qty;
         total += sub;
-        msg += "• " + qty + "x " + compound.name + " " + dose.label + " = R$ " + sub.toFixed(2).replace('.', ',') + "\\n";
+        msg += "• " + qty + "x " + compound.name + " " + dose.label + " (" + (isB2B ? "Caixa c/ 10 Frascos" : "1 Frasco") + ") = R$ " + sub.toFixed(2).replace('.', ',') + "\\n";
       });
 
       msg += "-----------------------------------------\\n";
