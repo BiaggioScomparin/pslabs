@@ -8,9 +8,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -22,9 +22,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 106.4,
     "minPrice2x": 212.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 112.6,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 429,
+    "profitUnitB2C": 322.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1220
   },
   {
@@ -36,9 +36,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -50,9 +50,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 112.6,
     "minPrice2x": 225.2,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 126.4,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 459,
+    "profitUnitB2C": 346.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1320
   },
   {
@@ -64,9 +64,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 106.4,
     "minPrice2x": 212.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 112.6,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 429,
+    "profitUnitB2C": 322.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1220
   },
   {
@@ -78,9 +78,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 78.7,
     "minPrice2x": 157.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 90.3,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 319,
+    "profitUnitB2C": 240.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 760
   },
   {
@@ -92,9 +92,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -106,9 +106,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 106.4,
     "minPrice2x": 212.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 112.6,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 429,
+    "profitUnitB2C": 322.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1220
   },
   {
@@ -120,9 +120,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 100.3,
     "minPrice2x": 200.6,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 108.7,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 409,
+    "profitUnitB2C": 308.7,
+    "marginPercent": 75,
     "b2bBoxPrice": 1120
   },
   {
@@ -134,9 +134,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 137.2,
     "minPrice2x": 274.4,
-    "suggestedPriceB2C": 289,
-    "profitUnitB2C": 151.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 549,
+    "profitUnitB2C": 411.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1720
   },
   {
@@ -148,9 +148,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 66.4,
     "minPrice2x": 132.8,
-    "suggestedPriceB2C": 139,
-    "profitUnitB2C": 72.6,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 269,
+    "profitUnitB2C": 202.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 560
   },
   {
@@ -162,9 +162,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 71,
     "minPrice2x": 142,
-    "suggestedPriceB2C": 149,
-    "profitUnitB2C": 78,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 289,
+    "profitUnitB2C": 218,
+    "marginPercent": 75,
     "b2bBoxPrice": 630
   },
   {
@@ -176,9 +176,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 69.5,
     "minPrice2x": 139,
-    "suggestedPriceB2C": 149,
-    "profitUnitB2C": 79.5,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 279,
+    "profitUnitB2C": 209.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 610
   },
   {
@@ -190,9 +190,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 75.6,
     "minPrice2x": 151.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 83.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 309,
+    "profitUnitB2C": 233.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 710
   },
   {
@@ -204,9 +204,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 84.9,
     "minPrice2x": 169.8,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 94.1,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 349,
+    "profitUnitB2C": 264.1,
+    "marginPercent": 76,
     "b2bBoxPrice": 860
   },
   {
@@ -218,9 +218,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 103.4,
     "minPrice2x": 206.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 115.6,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 419,
+    "profitUnitB2C": 315.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1170
   },
   {
@@ -232,9 +232,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 146.5,
     "minPrice2x": 293,
-    "suggestedPriceB2C": 299,
-    "profitUnitB2C": 152.5,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 589,
+    "profitUnitB2C": 442.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 1880
   },
   {
@@ -246,9 +246,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 81.8,
     "minPrice2x": 163.6,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 97.2,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 329,
+    "profitUnitB2C": 247.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 810
   },
   {
@@ -260,9 +260,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 121.8,
     "minPrice2x": 243.6,
-    "suggestedPriceB2C": 259,
-    "profitUnitB2C": 137.2,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 489,
+    "profitUnitB2C": 367.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1470
   },
   {
@@ -274,9 +274,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 161.9,
     "minPrice2x": 323.8,
-    "suggestedPriceB2C": 339,
-    "profitUnitB2C": 177.1,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 649,
+    "profitUnitB2C": 487.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 2130
   },
   {
@@ -288,9 +288,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 201.2,
     "minPrice2x": 402.4,
-    "suggestedPriceB2C": 409,
-    "profitUnitB2C": 207.8,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 809,
+    "profitUnitB2C": 607.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 2780
   },
   {
@@ -302,9 +302,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 81.8,
     "minPrice2x": 163.6,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 97.2,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 329,
+    "profitUnitB2C": 247.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 810
   },
   {
@@ -316,9 +316,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 172.3,
     "minPrice2x": 344.6,
-    "suggestedPriceB2C": 359,
-    "profitUnitB2C": 186.7,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 699,
+    "profitUnitB2C": 526.7,
+    "marginPercent": 75,
     "b2bBoxPrice": 2300
   },
   {
@@ -330,9 +330,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 74.1,
     "minPrice2x": 148.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 84.9,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 299,
+    "profitUnitB2C": 224.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 680
   },
   {
@@ -344,9 +344,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 81.8,
     "minPrice2x": 163.6,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 97.2,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 329,
+    "profitUnitB2C": 247.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 810
   },
   {
@@ -358,9 +358,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 91,
     "minPrice2x": 182,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 98,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 369,
+    "profitUnitB2C": 278,
+    "marginPercent": 75,
     "b2bBoxPrice": 960
   },
   {
@@ -372,9 +372,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 101.8,
     "minPrice2x": 203.6,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 117.2,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 409,
+    "profitUnitB2C": 307.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1140
   },
   {
@@ -386,9 +386,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 121.8,
     "minPrice2x": 243.6,
-    "suggestedPriceB2C": 259,
-    "profitUnitB2C": 137.2,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 489,
+    "profitUnitB2C": 367.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1470
   },
   {
@@ -400,9 +400,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 131.1,
     "minPrice2x": 262.2,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 137.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 529,
+    "profitUnitB2C": 397.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 1620
   },
   {
@@ -414,9 +414,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 149.6,
     "minPrice2x": 299.2,
-    "suggestedPriceB2C": 309,
-    "profitUnitB2C": 159.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 599,
+    "profitUnitB2C": 449.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1930
   },
   {
@@ -428,9 +428,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 169.6,
     "minPrice2x": 339.2,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 179.4,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 679,
+    "profitUnitB2C": 509.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 2260
   },
   {
@@ -442,9 +442,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 185,
     "minPrice2x": 370,
-    "suggestedPriceB2C": 379,
-    "profitUnitB2C": 194,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 749,
+    "profitUnitB2C": 564,
+    "marginPercent": 75,
     "b2bBoxPrice": 2510
   },
   {
@@ -456,9 +456,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 205.8,
     "minPrice2x": 411.6,
-    "suggestedPriceB2C": 419,
-    "profitUnitB2C": 213.2,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 829,
+    "profitUnitB2C": 623.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2860
   },
   {
@@ -470,9 +470,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 78.7,
     "minPrice2x": 157.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 90.3,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 319,
+    "profitUnitB2C": 240.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 760
   },
   {
@@ -484,9 +484,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 91,
     "minPrice2x": 182,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 98,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 369,
+    "profitUnitB2C": 278,
+    "marginPercent": 75,
     "b2bBoxPrice": 960
   },
   {
@@ -498,9 +498,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 115.7,
     "minPrice2x": 231.4,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 123.3,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 469,
+    "profitUnitB2C": 353.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 1370
   },
   {
@@ -512,9 +512,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 128,
     "minPrice2x": 256,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 141,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 519,
+    "profitUnitB2C": 391,
+    "marginPercent": 75,
     "b2bBoxPrice": 1570
   },
   {
@@ -526,9 +526,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 155.7,
     "minPrice2x": 311.4,
-    "suggestedPriceB2C": 319,
-    "profitUnitB2C": 163.3,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 629,
+    "profitUnitB2C": 473.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 2030
   },
   {
@@ -540,9 +540,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 75.6,
     "minPrice2x": 151.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 83.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 309,
+    "profitUnitB2C": 233.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 710
   },
   {
@@ -554,9 +554,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -568,9 +568,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 112.6,
     "minPrice2x": 225.2,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 126.4,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 459,
+    "profitUnitB2C": 346.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1320
   },
   {
@@ -582,9 +582,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 121.8,
     "minPrice2x": 243.6,
-    "suggestedPriceB2C": 259,
-    "profitUnitB2C": 137.2,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 489,
+    "profitUnitB2C": 367.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1470
   },
   {
@@ -596,9 +596,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 146.5,
     "minPrice2x": 293,
-    "suggestedPriceB2C": 299,
-    "profitUnitB2C": 152.5,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 589,
+    "profitUnitB2C": 442.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 1880
   },
   {
@@ -610,9 +610,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 164.2,
     "minPrice2x": 328.4,
-    "suggestedPriceB2C": 339,
-    "profitUnitB2C": 174.8,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 659,
+    "profitUnitB2C": 494.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 2170
   },
   {
@@ -624,9 +624,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 166.5,
     "minPrice2x": 333,
-    "suggestedPriceB2C": 339,
-    "profitUnitB2C": 172.5,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 669,
+    "profitUnitB2C": 502.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 2210
   },
   {
@@ -638,9 +638,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 186.1,
     "minPrice2x": 372.2,
-    "suggestedPriceB2C": 379,
-    "profitUnitB2C": 192.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 749,
+    "profitUnitB2C": 562.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 2530
   },
   {
@@ -652,9 +652,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 194.2,
     "minPrice2x": 388.4,
-    "suggestedPriceB2C": 399,
-    "profitUnitB2C": 204.8,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 779,
+    "profitUnitB2C": 584.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 2660
   },
   {
@@ -666,9 +666,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 258.9,
     "minPrice2x": 517.8,
-    "suggestedPriceB2C": 529,
-    "profitUnitB2C": 270.1,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 1039,
+    "profitUnitB2C": 780.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 3730
   },
   {
@@ -680,9 +680,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 328.2,
     "minPrice2x": 656.4,
-    "suggestedPriceB2C": 669,
-    "profitUnitB2C": 340.8,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 1319,
+    "profitUnitB2C": 990.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 4880
   },
   {
@@ -694,9 +694,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 69.5,
     "minPrice2x": 139,
-    "suggestedPriceB2C": 149,
-    "profitUnitB2C": 79.5,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 279,
+    "profitUnitB2C": 209.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 610
   },
   {
@@ -708,9 +708,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 75.6,
     "minPrice2x": 151.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 83.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 309,
+    "profitUnitB2C": 233.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 710
   },
   {
@@ -722,9 +722,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 84.9,
     "minPrice2x": 169.8,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 94.1,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 349,
+    "profitUnitB2C": 264.1,
+    "marginPercent": 76,
     "b2bBoxPrice": 860
   },
   {
@@ -736,9 +736,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -750,9 +750,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 169.6,
     "minPrice2x": 339.2,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 179.4,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 679,
+    "profitUnitB2C": 509.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 2260
   },
   {
@@ -764,9 +764,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 84.9,
     "minPrice2x": 169.8,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 94.1,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 349,
+    "profitUnitB2C": 264.1,
+    "marginPercent": 76,
     "b2bBoxPrice": 860
   },
   {
@@ -778,9 +778,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 106.4,
     "minPrice2x": 212.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 112.6,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 429,
+    "profitUnitB2C": 322.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1220
   },
   {
@@ -792,9 +792,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 77.2,
     "minPrice2x": 154.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 91.8,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 309,
+    "profitUnitB2C": 231.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 730
   },
   {
@@ -806,9 +806,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 91,
     "minPrice2x": 182,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 98,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 369,
+    "profitUnitB2C": 278,
+    "marginPercent": 75,
     "b2bBoxPrice": 960
   },
   {
@@ -820,9 +820,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 97.2,
     "minPrice2x": 194.4,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 111.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 389,
+    "profitUnitB2C": 291.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1060
   },
   {
@@ -834,9 +834,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 134.2,
     "minPrice2x": 268.4,
-    "suggestedPriceB2C": 279,
-    "profitUnitB2C": 144.8,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 539,
+    "profitUnitB2C": 404.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1670
   },
   {
@@ -848,9 +848,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 103.4,
     "minPrice2x": 206.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 115.6,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 419,
+    "profitUnitB2C": 315.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1170
   },
   {
@@ -862,9 +862,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 97.2,
     "minPrice2x": 194.4,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 111.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 389,
+    "profitUnitB2C": 291.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1060
   },
   {
@@ -876,9 +876,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 112.6,
     "minPrice2x": 225.2,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 126.4,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 459,
+    "profitUnitB2C": 346.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1320
   },
   {
@@ -890,9 +890,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 131.1,
     "minPrice2x": 262.2,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 137.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 529,
+    "profitUnitB2C": 397.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 1620
   },
   {
@@ -904,9 +904,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 166.9,
     "minPrice2x": 333.8,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 182.1,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 669,
+    "profitUnitB2C": 502.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 2210
   },
   {
@@ -918,9 +918,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 72.6,
     "minPrice2x": 145.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 86.4,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 299,
+    "profitUnitB2C": 226.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 660
   },
   {
@@ -932,9 +932,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 103.4,
     "minPrice2x": 206.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 115.6,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 419,
+    "profitUnitB2C": 315.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1170
   },
   {
@@ -946,9 +946,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 64.9,
     "minPrice2x": 129.8,
-    "suggestedPriceB2C": 139,
-    "profitUnitB2C": 74.1,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 269,
+    "profitUnitB2C": 204.1,
+    "marginPercent": 76,
     "b2bBoxPrice": 530
   },
   {
@@ -960,9 +960,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 71,
     "minPrice2x": 142,
-    "suggestedPriceB2C": 149,
-    "profitUnitB2C": 78,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 289,
+    "profitUnitB2C": 218,
+    "marginPercent": 75,
     "b2bBoxPrice": 630
   },
   {
@@ -974,9 +974,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -988,9 +988,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 161.9,
     "minPrice2x": 323.8,
-    "suggestedPriceB2C": 339,
-    "profitUnitB2C": 177.1,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 649,
+    "profitUnitB2C": 487.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 2130
   },
   {
@@ -1002,9 +1002,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 178,
     "minPrice2x": 356,
-    "suggestedPriceB2C": 369,
-    "profitUnitB2C": 191,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 719,
+    "profitUnitB2C": 541,
+    "marginPercent": 75,
     "b2bBoxPrice": 2400
   },
   {
@@ -1016,9 +1016,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 103.4,
     "minPrice2x": 206.8,
-    "suggestedPriceB2C": 219,
-    "profitUnitB2C": 115.6,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 419,
+    "profitUnitB2C": 315.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 1170
   },
   {
@@ -1030,9 +1030,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 128,
     "minPrice2x": 256,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 141,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 519,
+    "profitUnitB2C": 391,
+    "marginPercent": 75,
     "b2bBoxPrice": 1570
   },
   {
@@ -1044,9 +1044,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 115.7,
     "minPrice2x": 231.4,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 123.3,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 469,
+    "profitUnitB2C": 353.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 1370
   },
   {
@@ -1058,9 +1058,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -1072,9 +1072,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 171.1,
     "minPrice2x": 342.2,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 177.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 689,
+    "profitUnitB2C": 517.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 2280
   },
   {
@@ -1086,9 +1086,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 212.7,
     "minPrice2x": 425.4,
-    "suggestedPriceB2C": 439,
-    "profitUnitB2C": 226.3,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 859,
+    "profitUnitB2C": 646.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 2970
   },
   {
@@ -1100,9 +1100,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -1114,9 +1114,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 128,
     "minPrice2x": 256,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 141,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 519,
+    "profitUnitB2C": 391,
+    "marginPercent": 75,
     "b2bBoxPrice": 1570
   },
   {
@@ -1128,9 +1128,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 161.5,
     "minPrice2x": 323,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 167.5,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 649,
+    "profitUnitB2C": 487.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 2130
   },
   {
@@ -1142,9 +1142,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -1156,9 +1156,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 131.1,
     "minPrice2x": 262.2,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 137.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 529,
+    "profitUnitB2C": 397.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 1620
   },
   {
@@ -1170,9 +1170,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 166.9,
     "minPrice2x": 333.8,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 182.1,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 669,
+    "profitUnitB2C": 502.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 2210
   },
   {
@@ -1184,9 +1184,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 134.2,
     "minPrice2x": 268.4,
-    "suggestedPriceB2C": 279,
-    "profitUnitB2C": 144.8,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 539,
+    "profitUnitB2C": 404.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1670
   },
   {
@@ -1198,9 +1198,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -1212,9 +1212,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 112.6,
     "minPrice2x": 225.2,
-    "suggestedPriceB2C": 239,
-    "profitUnitB2C": 126.4,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 459,
+    "profitUnitB2C": 346.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1320
   },
   {
@@ -1226,9 +1226,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 155.7,
     "minPrice2x": 311.4,
-    "suggestedPriceB2C": 319,
-    "profitUnitB2C": 163.3,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 629,
+    "profitUnitB2C": 473.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 2030
   },
   {
@@ -1240,9 +1240,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 72.6,
     "minPrice2x": 145.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 86.4,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 299,
+    "profitUnitB2C": 226.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 660
   },
   {
@@ -1254,9 +1254,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 81.8,
     "minPrice2x": 163.6,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 97.2,
-    "marginPercent": 54,
+    "suggestedPriceB2C": 329,
+    "profitUnitB2C": 247.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 810
   },
   {
@@ -1268,9 +1268,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 97.2,
     "minPrice2x": 194.4,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 111.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 389,
+    "profitUnitB2C": 291.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1060
   },
   {
@@ -1282,9 +1282,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 88,
     "minPrice2x": 176,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 101,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 271,
+    "marginPercent": 75,
     "b2bBoxPrice": 910
   },
   {
@@ -1296,9 +1296,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 149.6,
     "minPrice2x": 299.2,
-    "suggestedPriceB2C": 309,
-    "profitUnitB2C": 159.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 599,
+    "profitUnitB2C": 449.4,
+    "marginPercent": 75,
     "b2bBoxPrice": 1930
   },
   {
@@ -1310,9 +1310,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 128,
     "minPrice2x": 256,
-    "suggestedPriceB2C": 269,
-    "profitUnitB2C": 141,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 519,
+    "profitUnitB2C": 391,
+    "marginPercent": 75,
     "b2bBoxPrice": 1570
   },
   {
@@ -1324,9 +1324,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 386,
     "minPrice2x": 772,
-    "suggestedPriceB2C": 779,
-    "profitUnitB2C": 393,
-    "marginPercent": 50,
+    "suggestedPriceB2C": 1549,
+    "profitUnitB2C": 1163,
+    "marginPercent": 75,
     "b2bBoxPrice": 5830
   },
   {
@@ -1338,9 +1338,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 97.2,
     "minPrice2x": 194.4,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 111.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 389,
+    "profitUnitB2C": 291.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1060
   },
   {
@@ -1352,9 +1352,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 118.8,
     "minPrice2x": 237.6,
-    "suggestedPriceB2C": 249,
-    "profitUnitB2C": 130.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 479,
+    "profitUnitB2C": 360.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1420
   },
   {
@@ -1366,9 +1366,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 166.9,
     "minPrice2x": 333.8,
-    "suggestedPriceB2C": 349,
-    "profitUnitB2C": 182.1,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 669,
+    "profitUnitB2C": 502.1,
+    "marginPercent": 75,
     "b2bBoxPrice": 2210
   },
   {
@@ -1380,9 +1380,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 208.1,
     "minPrice2x": 416.2,
-    "suggestedPriceB2C": 429,
-    "profitUnitB2C": 220.9,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 839,
+    "profitUnitB2C": 630.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 2890
   },
   {
@@ -1394,9 +1394,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 78.7,
     "minPrice2x": 157.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 90.3,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 319,
+    "profitUnitB2C": 240.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 760
   },
   {
@@ -1408,9 +1408,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 89.5,
     "minPrice2x": 179,
-    "suggestedPriceB2C": 189,
-    "profitUnitB2C": 99.5,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 359,
+    "profitUnitB2C": 269.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 940
   },
   {
@@ -1422,9 +1422,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 66.4,
     "minPrice2x": 132.8,
-    "suggestedPriceB2C": 139,
-    "profitUnitB2C": 72.6,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 269,
+    "profitUnitB2C": 202.6,
+    "marginPercent": 75,
     "b2bBoxPrice": 560
   },
   {
@@ -1436,9 +1436,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 78.7,
     "minPrice2x": 157.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 90.3,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 319,
+    "profitUnitB2C": 240.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 760
   },
   {
@@ -1450,9 +1450,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 84.9,
     "minPrice2x": 169.8,
-    "suggestedPriceB2C": 179,
-    "profitUnitB2C": 94.1,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 349,
+    "profitUnitB2C": 264.1,
+    "marginPercent": 76,
     "b2bBoxPrice": 860
   },
   {
@@ -1464,9 +1464,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 75.6,
     "minPrice2x": 151.2,
-    "suggestedPriceB2C": 159,
-    "profitUnitB2C": 83.4,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 309,
+    "profitUnitB2C": 233.4,
+    "marginPercent": 76,
     "b2bBoxPrice": 710
   },
   {
@@ -1478,9 +1478,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 94.1,
     "minPrice2x": 188.2,
-    "suggestedPriceB2C": 199,
-    "profitUnitB2C": 104.9,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 379,
+    "profitUnitB2C": 284.9,
+    "marginPercent": 75,
     "b2bBoxPrice": 1010
   },
   {
@@ -1492,9 +1492,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 158.8,
     "minPrice2x": 317.6,
-    "suggestedPriceB2C": 329,
-    "profitUnitB2C": 170.2,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 639,
+    "profitUnitB2C": 480.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 2080
   },
   {
@@ -1506,9 +1506,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 196.5,
     "minPrice2x": 393,
-    "suggestedPriceB2C": 399,
-    "profitUnitB2C": 202.5,
-    "marginPercent": 51,
+    "suggestedPriceB2C": 789,
+    "profitUnitB2C": 592.5,
+    "marginPercent": 75,
     "b2bBoxPrice": 2700
   },
   {
@@ -1520,9 +1520,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 100.3,
     "minPrice2x": 200.6,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 108.7,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 409,
+    "profitUnitB2C": 308.7,
+    "marginPercent": 75,
     "b2bBoxPrice": 1120
   },
   {
@@ -1534,9 +1534,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 137.2,
     "minPrice2x": 274.4,
-    "suggestedPriceB2C": 289,
-    "profitUnitB2C": 151.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 549,
+    "profitUnitB2C": 411.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1720
   },
   {
@@ -1548,9 +1548,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 100.3,
     "minPrice2x": 200.6,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 108.7,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 409,
+    "profitUnitB2C": 308.7,
+    "marginPercent": 75,
     "b2bBoxPrice": 1120
   },
   {
@@ -1562,9 +1562,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 137.2,
     "minPrice2x": 274.4,
-    "suggestedPriceB2C": 289,
-    "profitUnitB2C": 151.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 549,
+    "profitUnitB2C": 411.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1720
   },
   {
@@ -1576,9 +1576,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 100.3,
     "minPrice2x": 200.6,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 108.7,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 409,
+    "profitUnitB2C": 308.7,
+    "marginPercent": 75,
     "b2bBoxPrice": 1120
   },
   {
@@ -1590,9 +1590,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 121.8,
     "minPrice2x": 243.6,
-    "suggestedPriceB2C": 259,
-    "profitUnitB2C": 137.2,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 489,
+    "profitUnitB2C": 367.2,
+    "marginPercent": 75,
     "b2bBoxPrice": 1470
   },
   {
@@ -1604,9 +1604,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 164.2,
     "minPrice2x": 328.4,
-    "suggestedPriceB2C": 339,
-    "profitUnitB2C": 174.8,
-    "marginPercent": 52,
+    "suggestedPriceB2C": 659,
+    "profitUnitB2C": 494.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 2170
   },
   {
@@ -1618,9 +1618,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 78.7,
     "minPrice2x": 157.4,
-    "suggestedPriceB2C": 169,
-    "profitUnitB2C": 90.3,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 319,
+    "profitUnitB2C": 240.3,
+    "marginPercent": 75,
     "b2bBoxPrice": 760
   },
   {
@@ -1632,9 +1632,9 @@
     "addedInsumosCost": 41,
     "totalCostB2C": 97.2,
     "minPrice2x": 194.4,
-    "suggestedPriceB2C": 209,
-    "profitUnitB2C": 111.8,
-    "marginPercent": 53,
+    "suggestedPriceB2C": 389,
+    "profitUnitB2C": 291.8,
+    "marginPercent": 75,
     "b2bBoxPrice": 1060
   }
 ]

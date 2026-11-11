@@ -159,15 +159,13 @@ const structuredList = [];
 rawData.forEach(item => {
   const powderCostPerVial = item.boxCost / 10;
   const totalCostB2C = powderCostPerVial + ADDED_COST_B2C;
-  const minPriceB2C = totalCostB2C * 2; // Exatamente o dobro
+  const minPriceB2C = totalCostB2C * 2;
 
-  // Arredondamento comercial para cima (mantendo SEMPRE >= minPriceB2C)
-  let suggestedPriceB2C = Math.ceil(minPriceB2C / 10) * 10 - 1;
-  if (suggestedPriceB2C < minPriceB2C) {
-    suggestedPriceB2C += 10;
-  }
-  // Ajuste sutil para terminação comercial (ex: R$ 179, R$ 189, R$ 249...)
-  if (suggestedPriceB2C - minPriceB2C < 6) {
+  // Regra de Margem Líquida B2C de 75%:
+  // Preço = CustoTotal / (1 - 0.75) = CustoTotal / 0.25 = CustoTotal * 4
+  const target75Price = totalCostB2C / 0.25;
+  let suggestedPriceB2C = Math.ceil(target75Price / 10) * 10 - 1;
+  if (suggestedPriceB2C < target75Price) {
     suggestedPriceB2C += 10;
   }
 

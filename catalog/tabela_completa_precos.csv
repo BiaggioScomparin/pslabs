@@ -1,118 +1,118 @@
 ﻿Codigo;Produto;Especificacao;Categoria;Custo Po Frasco (R$);Insumos Extras B2C (Agua+Frete+Emb+Etq+Cx);CUSTO TOTAL UNITARIO B2C (R$);PRECO MINIMO O DOBRO (2x Custo);PRECO FINAL SUGERIDO B2C (R$);LUCRO LIQUIDO UNITARIO B2C (R$);MARGEM DE LUCRO B2C (%);ATACADO B2B CAIXA C/ 10 (R$)
-LC600;"L-carnitine";"600mg por frasco, caixa com 10 frascos";"Metabolismo & Queima";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-LC1200;"L-carnitine";"1200mg por frasco, caixa com 10 frascos";"Metabolismo & Queima";65.40;41.00;106.40;212.80;219.00;112.60;51%;1220.00
-LemonBottle;"Lemon Bottle";"10ml por frasco, caixa com 10 frascos";"Gordura Localizada";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-Lipo-C;"Lipo-c";"10ml por frasco, caixa com 10 frascos";"Metabolismo & Fígado";71.60;41.00;112.60;225.20;239.00;126.40;53%;1320.00
-MIC;"MIC (Lipo C with B12)";"10mg por frasco, caixa com 10 frascos";"Metabolismo & Energia";65.40;41.00;106.40;212.80;219.00;112.60;51%;1220.00
-BC5;"BPC 157";"5mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";37.70;41.00;78.70;157.40;169.00;90.30;53%;760.00
-BC10;"BPC 157";"10mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-BC20;"BPC 157";"20mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";65.40;41.00;106.40;212.80;219.00;112.60;51%;1220.00
-BT5;"TB500 全链";"5mg por frasco, caixa com 10 frascos";"Regeneração Muscular";59.30;41.00;100.30;200.60;209.00;108.70;52%;1120.00
-BT10;"TB500 全链";"10mg por frasco, caixa com 10 frascos";"Regeneração Muscular";96.20;41.00;137.20;274.40;289.00;151.80;53%;1720.00
-CU50;"GHK-Cu";"50mg por frasco, caixa com 10 frascos";"Pele, Cabelo & Colágeno";25.40;41.00;66.40;132.80;139.00;72.60;52%;560.00
-CU100;"GHK-Cu";"100mg por frasco, caixa com 10 frascos";"Pele, Cabelo & Colágeno";30.00;41.00;71.00;142.00;149.00;78.00;52%;630.00
-AU20;"AHK-CU";"20mg por frasco, caixa com 10 frascos";"Crescimento Capilar";28.50;41.00;69.50;139.00;149.00;79.50;53%;610.00
-AU50;"AHK-CU";"50mg por frasco, caixa com 10 frascos";"Crescimento Capilar";34.60;41.00;75.60;151.20;159.00;83.40;52%;710.00
-AU100;"AHK-CU";"100mg por frasco, caixa com 10 frascos";"Crescimento Capilar";43.90;41.00;84.90;169.80;179.00;94.10;53%;860.00
-SMO5;"Sermorelin";"5mg por frasco, caixa com 10 frascos";"Anti-Aging & GH";62.40;41.00;103.40;206.80;219.00;115.60;53%;1170.00
-SMO10;"Sermorelin";"10mg por frasco, caixa com 10 frascos";"Anti-Aging & GH";105.50;41.00;146.50;293.00;299.00;152.50;51%;1880.00
-TSM2;"Tesamorelin";"2mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";40.80;41.00;81.80;163.60;179.00;97.20;54%;810.00
-TSM5;"Tesamorelin";"5mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";80.80;41.00;121.80;243.60;259.00;137.20;53%;1470.00
-TSM10;"Tesamorelin";"10mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";120.90;41.00;161.90;323.80;339.00;177.10;52%;2130.00
-TSM20;"Tesamorelin";"20mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";160.20;41.00;201.20;402.40;409.00;207.80;51%;2780.00
-IG01;"IGF-1 LR3";"100mcg por frasco, caixa com 10 frascos";"Hipertrofia Celular";40.80;41.00;81.80;163.60;179.00;97.20;54%;810.00
-IG1-1;"IGF-1 LR3";"1mg por frasco, caixa com 10 frascos";"Hipertrofia Celular";131.30;41.00;172.30;344.60;359.00;186.70;52%;2300.00
-TR5;"Tirzepatide";"5mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";33.10;41.00;74.10;148.20;159.00;84.90;53%;680.00
-TR10;"Tirzepatide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";40.80;41.00;81.80;163.60;179.00;97.20;54%;810.00
-TR15;"Tirzepatide";"15mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";50.00;41.00;91.00;182.00;189.00;98.00;52%;960.00
-TR20;"Tirzepatide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";60.80;41.00;101.80;203.60;219.00;117.20;54%;1140.00
-TR30;"Tirzepatide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";80.80;41.00;121.80;243.60;259.00;137.20;53%;1470.00
-TR40;"Tirzepatide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";90.10;41.00;131.10;262.20;269.00;137.90;51%;1620.00
-TR50;"Tirzepatide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";108.60;41.00;149.60;299.20;309.00;159.40;52%;1930.00
-TR60;"Tirzepatide";"60mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";128.60;41.00;169.60;339.20;349.00;179.40;51%;2260.00
-TR80;"Tirzepatide";"80mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";144.00;41.00;185.00;370.00;379.00;194.00;51%;2510.00
-TR100;"Tirzepatide";"100mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";164.80;41.00;205.80;411.60;419.00;213.20;51%;2860.00
-SM10;"Semaglutide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";37.70;41.00;78.70;157.40;169.00;90.30;53%;760.00
-SM20;"Semaglutide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";50.00;41.00;91.00;182.00;189.00;98.00;52%;960.00
-SM30;"Semaglutide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";74.70;41.00;115.70;231.40;239.00;123.30;52%;1370.00
-SM40;"Semaglutide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";87.00;41.00;128.00;256.00;269.00;141.00;52%;1570.00
-SM50;"Semaglutide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";114.70;41.00;155.70;311.40;319.00;163.30;51%;2030.00
-RT5;"Retatrutide";"5mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";34.60;41.00;75.60;151.20;159.00;83.40;52%;710.00
-RT10;"Retatrutide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-RT15;"Retatrutide";"15mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";71.60;41.00;112.60;225.20;239.00;126.40;53%;1320.00
-RT20;"Retatrutide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";80.80;41.00;121.80;243.60;259.00;137.20;53%;1470.00
-RT30;"Retatrutide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";105.50;41.00;146.50;293.00;299.00;152.50;51%;1880.00
-RT40;"Retatrutide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";123.20;41.00;164.20;328.40;339.00;174.80;52%;2170.00
-RT50;"Retatrutide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";125.50;41.00;166.50;333.00;339.00;172.50;51%;2210.00
-RT60;"Retatrutide";"60mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";145.10;41.00;186.10;372.20;379.00;192.90;51%;2530.00
-RT80;"Retatrutide";"80mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";153.20;41.00;194.20;388.40;399.00;204.80;51%;2660.00
-RT100;"Retatrutide";"100mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";217.90;41.00;258.90;517.80;529.00;270.10;51%;3730.00
-RT120;"Retatrutide";"120mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";287.20;41.00;328.20;656.40;669.00;340.80;51%;4880.00
-NJ100;"NAD+";"100mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";28.50;41.00;69.50;139.00;149.00;79.50;53%;610.00
-NJ500;"NAD+";"500mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";34.60;41.00;75.60;151.20;159.00;83.40;52%;710.00
-NJ1000;"NAD+";"1000mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";43.90;41.00;84.90;169.80;179.00;94.10;53%;860.00
-GLOW;"GLOW70";"70mg por frasco, caixa com 10 frascos";"Beleza & Rejuvenescimento";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-Klow;"Klow80";"80mg por frasco, caixa com 10 frascos";"Beleza & Rejuvenescimento";128.60;41.00;169.60;339.20;349.00;179.40;51%;2260.00
-DS5;"DSIP";"5mg por frasco, caixa com 10 frascos";"Sono Profundo & Regeneração";43.90;41.00;84.90;169.80;179.00;94.10;53%;860.00
-DS10;"DSIP";"10mg por frasco, caixa com 10 frascos";"Sono Profundo & Regeneração";65.40;41.00;106.40;212.80;219.00;112.60;51%;1220.00
-SK5;"Selank";"5mg por frasco, caixa com 10 frascos";"Ansiedade & Humor";36.20;41.00;77.20;154.40;169.00;91.80;54%;730.00
-SK10;"Selank";"10mg por frasco, caixa com 10 frascos";"Ansiedade & Humor";50.00;41.00;91.00;182.00;189.00;98.00;52%;960.00
-AX5;"Adamax";"5mg por frasco, caixa com 10 frascos";"Super Nootrópico & Foco";56.20;41.00;97.20;194.40;209.00;111.80;53%;1060.00
-AX10;"Adamax";"10mg por frasco, caixa com 10 frascos";"Super Nootrópico & Foco";93.20;41.00;134.20;268.40;279.00;144.80;52%;1670.00
-MT210;"Melanotan II";"10mg por frasco, caixa com 10 frascos";"Bronzeamento & Libido";62.40;41.00;103.40;206.80;219.00;115.60;53%;1170.00
-MS10;"MOTS-c";"10mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";56.20;41.00;97.20;194.40;209.00;111.80;53%;1060.00
-MS15;"MOTS-c";"15mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";71.60;41.00;112.60;225.20;239.00;126.40;53%;1320.00
-MS20;"MOTS-c";"20mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";90.10;41.00;131.10;262.20;269.00;137.90;51%;1620.00
-MS40;"MOTS-c";"40mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";125.90;41.00;166.90;333.80;349.00;182.10;52%;2210.00
-B12;"vitamin B12";"10ml por frasco, caixa com 10 frascos";"Energia & Hematopoiese";31.60;41.00;72.60;145.20;159.00;86.40;54%;660.00
-P41;"PT141";"10mg por frasco, caixa com 10 frascos";"Libido & Vitalidade Sexual";62.40;41.00;103.40;206.80;219.00;115.60;53%;1170.00
-KPV2;"KPV";"2mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";23.90;41.00;64.90;129.80;139.00;74.10;53%;530.00
-KPV5;"KPV";"5mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";30.00;41.00;71.00;142.00;149.00;78.00;52%;630.00
-KPV10;"KPV";"10mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-VP5;"VIP";"5mg por frasco, caixa com 10 frascos";"Saúde Pulmonar & Imunomodulação";120.90;41.00;161.90;323.80;339.00;177.10;52%;2130.00
-VP10;"VIP";"10mg por frasco, caixa com 10 frascos";"Saúde Pulmonar & Imunomodulação";137.00;41.00;178.00;356.00;369.00;191.00;52%;2400.00
-RA10;"ARA290";"10mg por frasco, caixa com 10 frascos";"Dor Neuropática & Reparo Nervoso";62.40;41.00;103.40;206.80;219.00;115.60;53%;1170.00
-RA16;"ARA290";"16mg por frasco, caixa com 10 frascos";"Dor Neuropática & Reparo Nervoso";87.00;41.00;128.00;256.00;269.00;141.00;52%;1570.00
-BB10;"BPC 5mg+TB5mg";"10mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";74.70;41.00;115.70;231.40;239.00;123.30;52%;1370.00
-BB20;"BPC 10mg+TB10mg";"20mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-BB30;"BPC 15mg+TB15mg";"30mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";130.10;41.00;171.10;342.20;349.00;177.90;51%;2280.00
-BB40;"BPC 20mg+TB20mg";"40mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";171.70;41.00;212.70;425.40;439.00;226.30;52%;2970.00
-XS20;"Semax 10mg+Selank 10mg";"20mg por frasco, caixa com 10 frascos";"Combo Foco & Anti-Ansiedade";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-CP10;"CJC1295+Ipamorelin";"10mg por frasco, caixa com 10 frascos";"Combo GH & Massa Magra";87.00;41.00;128.00;256.00;269.00;141.00;52%;1570.00
-CP20;"CJC1295+Ipamorelin";"20mg por frasco, caixa com 10 frascos";"Combo GH & Massa Magra";120.50;41.00;161.50;323.00;329.00;167.50;51%;2130.00
-RET60;"Retatrutide 30mg+Tirzepatide 30mg";"60mg por frasco, caixa com 10 frascos";"Combo Super Metabólico";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-TI10;"Tesamorelin 5mg+Ipamorelin 5mg";"10mg por frasco, caixa com 10 frascos";"Combo Gordura Visceral & GH";90.10;41.00;131.10;262.20;269.00;137.90;51%;1620.00
-TI15;"Tesamorelin 10mg+Ipamorelin 5mg";"15mg por frasco, caixa com 10 frascos";"Combo Gordura Visceral & GH";125.90;41.00;166.90;333.80;349.00;182.10;52%;2210.00
-CGL5;"Cagrilintide";"5mg por frasco, caixa com 10 frascos";"Amilina & Saciedade Intensa";93.20;41.00;134.20;268.40;279.00;144.80;52%;1670.00
-CGL10;"Cagrilintide";"10mg por frasco, caixa com 10 frascos";"Amilina & Saciedade Intensa";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-AD5;"AOD9604";"5mg por frasco, caixa com 10 frascos";"Lipólise Seletiva sem pico de GH";71.60;41.00;112.60;225.20;239.00;126.40;53%;1320.00
-AD10;"AOD9604";"10mg por frasco, caixa com 10 frascos";"Lipólise Seletiva sem pico de GH";114.70;41.00;155.70;311.40;319.00;163.30;51%;2030.00
-5AM;"5-AMINO-1MQ";"5mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";31.60;41.00;72.60;145.20;159.00;86.40;54%;660.00
-10AM;"5-AMINO-1MQ";"10mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";40.80;41.00;81.80;163.60;179.00;97.20;54%;810.00
-50AM;"5-AMINO-1MQ";"50mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";56.20;41.00;97.20;194.40;209.00;111.80;53%;1060.00
-ET10;"Epithalon";"10mg por frasco, caixa com 10 frascos";"Telômeros & Longevidade";47.00;41.00;88.00;176.00;189.00;101.00;53%;910.00
-ET50;"Epithalon";"50mg por frasco, caixa com 10 frascos";"Telômeros & Longevidade";108.60;41.00;149.60;299.20;309.00;159.40;52%;1930.00
-F42;"FOXO4-DRI";"2mg por frasco, caixa com 10 frascos";"Senolítico (Eliminação de Células Zumbis)";87.00;41.00;128.00;256.00;269.00;141.00;52%;1570.00
-FOX10;"FOXO4-DRI";"10mg por frasco, caixa com 10 frascos";"Senolítico (Eliminação de Células Zumbis)";345.00;41.00;386.00;772.00;779.00;393.00;50%;5830.00
-NP810;"Snap-8";"10mg por frasco, caixa com 10 frascos";"Anti-Rugas (Efeito Botox-like)";56.20;41.00;97.20;194.40;209.00;111.80;53%;1060.00
-2S10;"SS-31";"10mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";77.80;41.00;118.80;237.60;249.00;130.20;52%;1420.00
-2S20;"SS-31";"20mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";125.90;41.00;166.90;333.80;349.00;182.10;52%;2210.00
-2S50;"SS-31";"50mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";167.10;41.00;208.10;416.20;429.00;220.90;51%;2890.00
-SX5;"Semax";"5mg por frasco, caixa com 10 frascos";"BDNF & Nootrópico";37.70;41.00;78.70;157.40;169.00;90.30;53%;760.00
-SX10;"Semax";"10mg por frasco, caixa com 10 frascos";"BDNF & Nootrópico";48.50;41.00;89.50;179.00;189.00;99.50;53%;940.00
-OT2;"Oxytocin";"2mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";25.40;41.00;66.40;132.80;139.00;72.60;52%;560.00
-OT5;"Oxytocin";"5mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";37.70;41.00;78.70;157.40;169.00;90.30;53%;760.00
-OT10;"Oxytocin";"10mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";43.90;41.00;84.90;169.80;179.00;94.10;53%;860.00
-IP5;"Ipamorelin";"5mg por frasco, caixa com 10 frascos";"Liberação de GH Seletivo";34.60;41.00;75.60;151.20;159.00;83.40;52%;710.00
-IP10;"Ipamorelin";"10mg por frasco, caixa com 10 frascos";"Liberação de GH Seletivo";53.10;41.00;94.10;188.20;199.00;104.90;53%;1010.00
-CD5;"CJC1295 with DAC";"5mg por frasco, caixa com 10 frascos";"GH de Longa Ação";117.80;41.00;158.80;317.60;329.00;170.20;52%;2080.00
-CD10;"CJC1295 with DAC";"10mg por frasco, caixa com 10 frascos";"GH de Longa Ação";155.50;41.00;196.50;393.00;399.00;202.50;51%;2700.00
-CND5;"CJC1295 no DAC";"5mg por frasco, caixa com 10 frascos";"GH Pulsátil";59.30;41.00;100.30;200.60;209.00;108.70;52%;1120.00
-CND10;"CJC1295 no DAC";"10mg por frasco, caixa com 10 frascos";"GH Pulsátil";96.20;41.00;137.20;274.40;289.00;151.80;53%;1720.00
-KS5;"Kisspeptin-10";"5mg por frasco, caixa com 10 frascos";"Eixo Hormonal & LH/FSH";59.30;41.00;100.30;200.60;209.00;108.70;52%;1120.00
-KS10;"Kisspeptin-10";"10mg por frasco, caixa com 10 frascos";"Eixo Hormonal & LH/FSH";96.20;41.00;137.20;274.40;289.00;151.80;53%;1720.00
-TY10;"Thymalin/Thymulin";"10mg por frasco, caixa com 10 frascos";"Regeneração Tímica & Imunidade";59.30;41.00;100.30;200.60;209.00;108.70;52%;1120.00
-TA5;"Thymosin alpha 1";"5mg por frasco, caixa com 10 frascos";"Super Imunomodulador T";80.80;41.00;121.80;243.60;259.00;137.20;53%;1470.00
-TA10;"Thymosin alpha 1";"10mg por frasco, caixa com 10 frascos";"Super Imunomodulador T";123.20;41.00;164.20;328.40;339.00;174.80;52%;2170.00
-GTT600;"Glutathione";"600mg por frasco, caixa com 10 frascos";"Master Antioxidante & Detox";37.70;41.00;78.70;157.40;169.00;90.30;53%;760.00
-GTT1500;"Glutathione";"1500mg por frasco, caixa com 10 frascos";"Master Antioxidante & Detox";56.20;41.00;97.20;194.40;209.00;111.80;53%;1060.00
+LC600;"L-carnitine";"600mg por frasco, caixa com 10 frascos";"Metabolismo & Queima";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+LC1200;"L-carnitine";"1200mg por frasco, caixa com 10 frascos";"Metabolismo & Queima";65.40;41.00;106.40;212.80;429.00;322.60;75%;1220.00
+LemonBottle;"Lemon Bottle";"10ml por frasco, caixa com 10 frascos";"Gordura Localizada";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+Lipo-C;"Lipo-c";"10ml por frasco, caixa com 10 frascos";"Metabolismo & Fígado";71.60;41.00;112.60;225.20;459.00;346.40;75%;1320.00
+MIC;"MIC (Lipo C with B12)";"10mg por frasco, caixa com 10 frascos";"Metabolismo & Energia";65.40;41.00;106.40;212.80;429.00;322.60;75%;1220.00
+BC5;"BPC 157";"5mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";37.70;41.00;78.70;157.40;319.00;240.30;75%;760.00
+BC10;"BPC 157";"10mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+BC20;"BPC 157";"20mg por frasco, caixa com 10 frascos";"Regeneração & Articulações";65.40;41.00;106.40;212.80;429.00;322.60;75%;1220.00
+BT5;"TB500 全链";"5mg por frasco, caixa com 10 frascos";"Regeneração Muscular";59.30;41.00;100.30;200.60;409.00;308.70;75%;1120.00
+BT10;"TB500 全链";"10mg por frasco, caixa com 10 frascos";"Regeneração Muscular";96.20;41.00;137.20;274.40;549.00;411.80;75%;1720.00
+CU50;"GHK-Cu";"50mg por frasco, caixa com 10 frascos";"Pele, Cabelo & Colágeno";25.40;41.00;66.40;132.80;269.00;202.60;75%;560.00
+CU100;"GHK-Cu";"100mg por frasco, caixa com 10 frascos";"Pele, Cabelo & Colágeno";30.00;41.00;71.00;142.00;289.00;218.00;75%;630.00
+AU20;"AHK-CU";"20mg por frasco, caixa com 10 frascos";"Crescimento Capilar";28.50;41.00;69.50;139.00;279.00;209.50;75%;610.00
+AU50;"AHK-CU";"50mg por frasco, caixa com 10 frascos";"Crescimento Capilar";34.60;41.00;75.60;151.20;309.00;233.40;76%;710.00
+AU100;"AHK-CU";"100mg por frasco, caixa com 10 frascos";"Crescimento Capilar";43.90;41.00;84.90;169.80;349.00;264.10;76%;860.00
+SMO5;"Sermorelin";"5mg por frasco, caixa com 10 frascos";"Anti-Aging & GH";62.40;41.00;103.40;206.80;419.00;315.60;75%;1170.00
+SMO10;"Sermorelin";"10mg por frasco, caixa com 10 frascos";"Anti-Aging & GH";105.50;41.00;146.50;293.00;589.00;442.50;75%;1880.00
+TSM2;"Tesamorelin";"2mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";40.80;41.00;81.80;163.60;329.00;247.20;75%;810.00
+TSM5;"Tesamorelin";"5mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";80.80;41.00;121.80;243.60;489.00;367.20;75%;1470.00
+TSM10;"Tesamorelin";"10mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";120.90;41.00;161.90;323.80;649.00;487.10;75%;2130.00
+TSM20;"Tesamorelin";"20mg por frasco, caixa com 10 frascos";"Gordura Visceral & GH";160.20;41.00;201.20;402.40;809.00;607.80;75%;2780.00
+IG01;"IGF-1 LR3";"100mcg por frasco, caixa com 10 frascos";"Hipertrofia Celular";40.80;41.00;81.80;163.60;329.00;247.20;75%;810.00
+IG1-1;"IGF-1 LR3";"1mg por frasco, caixa com 10 frascos";"Hipertrofia Celular";131.30;41.00;172.30;344.60;699.00;526.70;75%;2300.00
+TR5;"Tirzepatide";"5mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";33.10;41.00;74.10;148.20;299.00;224.90;75%;680.00
+TR10;"Tirzepatide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";40.80;41.00;81.80;163.60;329.00;247.20;75%;810.00
+TR15;"Tirzepatide";"15mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";50.00;41.00;91.00;182.00;369.00;278.00;75%;960.00
+TR20;"Tirzepatide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";60.80;41.00;101.80;203.60;409.00;307.20;75%;1140.00
+TR30;"Tirzepatide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";80.80;41.00;121.80;243.60;489.00;367.20;75%;1470.00
+TR40;"Tirzepatide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";90.10;41.00;131.10;262.20;529.00;397.90;75%;1620.00
+TR50;"Tirzepatide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";108.60;41.00;149.60;299.20;599.00;449.40;75%;1930.00
+TR60;"Tirzepatide";"60mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";128.60;41.00;169.60;339.20;679.00;509.40;75%;2260.00
+TR80;"Tirzepatide";"80mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";144.00;41.00;185.00;370.00;749.00;564.00;75%;2510.00
+TR100;"Tirzepatide";"100mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1/GIP";164.80;41.00;205.80;411.60;829.00;623.20;75%;2860.00
+SM10;"Semaglutide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";37.70;41.00;78.70;157.40;319.00;240.30;75%;760.00
+SM20;"Semaglutide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";50.00;41.00;91.00;182.00;369.00;278.00;75%;960.00
+SM30;"Semaglutide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";74.70;41.00;115.70;231.40;469.00;353.30;75%;1370.00
+SM40;"Semaglutide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";87.00;41.00;128.00;256.00;519.00;391.00;75%;1570.00
+SM50;"Semaglutide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento & GLP-1";114.70;41.00;155.70;311.40;629.00;473.30;75%;2030.00
+RT5;"Retatrutide";"5mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";34.60;41.00;75.60;151.20;309.00;233.40;76%;710.00
+RT10;"Retatrutide";"10mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+RT15;"Retatrutide";"15mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";71.60;41.00;112.60;225.20;459.00;346.40;75%;1320.00
+RT20;"Retatrutide";"20mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";80.80;41.00;121.80;243.60;489.00;367.20;75%;1470.00
+RT30;"Retatrutide";"30mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";105.50;41.00;146.50;293.00;589.00;442.50;75%;1880.00
+RT40;"Retatrutide";"40mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";123.20;41.00;164.20;328.40;659.00;494.80;75%;2170.00
+RT50;"Retatrutide";"50mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";125.50;41.00;166.50;333.00;669.00;502.50;75%;2210.00
+RT60;"Retatrutide";"60mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";145.10;41.00;186.10;372.20;749.00;562.90;75%;2530.00
+RT80;"Retatrutide";"80mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";153.20;41.00;194.20;388.40;779.00;584.80;75%;2660.00
+RT100;"Retatrutide";"100mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";217.90;41.00;258.90;517.80;1039.00;780.10;75%;3730.00
+RT120;"Retatrutide";"120mg por frasco, caixa com 10 frascos";"Emagrecimento Triplo Agonista";287.20;41.00;328.20;656.40;1319.00;990.80;75%;4880.00
+NJ100;"NAD+";"100mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";28.50;41.00;69.50;139.00;279.00;209.50;75%;610.00
+NJ500;"NAD+";"500mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";34.60;41.00;75.60;151.20;309.00;233.40;76%;710.00
+NJ1000;"NAD+";"1000mg por frasco, caixa com 10 frascos";"Longevidade & Mitocôndria";43.90;41.00;84.90;169.80;349.00;264.10;76%;860.00
+GLOW;"GLOW70";"70mg por frasco, caixa com 10 frascos";"Beleza & Rejuvenescimento";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+Klow;"Klow80";"80mg por frasco, caixa com 10 frascos";"Beleza & Rejuvenescimento";128.60;41.00;169.60;339.20;679.00;509.40;75%;2260.00
+DS5;"DSIP";"5mg por frasco, caixa com 10 frascos";"Sono Profundo & Regeneração";43.90;41.00;84.90;169.80;349.00;264.10;76%;860.00
+DS10;"DSIP";"10mg por frasco, caixa com 10 frascos";"Sono Profundo & Regeneração";65.40;41.00;106.40;212.80;429.00;322.60;75%;1220.00
+SK5;"Selank";"5mg por frasco, caixa com 10 frascos";"Ansiedade & Humor";36.20;41.00;77.20;154.40;309.00;231.80;75%;730.00
+SK10;"Selank";"10mg por frasco, caixa com 10 frascos";"Ansiedade & Humor";50.00;41.00;91.00;182.00;369.00;278.00;75%;960.00
+AX5;"Adamax";"5mg por frasco, caixa com 10 frascos";"Super Nootrópico & Foco";56.20;41.00;97.20;194.40;389.00;291.80;75%;1060.00
+AX10;"Adamax";"10mg por frasco, caixa com 10 frascos";"Super Nootrópico & Foco";93.20;41.00;134.20;268.40;539.00;404.80;75%;1670.00
+MT210;"Melanotan II";"10mg por frasco, caixa com 10 frascos";"Bronzeamento & Libido";62.40;41.00;103.40;206.80;419.00;315.60;75%;1170.00
+MS10;"MOTS-c";"10mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";56.20;41.00;97.20;194.40;389.00;291.80;75%;1060.00
+MS15;"MOTS-c";"15mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";71.60;41.00;112.60;225.20;459.00;346.40;75%;1320.00
+MS20;"MOTS-c";"20mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";90.10;41.00;131.10;262.20;529.00;397.90;75%;1620.00
+MS40;"MOTS-c";"40mg por frasco, caixa com 10 frascos";"Metabolismo & Resistência";125.90;41.00;166.90;333.80;669.00;502.10;75%;2210.00
+B12;"vitamin B12";"10ml por frasco, caixa com 10 frascos";"Energia & Hematopoiese";31.60;41.00;72.60;145.20;299.00;226.40;76%;660.00
+P41;"PT141";"10mg por frasco, caixa com 10 frascos";"Libido & Vitalidade Sexual";62.40;41.00;103.40;206.80;419.00;315.60;75%;1170.00
+KPV2;"KPV";"2mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";23.90;41.00;64.90;129.80;269.00;204.10;76%;530.00
+KPV5;"KPV";"5mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";30.00;41.00;71.00;142.00;289.00;218.00;75%;630.00
+KPV10;"KPV";"10mg por frasco, caixa com 10 frascos";"Anti-inflamatório Intestinal";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+VP5;"VIP";"5mg por frasco, caixa com 10 frascos";"Saúde Pulmonar & Imunomodulação";120.90;41.00;161.90;323.80;649.00;487.10;75%;2130.00
+VP10;"VIP";"10mg por frasco, caixa com 10 frascos";"Saúde Pulmonar & Imunomodulação";137.00;41.00;178.00;356.00;719.00;541.00;75%;2400.00
+RA10;"ARA290";"10mg por frasco, caixa com 10 frascos";"Dor Neuropática & Reparo Nervoso";62.40;41.00;103.40;206.80;419.00;315.60;75%;1170.00
+RA16;"ARA290";"16mg por frasco, caixa com 10 frascos";"Dor Neuropática & Reparo Nervoso";87.00;41.00;128.00;256.00;519.00;391.00;75%;1570.00
+BB10;"BPC 5mg+TB5mg";"10mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";74.70;41.00;115.70;231.40;469.00;353.30;75%;1370.00
+BB20;"BPC 10mg+TB10mg";"20mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+BB30;"BPC 15mg+TB15mg";"30mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";130.10;41.00;171.10;342.20;689.00;517.90;75%;2280.00
+BB40;"BPC 20mg+TB20mg";"40mg por frasco, caixa com 10 frascos";"Combo Regeneração Completa";171.70;41.00;212.70;425.40;859.00;646.30;75%;2970.00
+XS20;"Semax 10mg+Selank 10mg";"20mg por frasco, caixa com 10 frascos";"Combo Foco & Anti-Ansiedade";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+CP10;"CJC1295+Ipamorelin";"10mg por frasco, caixa com 10 frascos";"Combo GH & Massa Magra";87.00;41.00;128.00;256.00;519.00;391.00;75%;1570.00
+CP20;"CJC1295+Ipamorelin";"20mg por frasco, caixa com 10 frascos";"Combo GH & Massa Magra";120.50;41.00;161.50;323.00;649.00;487.50;75%;2130.00
+RET60;"Retatrutide 30mg+Tirzepatide 30mg";"60mg por frasco, caixa com 10 frascos";"Combo Super Metabólico";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+TI10;"Tesamorelin 5mg+Ipamorelin 5mg";"10mg por frasco, caixa com 10 frascos";"Combo Gordura Visceral & GH";90.10;41.00;131.10;262.20;529.00;397.90;75%;1620.00
+TI15;"Tesamorelin 10mg+Ipamorelin 5mg";"15mg por frasco, caixa com 10 frascos";"Combo Gordura Visceral & GH";125.90;41.00;166.90;333.80;669.00;502.10;75%;2210.00
+CGL5;"Cagrilintide";"5mg por frasco, caixa com 10 frascos";"Amilina & Saciedade Intensa";93.20;41.00;134.20;268.40;539.00;404.80;75%;1670.00
+CGL10;"Cagrilintide";"10mg por frasco, caixa com 10 frascos";"Amilina & Saciedade Intensa";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+AD5;"AOD9604";"5mg por frasco, caixa com 10 frascos";"Lipólise Seletiva sem pico de GH";71.60;41.00;112.60;225.20;459.00;346.40;75%;1320.00
+AD10;"AOD9604";"10mg por frasco, caixa com 10 frascos";"Lipólise Seletiva sem pico de GH";114.70;41.00;155.70;311.40;629.00;473.30;75%;2030.00
+5AM;"5-AMINO-1MQ";"5mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";31.60;41.00;72.60;145.20;299.00;226.40;76%;660.00
+10AM;"5-AMINO-1MQ";"10mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";40.80;41.00;81.80;163.60;329.00;247.20;75%;810.00
+50AM;"5-AMINO-1MQ";"50mg por frasco, caixa com 10 frascos";"Inibidor NNMT & Queima Celular";56.20;41.00;97.20;194.40;389.00;291.80;75%;1060.00
+ET10;"Epithalon";"10mg por frasco, caixa com 10 frascos";"Telômeros & Longevidade";47.00;41.00;88.00;176.00;359.00;271.00;75%;910.00
+ET50;"Epithalon";"50mg por frasco, caixa com 10 frascos";"Telômeros & Longevidade";108.60;41.00;149.60;299.20;599.00;449.40;75%;1930.00
+F42;"FOXO4-DRI";"2mg por frasco, caixa com 10 frascos";"Senolítico (Eliminação de Células Zumbis)";87.00;41.00;128.00;256.00;519.00;391.00;75%;1570.00
+FOX10;"FOXO4-DRI";"10mg por frasco, caixa com 10 frascos";"Senolítico (Eliminação de Células Zumbis)";345.00;41.00;386.00;772.00;1549.00;1163.00;75%;5830.00
+NP810;"Snap-8";"10mg por frasco, caixa com 10 frascos";"Anti-Rugas (Efeito Botox-like)";56.20;41.00;97.20;194.40;389.00;291.80;75%;1060.00
+2S10;"SS-31";"10mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";77.80;41.00;118.80;237.60;479.00;360.20;75%;1420.00
+2S20;"SS-31";"20mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";125.90;41.00;166.90;333.80;669.00;502.10;75%;2210.00
+2S50;"SS-31";"50mg por frasco, caixa com 10 frascos";"Rejuvenescimento Mitocondrial";167.10;41.00;208.10;416.20;839.00;630.90;75%;2890.00
+SX5;"Semax";"5mg por frasco, caixa com 10 frascos";"BDNF & Nootrópico";37.70;41.00;78.70;157.40;319.00;240.30;75%;760.00
+SX10;"Semax";"10mg por frasco, caixa com 10 frascos";"BDNF & Nootrópico";48.50;41.00;89.50;179.00;359.00;269.50;75%;940.00
+OT2;"Oxytocin";"2mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";25.40;41.00;66.40;132.80;269.00;202.60;75%;560.00
+OT5;"Oxytocin";"5mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";37.70;41.00;78.70;157.40;319.00;240.30;75%;760.00
+OT10;"Oxytocin";"10mg por frasco, caixa com 10 frascos";"Vínculo, Humor & Calma";43.90;41.00;84.90;169.80;349.00;264.10;76%;860.00
+IP5;"Ipamorelin";"5mg por frasco, caixa com 10 frascos";"Liberação de GH Seletivo";34.60;41.00;75.60;151.20;309.00;233.40;76%;710.00
+IP10;"Ipamorelin";"10mg por frasco, caixa com 10 frascos";"Liberação de GH Seletivo";53.10;41.00;94.10;188.20;379.00;284.90;75%;1010.00
+CD5;"CJC1295 with DAC";"5mg por frasco, caixa com 10 frascos";"GH de Longa Ação";117.80;41.00;158.80;317.60;639.00;480.20;75%;2080.00
+CD10;"CJC1295 with DAC";"10mg por frasco, caixa com 10 frascos";"GH de Longa Ação";155.50;41.00;196.50;393.00;789.00;592.50;75%;2700.00
+CND5;"CJC1295 no DAC";"5mg por frasco, caixa com 10 frascos";"GH Pulsátil";59.30;41.00;100.30;200.60;409.00;308.70;75%;1120.00
+CND10;"CJC1295 no DAC";"10mg por frasco, caixa com 10 frascos";"GH Pulsátil";96.20;41.00;137.20;274.40;549.00;411.80;75%;1720.00
+KS5;"Kisspeptin-10";"5mg por frasco, caixa com 10 frascos";"Eixo Hormonal & LH/FSH";59.30;41.00;100.30;200.60;409.00;308.70;75%;1120.00
+KS10;"Kisspeptin-10";"10mg por frasco, caixa com 10 frascos";"Eixo Hormonal & LH/FSH";96.20;41.00;137.20;274.40;549.00;411.80;75%;1720.00
+TY10;"Thymalin/Thymulin";"10mg por frasco, caixa com 10 frascos";"Regeneração Tímica & Imunidade";59.30;41.00;100.30;200.60;409.00;308.70;75%;1120.00
+TA5;"Thymosin alpha 1";"5mg por frasco, caixa com 10 frascos";"Super Imunomodulador T";80.80;41.00;121.80;243.60;489.00;367.20;75%;1470.00
+TA10;"Thymosin alpha 1";"10mg por frasco, caixa com 10 frascos";"Super Imunomodulador T";123.20;41.00;164.20;328.40;659.00;494.80;75%;2170.00
+GTT600;"Glutathione";"600mg por frasco, caixa com 10 frascos";"Master Antioxidante & Detox";37.70;41.00;78.70;157.40;319.00;240.30;75%;760.00
+GTT1500;"Glutathione";"1500mg por frasco, caixa com 10 frascos";"Master Antioxidante & Detox";56.20;41.00;97.20;194.40;389.00;291.80;75%;1060.00
