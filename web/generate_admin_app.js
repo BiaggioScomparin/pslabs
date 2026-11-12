@@ -909,6 +909,7 @@ const adminHtml = `<!DOCTYPE html>
               <button class="filter-pill" data-cat="box" onclick="filterCompras('box', this)">📦 Caixas (<span id="count-box">0</span>)</button>
               <button class="filter-pill" data-cat="label" onclick="filterCompras('label', this)">🏷️ Etiquetas (<span id="count-label">0</span>)</button>
               <button class="filter-pill" data-cat="supplies" onclick="filterCompras('supplies', this)">💉 Insumos (<span id="count-supplies">0</span>)</button>
+              <button class="filter-pill" data-cat="gift" onclick="filterCompras('gift', this)" style="background: #FFFBEB; border-color: #FDE68A; color: #92400E;">🎁 Brindes (<span id="count-gift">0</span>)</button>
               <button class="filter-pill" data-cat="other" onclick="filterCompras('other', this)">📝 Outros (<span id="count-other">0</span>)</button>
             </div>
 
@@ -1316,6 +1317,17 @@ const adminHtml = `<!DOCTYPE html>
           <div class="form-group">
             <label class="form-label">Descrição do Item / Despesa</label>
             <input type="text" id="compra-other-desc" class="form-input" placeholder="Ex: Frete Aéreo Internacional DHL, Fita gomada, etc.">
+          </div>
+        </div>
+
+        <!-- Opção Brinde da Chinesa / Bonificação (Custo R$ 0,00) -->
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; color: #166534; font-size: 13px; margin: 0;">
+            <input type="checkbox" id="compra-is-gift" onchange="toggleCompraGift(this.checked)" style="width: 18px; height: 18px; accent-color: #10B981; cursor: pointer;">
+            <span>🎁 Item recebido como Brinde / Bonificação (Custo R$ 0,00)</span>
+          </label>
+          <div style="font-size: 11px; color: #15803D; margin-top: 4px; margin-left: 28px;">
+            Marque para frascos ou itens enviados de brinde pela fabricante chinesa. O item entra no estoque físico a custo zero, gerando 100% de lucro líquido na venda.
           </div>
         </div>
 
@@ -1765,6 +1777,21 @@ const adminHtml = `<!DOCTYPE html>
           totalCost: 380.00,
           supplier: "DHL Express Brasil",
           notes: "Desembaraço prioritário lote laboratorial"
+        },
+        {
+          id: "CMP-010",
+          date: "2026-11-06",
+          category: "peptide",
+          isGift: true,
+          compoundId: "ghk-cu",
+          code: "CU50",
+          name: "GHK-Cu",
+          dosage: "50mg (Bonificação)",
+          qty: 5,
+          unitCost: 0.00,
+          totalCost: 0.00,
+          supplier: "SinoPept / Fábrica Chinesa",
+          notes: "🎁 Brinde enviado pela fabricante chinesa junto com o lote (Custo R$ 0,00)"
         }
       ];
       localStorage.setItem('psl_compras', JSON.stringify(compras));
@@ -2026,6 +2053,8 @@ const adminHtml = `<!DOCTYPE html>
         document.getElementById('compra-date').value = today;
         populateCompoundSelect('compra-compound', 'compra-dose');
         document.getElementById('compra-category').value = 'peptide';
+        const giftCheck = document.getElementById('compra-is-gift');
+        if (giftCheck) giftCheck.checked = false;
         onCompraCategoryChange();
       } else if (modalId === 'modal-venda') {
         document.getElementById('venda-date').value = today;
@@ -2260,10 +2289,45 @@ const adminHtml = `<!DOCTYPE html>
       }
     }
 
+    function toggleCompraGift(isGift) {
+      const costInput = document.getElementById('compra-unit-cost');
+      const totalInput = document.getElementById('compra-total-cost');
+      const notesInput = document.getElementById('compra-notes');
+      const supplierInput = document.getElementById('compra-supplier');
+
+      if (isGift) {
+        costInput.value = '0.00';
+        totalInput.value = '0.00';
+        if (!notesInput.value) {
+          notesInput.value = '🎁 Brinde da chinesa (custo R$ 0,00)';
+        }
+        if (!supplierInput.value || supplierInput.value === 'Fornecedor Padrão') {
+          supplierInput.value = 'SinoPept / Fábrica Chinesa';
+        }
+      } else {
+        const cat = document.getElementById('compra-category').value;
+        if (cat === 'peptide') {
+          onCompraDoseChange();
+        } else if (cat === 'other') {
+          costInput.value = '50.00';
+        } else {
+          onCompraPresetSelectChange();
+        }
+        recalcCompraTotal();
+      }
+    }
+
     function recalcCompraTotal() {
+      const giftCheck = document.getElementById('compra-is-gift');
+      const isGift = giftCheck ? giftCheck.checked : false;
       const qty = parseFloat(document.getElementById('compra-qty').value) || 0;
       const unit = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
-      document.getElementById('compra-total-cost').value = (qty * unit).toFixed(2);
+      
+      if (isGift || unit === 0) {
+        document.getElementById('compra-total-cost').value = '0.00';
+      } else {
+        document.getElementById('compra-total-cost').value = (qty * unit).toFixed(2);
+      }
     }
 
     function onVendaCompoundChange() {
@@ -2357,16 +2421,32 @@ const adminHtml = `<!DOCTYPE html>
     // CRUD: Save Compra (Peptídeos & Insumos)
     function saveCompra() {
       const cat = document.getElementById('compra-category').value;
+      const giftCheck = document.getElementById('compra-is-gift');
+      const isGift = Boolean(giftCheck && giftCheck.checked);
       const qty = parseInt(document.getElementById('compra-qty').value) || 0;
-      const unitCost = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
-      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || (qty * unitCost);
+      let unitCost = parseFloat(document.getElementById('compra-unit-cost').value);
+      if (isNaN(unitCost)) unitCost = 0;
+      let totalCost = isGift ? 0 : (parseFloat(document.getElementById('compra-total-cost').value) || (qty * unitCost));
       const date = document.getElementById('compra-date').value || new Date().toISOString().split('T')[0];
-      const supplier = document.getElementById('compra-supplier').value.trim() || 'Fornecedor Padrão';
-      const notes = document.getElementById('compra-notes').value.trim() || '';
+      const supplier = document.getElementById('compra-supplier').value.trim() || (isGift ? 'SinoPept / Fábrica Chinesa' : 'Fornecedor Padrão');
+      let notes = document.getElementById('compra-notes').value.trim();
 
-      if (qty <= 0 || unitCost <= 0) {
-        alert("Por favor, preencha quantidade e custo válidos!");
+      if (qty <= 0) {
+        alert("Por favor, informe uma quantidade válida (maior que zero)!");
         return;
+      }
+
+      if (unitCost < 0) {
+        alert("O custo unitário não pode ser negativo!");
+        return;
+      }
+
+      // Se custo for 0 ou marcado como brinde, confirma condição de brinde gratuito
+      const finalIsGift = isGift || (unitCost === 0);
+      if (finalIsGift) {
+        unitCost = 0;
+        totalCost = 0;
+        if (!notes) notes = '🎁 Brinde da chinesa (custo R$ 0,00)';
       }
 
       let compoundId = '';
@@ -2411,6 +2491,7 @@ const adminHtml = `<!DOCTYPE html>
         id: "CMP-" + String(compras.length + 1).padStart(3, '0'),
         date: date,
         category: cat,
+        isGift: finalIsGift,
         compoundId: compoundId,
         code: code,
         name: name,
@@ -2426,7 +2507,7 @@ const adminHtml = `<!DOCTYPE html>
       localStorage.setItem('psl_compras', JSON.stringify(compras));
 
       closeModal('modal-compra');
-      showToast("Compra registrada: " + name + " (" + qty + " un)");
+      showToast(finalIsGift ? ("🎁 Brinde registrado com sucesso: " + name + " (" + qty + " un a R$ 0)") : ("Compra registrada: " + name + " (" + qty + " un)"));
       renderDRE();
       renderComprasTable();
       renderBalancoTable();
@@ -2736,11 +2817,14 @@ const adminHtml = `<!DOCTYPE html>
       let countBox = 0;
       let countLabel = 0;
       let countSupplies = 0;
+      let countGift = 0;
       let countOther = 0;
 
       compras.forEach(c => {
         totalComprasGeral += c.totalCost;
         const cat = c.category || 'peptide';
+        if (c.isGift || c.unitCost === 0) countGift++;
+
         if (cat === 'peptide') {
           countPeptide++;
           totalPepCost += c.totalCost;
@@ -2770,6 +2854,7 @@ const adminHtml = `<!DOCTYPE html>
       if (document.getElementById('count-box')) document.getElementById('count-box').innerText = countBox;
       if (document.getElementById('count-label')) document.getElementById('count-label').innerText = countLabel;
       if (document.getElementById('count-supplies')) document.getElementById('count-supplies').innerText = countSupplies;
+      if (document.getElementById('count-gift')) document.getElementById('count-gift').innerText = countGift;
       if (document.getElementById('count-other')) document.getElementById('count-other').innerText = countOther;
 
       // Update top metric cards in Compras tab
@@ -2786,7 +2871,9 @@ const adminHtml = `<!DOCTYPE html>
 
       // Filter
       let filtered = compras;
-      if (currentComprasFilter !== 'all') {
+      if (currentComprasFilter === 'gift') {
+        filtered = compras.filter(c => Boolean(c.isGift || c.unitCost === 0));
+      } else if (currentComprasFilter !== 'all') {
         filtered = compras.filter(c => (c.category || 'peptide') === currentComprasFilter);
       }
 
@@ -2798,17 +2885,24 @@ const adminHtml = `<!DOCTYPE html>
       tbody.innerHTML = filtered.map(c => {
         const cat = c.category || 'peptide';
         const badge = getCategoryBadge(cat);
+        const isGift = Boolean(c.isGift || c.unitCost === 0);
+        const giftBadge = isGift ? '<span class="badge" style="background: #FEF3C7; color: #92400E; font-weight: 700; margin-left: 4px;">🎁 Brinde (R$ 0)</span>' : '';
         return \`
-          <tr>
+          <tr style="\${isGift ? 'background: #FFFDF5;' : ''}">
             <td><strong>\${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${c.date}</span></td>
             <td>
-              <div style="margin-bottom: 4px;">\${badge}</div>
+              <div style="margin-bottom: 4px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                \${badge}
+                \${giftBadge}
+              </div>
               <strong style="color: var(--dark); font-size: 13px;">\${c.name}</strong>
               <div style="font-size: 12px; color: var(--gray-600);">\${c.dosage}</div>
             </td>
             <td><strong>\${c.qty}</strong> un</td>
-            <td>R$ \${c.unitCost.toFixed(2)}</td>
-            <td style="font-weight: 800; color: var(--primary);">R$ \${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>\${isGift ? '<span style="color: #059669; font-weight: 700;">R$ 0,00</span>' : 'R$ ' + c.unitCost.toFixed(2)}</td>
+            <td style="font-weight: 800; color: \${isGift ? '#059669' : 'var(--primary)'};">
+              \${isGift ? 'R$ 0,00 <span style="font-size: 11px; font-weight: 600; color: #059669;">(Grátis)</span>' : 'R$ ' + c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+            </td>
             <td>\${c.supplier}</td>
             <td style="font-size: 12px; color: var(--gray-600);">\${c.notes || '-'}</td>
             <td>
