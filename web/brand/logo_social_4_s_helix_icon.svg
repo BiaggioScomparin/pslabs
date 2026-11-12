@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#145C46"/>
+      <stop offset="75%" stop-color="#08291F"/>
+      <stop offset="100%" stop-color="#03140F"/>
+    </radialGradient>
+    <filter id="glow4" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bgGrad4)"/>
+
+  <circle cx="540" cy="540" r="490" stroke="#34D399" stroke-width="3" stroke-opacity="0.6" fill="none"/>
+  <circle cx="540" cy="540" r="460" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.15" fill="none"/>
+
+  <polygon points="540,120 880,316 880,708 540,904 200,708 200,316" stroke="#25D366" stroke-opacity="0.12" stroke-width="2" fill="none"/>
+
+  <text x="540" y="240" text-anchor="middle" font-family="'Inter', sans-serif" font-size="34" font-weight="900" fill="#FFFFFF" letter-spacing="8">PSL</text>
+
+  <g transform="translate(540, 520) scale(2.6) translate(-72, -90)">
+    <path d="M 126 34 C 114 20 98 12 78 12 C 50 12 34 24 34 42 C 34 62 54 72 84 80 C 124 90 144 108 144 136 C 144 168 116 186 74 186 C 42 186 18 172 4 150 L 32 124 C 42 138 56 148 74 148 C 96 148 106 138 106 124 C 106 108 90 100 60 92 C 24 82 0 66 0 38 C 0 12 28 -4 74 -4 C 98 -4 122 6 136 20 Z" fill="#FFFFFF" filter="url(#glow4)"/>
+    <path d="M 126 34 C 114 20 98 12 78 12 C 50 12 34 24 34 42 C 34 62 54 72 84 80 C 124 90 144 108 144 136 C 144 168 116 186 74 186 C 42 186 18 172 4 150 L 32 124 C 42 138 56 148 74 148 C 96 148 106 138 106 124 C 106 108 90 100 60 92 C 24 82 0 66 0 38 C 0 12 28 -4 74 -4 C 98 -4 122 6 136 20 Z" fill="#FFFFFF"/>
+
+    <path d="M 50 -18 Q 72 -36 88 -26 Q 96 -20 92 -4" fill="none" stroke="#25D366" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 88 -18 Q 74 -34 60 -24 Q 54 -18 58 -4" fill="none" stroke="#25D366" stroke-width="5" stroke-linecap="round"/>
+
+    <g stroke="#145C46" stroke-linecap="round">
+      <path d="M 50 4 Q 74 46 98 88 T 50 172" fill="none" stroke-width="5.5"/>
+      <path d="M 98 4 Q 74 46 50 88 T 98 172" fill="none" stroke-width="5.5"/>
+      <line x1="58" y1="20" x2="90" y2="20" stroke-width="4"/>
+      <line x1="64" y1="38" x2="84" y2="38" stroke-width="4"/>
+      <line x1="71" y1="58" x2="77" y2="58" stroke-width="4"/>
+      <line x1="71" y1="118" x2="77" y2="118" stroke-width="4"/>
+      <line x1="64" y1="138" x2="84" y2="138" stroke-width="4"/>
+      <line x1="58" y1="156" x2="90" y2="156" stroke-width="4"/>
+    </g>
+  </g>
+
+  <text x="540" y="860" text-anchor="middle" font-family="'Inter', sans-serif" font-size="44" font-weight="300" fill="#34D399" letter-spacing="16">LABS</text>
+</svg>

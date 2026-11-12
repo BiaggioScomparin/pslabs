@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0E3326"/>
+      <stop offset="70%" stop-color="#061B14"/>
+      <stop offset="100%" stop-color="#020B08"/>
+    </radialGradient>
+    <linearGradient id="gold3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#CA8A04"/>
+      <stop offset="100%" stop-color="#EAB308"/>
+    </linearGradient>
+
+    <path id="textCircleTop" d="M 170 540 A 370 370 0 0 1 910 540" fill="none"/>
+    <path id="textCircleBottom" d="M 910 540 A 370 370 0 0 1 170 540" fill="none"/>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bgGrad3)"/>
+
+  <circle cx="540" cy="540" r="496" stroke="url(#gold3)" stroke-width="4" fill="none"/>
+  <circle cx="540" cy="540" r="480" stroke="#1F5643" stroke-width="2" stroke-dasharray="8,8" fill="none"/>
+  <circle cx="540" cy="540" r="430" stroke="url(#gold3)" stroke-width="2.5" fill="none"/>
+  <circle cx="540" cy="540" r="310" stroke="#34D399" stroke-width="2" fill="#061E16"/>
+
+  <text font-family="'Inter', sans-serif" font-size="32" font-weight="900" fill="#FFFFFF" letter-spacing="9">
+    <textPath href="#textCircleTop" startOffset="50%" text-anchor="middle">
+      PREMIUM SYNTHESIS LINE
+    </textPath>
+  </text>
+
+  <text font-family="'Inter', sans-serif" font-size="28" font-weight="800" fill="#FDE047" letter-spacing="7">
+    <textPath href="#textCircleBottom" startOffset="50%" text-anchor="middle">
+      ★ HPLC CERTIFIED >99% PURITY ★
+    </textPath>
+  </text>
+
+  <g transform="translate(540, 500) scale(1.05) translate(-230, -100)">
+    <path d="M 0 0 L 82 0 C 118 0 140 18 140 50 C 140 82 118 100 82 100 L 42 100 L 42 160 L 0 160 Z M 42 34 L 42 66 L 78 66 C 92 66 98 59 98 50 C 98 41 92 34 78 34 Z" fill="#FFFFFF"/>
+    <g transform="translate(155, 0)">
+      <path d="M 126 34 C 114 20 98 12 78 12 C 50 12 34 24 34 42 C 34 62 54 72 84 80 C 124 90 144 108 144 136 C 144 168 116 186 74 186 C 42 186 18 172 4 150 L 32 124 C 42 138 56 148 74 148 C 96 148 106 138 106 124 C 106 108 90 100 60 92 C 24 82 0 66 0 38 C 0 12 28 -4 74 -4 C 98 -4 122 6 136 20 Z" fill="#FFFFFF"/>
+      <path d="M 50 -18 Q 72 -36 88 -26 Q 96 -20 92 -4" fill="none" stroke="#FDE047" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M 88 -18 Q 74 -34 60 -24 Q 54 -18 58 -4" fill="none" stroke="#FDE047" stroke-width="4.5" stroke-linecap="round"/>
+      <g stroke="#145C46" stroke-linecap="round">
+        <path d="M 50 4 Q 74 46 98 88 T 50 172" fill="none" stroke-width="5"/>
+        <path d="M 98 4 Q 74 46 50 88 T 98 172" fill="none" stroke-width="5"/>
+        <line x1="58" y1="20" x2="90" y2="20" stroke-width="3.5"/>
+        <line x1="64" y1="38" x2="84" y2="38" stroke-width="3.5"/>
+        <line x1="71" y1="58" x2="77" y2="58" stroke-width="3.5"/>
+        <line x1="71" y1="118" x2="77" y2="118" stroke-width="3.5"/>
+        <line x1="64" y1="138" x2="84" y2="138" stroke-width="3.5"/>
+        <line x1="58" y1="156" x2="90" y2="156" stroke-width="3.5"/>
+      </g>
+    </g>
+    <path d="M 325 0 L 367 0 L 367 124 L 452 124 L 452 160 L 325 160 Z" fill="#FFFFFF"/>
+  </g>
+
+  <text x="540" y="650" text-anchor="middle" font-family="'Inter', sans-serif" font-size="52" font-weight="400" fill="#34D399" letter-spacing="14">LABS</text>
+</svg>
