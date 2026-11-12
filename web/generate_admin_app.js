@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-// Reads compound data from generate_web_app logic
+// Reads compound data from catalog
 const rawProducts = require('../catalog/psl_products.json');
 
 function getCategoryLine(cat) {
@@ -59,15 +59,10 @@ function getParentCompound(item) {
   if (n.includes("Sermorelin")) return { id: "sermorelin", name: "Sermorelin", desc: "Secretagogo de GH clássico para restauração do bem-estar, tônus e anti-envelhecimento." };
   if (n.includes("Ipamorelin")) return { id: "ipamorelin", name: "Ipamorelin", desc: "Agonista seletivo do receptor de grelina para liberação limpa de GH sem pico de prolactina/cortisol." };
   if (n.includes("CJC1295 with DAC")) return { id: "cjc-dac", name: "CJC-1295 (com DAC)", desc: "Análogo de GHRH com meia-vida prolongada para liberação estável contínua de GH." };
-  if (n.includes("CJC1295 no DAC")) return { id: "cjc-nodac", name: "CJC-1295 (sem DAC)", desc: "GHRH pulsátil ideal para protocolos noturnos em conjunto com Ipamorelin." };
-  if (n.includes("SS-31")) return { id: "ss31", name: "SS-31 (Elamipretide)", desc: "Peptídeo cardiolipina-alvo para reparação da membrana interna mitocondrial e energia." };
-  if (n.includes("FOXO4")) return { id: "foxo4", name: "FOXO4-DRI", desc: "Peptídeo senolítico de última geração que induz apoptose em células senescentes envelhecidas." };
-  if (n.includes("Snap")) return { id: "snap8", name: "Snap-8", desc: "Octapeptídeo cosmético anti-rugas com efeito de relaxamento da expressão muscular facial." };
-  if (n.includes("Oxytocin")) return { id: "oxytocin", name: "Oxytocin", desc: "Neuropeptídeo do bem-estar, conexão afetiva, relaxamento e redução dos níveis de estresse." };
-  if (n.includes("Melanotan")) return { id: "melanotan2", name: "Melanotan II", desc: "Estimulante da melanogênese para bronzeamento uniforme com leve ação na libido." };
-  if (n.includes("Kisspeptin")) return { id: "kisspeptin", name: "Kisspeptin-10", desc: "Regulador mestre do eixo hipotálamo-hipófise-gonadal para modulação natural de LH/FSH." };
+  if (n.includes("CJC1295 without DAC")) return { id: "cjc-nodac", name: "CJC-1295 (sem DAC)", desc: "GHRH pulsátil ideal para protocolos noturnos em conjunto com Ipamorelin." };
+  if (n.includes("Kisspeptin-10")) return { id: "kisspeptin", name: "Kisspeptin-10", desc: "Regulador mestre do eixo hipotálamo-hipófise-gonadal para modulação natural de LH/FSH." };
   if (n.includes("Thymalin")) return { id: "thymalin", name: "Thymalin", desc: "Bio-regulador peptídico do timo para reativação do sistema imunológico celular." };
-  if (n.includes("Thymosin")) return { id: "thymosin-a1", name: "Thymosin Alpha 1", desc: "Modulador imunitário padrão-ouro para imunossupressão, defesa antiviral e longevidade celular." };
+  if (n.includes("Thymosin Alpha 1")) return { id: "thymosin-a1", name: "Thymosin Alpha 1", desc: "Modulador imunitário padrão-ouro para imunossupressão, defesa antiviral e longevidade celular." };
   if (n.includes("Glutathione")) return { id: "glutathione", name: "Glutathione", desc: "Antioxidante mestre do organismo para desintoxicação hepática e eliminação de radicais livres." };
   if (n.includes("IGF-1")) return { id: "igf1", name: "IGF-1 LR3", desc: "Fator de crescimento tipo insulina potente para retenção de nitrogênio e síntese proteica muscular." };
   if (n.includes("L-carnitine")) return { id: "lcarnitine", name: "L-Carnitina Injetável", desc: "Auxilia no transporte de ácidos graxos para a mitocôndria para oxidação e geração de energia." };
@@ -115,19 +110,20 @@ rawProducts.forEach(item => {
     b2bBoxPrice: item.b2bBoxPrice,
     profitUnitB2C: item.profitUnitB2C,
     marginPercent: item.marginPercent,
-    stockQty: 5, // initial default mock stock
-    status: 'in_stock' // 'in_stock', 'pre_order', 'out_of_stock'
+    stockQty: 5,
+    status: 'in_stock'
   });
 });
 
 const compoundList = Array.from(compoundMap.values());
 
+// Read HTML content and build script
 const adminHtml = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo — PSL Labs</title>
+  <title>Painel Administrativo & DRE · PSL Labs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -139,6 +135,8 @@ const adminHtml = `<!DOCTYPE html>
       --primary-border: #A3D4C1;
       --accent: #10B981;
       --dark: #0F172A;
+      --gray-900: #0F172A;
+      --gray-800: #1E293B;
       --gray-700: #334155;
       --gray-600: #475569;
       --gray-400: #94A3B8;
@@ -148,29 +146,26 @@ const adminHtml = `<!DOCTYPE html>
       --white: #FFFFFF;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
       --shadow-md: 0 4px 14px -2px rgba(20, 92, 70, 0.08);
+      --shadow-lg: 0 12px 28px -4px rgba(0,0,0,0.15);
       --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 16px;
+      --radius-lg: 18px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg-page);
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-page);
       color: var(--dark);
-      line-height: 1.5;
+      min-height: 100vh;
     }
 
-    /* Auth Overlay */
+    /* Auth Screen Overlay */
     #auth-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, #064E3B 0%, #145C46 50%, #064E3B 100%);
+      background: rgba(10, 30, 24, 0.95);
+      backdrop-filter: blur(12px);
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -181,83 +176,60 @@ const adminHtml = `<!DOCTYPE html>
     .auth-card {
       background: var(--white);
       border-radius: var(--radius-lg);
-      padding: 36px 30px;
-      max-width: 400px;
+      padding: 36px 32px;
+      max-width: 420px;
       width: 100%;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      box-shadow: var(--shadow-lg);
       text-align: center;
-    }
-
-    .auth-logo {
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-    }
-
-    .auth-sub {
-      font-size: 8px;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 3.5px;
-      margin-bottom: 24px;
     }
 
     .auth-input {
       width: 100%;
-      height: 48px;
-      padding: 0 16px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: 16px;
-      font-weight: 600;
-      outline: none;
+      padding: 14px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 6px;
       text-align: center;
-      letter-spacing: 4px;
-      margin-bottom: 16px;
+      color: var(--primary);
+      margin: 16px 0;
+      outline: none;
+      transition: border 0.2s;
     }
-
     .auth-input:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-light);
     }
 
     .btn-auth {
       width: 100%;
-      height: 48px;
+      padding: 14px;
       background: var(--primary);
       color: var(--white);
-      border: none;
-      border-radius: var(--radius-sm);
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      border: none;
       cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-auth:hover { background: var(--primary-dark); }
 
-    .btn-auth:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Admin Layout */
+    /* Admin Shell Layout */
     .admin-wrapper {
       display: flex;
       min-height: 100vh;
     }
 
-    /* Sidebar */
+    /* Sidebar Desktop */
     .admin-sidebar {
-      width: 250px;
+      width: 270px;
       background: var(--white);
       border-right: 1px solid var(--gray-200);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-    }
-
-    @media (max-width: 768px) {
-      .admin-sidebar {
-        display: none;
-      }
     }
 
     .sidebar-header {
@@ -271,34 +243,34 @@ const adminHtml = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       gap: 4px;
+      overflow-y: auto;
     }
 
     .nav-link {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 11px 14px;
-      color: var(--gray-600);
-      font-size: 13.5px;
-      font-weight: 700;
+      padding: 10px 14px;
       border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--gray-700);
       text-decoration: none;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      border: none;
       background: transparent;
+      border: none;
       width: 100%;
       text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
-
     .nav-link:hover {
       background: var(--gray-100);
-      color: var(--dark);
+      color: var(--primary);
     }
-
     .nav-link.active {
       background: var(--primary-light);
       color: var(--primary);
+      font-weight: 700;
     }
 
     .sidebar-footer {
@@ -317,73 +289,74 @@ const adminHtml = `<!DOCTYPE html>
       border-radius: var(--radius-sm);
       cursor: pointer;
     }
+    .btn-logout:hover { background: #FEF2F2; }
 
-    /* Main Content Area */
+    /* Main Content */
     .admin-main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .admin-topbar {
+      height: 64px;
       background: var(--white);
       border-bottom: 1px solid var(--gray-200);
-      padding: 14px 24px;
+      padding: 0 24px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
 
     .topbar-title {
       font-size: 18px;
       font-weight: 800;
       color: var(--dark);
-    }
-
-    .admin-content {
-      padding: 24px;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    /* Mobile Nav Bar for Admin */
-    .admin-mobile-tabs {
       display: flex;
-      overflow-x: auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-mobile-tabs {
+      display: none;
       background: var(--white);
       border-bottom: 1px solid var(--gray-200);
       padding: 8px 12px;
-      gap: 8px;
-      scrollbar-width: none;
-    }
-
-    @media (min-width: 769px) {
-      .admin-mobile-tabs {
-        display: none;
-      }
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 6px;
     }
 
     .m-tab-btn {
-      white-space: nowrap;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--gray-200);
-      background: var(--white);
+      padding: 6px 12px;
       font-size: 12px;
       font-weight: 700;
+      border-radius: 100px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
       color: var(--gray-600);
       cursor: pointer;
     }
-
     .m-tab-btn.active {
       background: var(--primary);
       color: var(--white);
       border-color: var(--primary);
     }
 
-    /* Dashboard Metric Cards */
+    .admin-content {
+      padding: 24px;
+      flex: 1;
+    }
+
+    .view-tab {
+      display: none;
+    }
+    .view-tab.active {
+      display: block;
+    }
+
+    /* KPI Metrics Grid */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -395,8 +368,20 @@ const adminHtml = `<!DOCTYPE html>
       background: var(--white);
       border: 1px solid var(--gray-200);
       border-radius: var(--radius-md);
-      padding: 18px 20px;
+      padding: 20px;
       box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card.highlight {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+    }
+    .metric-card.loss-card {
+      border-color: #FCA5A5;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FEF2F2 100%);
     }
 
     .metric-label {
@@ -406,156 +391,252 @@ const adminHtml = `<!DOCTYPE html>
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .metric-val {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
-      color: var(--primary);
+      color: var(--dark);
       line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .metric-val.profit-val {
+      color: #059669;
+    }
+    .metric-val.loss-val {
+      color: #DC2626;
     }
 
     .metric-sub {
       font-size: 11.5px;
-      color: #059669;
-      font-weight: 600;
-      margin-top: 4px;
+      color: var(--gray-400);
     }
 
-    /* Card Panels */
+    /* Panels & Tables */
     .panel {
       background: var(--white);
       border: 1px solid var(--gray-200);
       border-radius: var(--radius-md);
+      padding: 24px;
       box-shadow: var(--shadow-sm);
-      padding: 20px;
       margin-bottom: 24px;
     }
 
     .panel-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 18px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--gray-100);
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .panel-title {
       font-size: 16px;
       font-weight: 800;
       color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* Tables */
     .table-wrap {
       overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 13px;
       text-align: left;
-      font-size: 13.5px;
     }
 
     th {
-      background: #F8FAFC;
-      color: var(--gray-600);
+      background: var(--gray-100);
+      color: var(--gray-700);
       font-weight: 700;
-      padding: 10px 14px;
-      border-bottom: 1.5px solid var(--gray-200);
-      font-size: 11.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      white-space: nowrap;
     }
 
     td {
       padding: 12px 14px;
-      border-bottom: 1px solid var(--gray-100);
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: middle;
+      color: var(--gray-800);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
     }
 
     tr:hover td {
-      background: #FAFCFB;
+      background: #F8FAFC;
     }
 
-    /* Badges */
     .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 100px;
       font-size: 11px;
       font-weight: 700;
+      letter-spacing: 0.3px;
     }
-
     .badge-in-stock { background: #DCFCE7; color: #166534; }
     .badge-pre-order { background: #FEF3C7; color: #92400E; }
     .badge-out-of-stock { background: #FEE2E2; color: #991B1B; }
 
-    /* Action Buttons */
+    /* Buttons */
     .btn-sm {
-      padding: 6px 12px;
+      padding: 7px 12px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      border: none;
-      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
     }
-
-    .btn-primary {
-      background: var(--primary);
-      color: var(--white);
-    }
+    .btn-primary { background: var(--primary); color: var(--white); border: none; }
     .btn-primary:hover { background: var(--primary-dark); }
-
-    .btn-outline {
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      color: var(--dark);
-    }
+    .btn-success { background: #10B981; color: var(--white); border: none; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #EF4444; color: var(--white); border: none; }
+    .btn-danger:hover { background: #DC2626; }
+    .btn-outline { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-200); }
     .btn-outline:hover { background: var(--gray-100); }
 
-    .btn-success {
-      background: #25D366;
-      color: var(--white);
-    }
-
-    /* Forms */
+    /* Form Inputs */
     .form-group {
       margin-bottom: 16px;
     }
-
     .form-label {
       display: block;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--dark);
+      color: var(--gray-700);
       margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
-
-    .form-input {
+    .form-input, .form-select, .form-textarea {
       width: 100%;
-      height: 42px;
-      padding: 0 12px;
-      border: 1.5px solid var(--gray-200);
+      padding: 10px 14px;
+      border: 1px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: 14px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: var(--dark);
       outline: none;
+      background: var(--white);
     }
-
-    .form-input:focus {
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
     }
 
-    /* Tabs View Containers */
-    .view-tab {
+    /* Modal System */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
       display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
     }
-    .view-tab.active {
-      display: block;
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      animation: modalFadeIn 0.2s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: #F8FAFC;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #04120E;
+      border-left: 4px solid var(--accent);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      z-index: 99999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .admin-sidebar { display: none; }
+      .admin-mobile-tabs { display: flex; }
+      .admin-content { padding: 16px; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .metrics-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -567,13 +648,13 @@ const adminHtml = `<!DOCTYPE html>
       <div style="margin-bottom: 16px; text-align: center;">
         <img src="/brand/logo_transparent.png" onerror="this.onerror=null; this.src='/logo.png';" alt="PSL Labs" style="height: 48px; width: auto; max-width: 200px;">
       </div>
-      <div class="auth-sub" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2.5px; margin-bottom: 14px;">PAINEL ADMINISTRATIVO</div>
+      <div class="auth-sub" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2.5px; margin-bottom: 14px;">PAINEL OPERACIONAL &amp; DRE</div>
       <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
-        Digite o PIN de segurança para gerenciar estoque, pedidos e preços:
+        Digite o PIN de segurança para gerenciar compras, vendas, perdas e financeiro:
       </p>
       <input type="password" id="admin-pin-input" class="auth-input" placeholder="••••" maxlength="10">
       <button class="btn-auth" onclick="verifyPin()">Entrar no Painel</button>
-      <div style="font-size: 11px; color: var(--gray-400); margin-top: 14px;">PIN Padrão Inicial: <strong>psl2026</strong></div>
+      <div style="font-size: 11px; color: var(--gray-400); margin-top: 14px;">PIN Padrão: <strong>psl2026</strong></div>
     </div>
   </div>
 
@@ -586,27 +667,36 @@ const adminHtml = `<!DOCTYPE html>
         <a href="/" target="_blank" style="display: block; text-decoration: none;">
           <img src="/brand/logo_transparent.png" onerror="this.onerror=null; this.src='/logo.png';" alt="PSL Labs" style="height: 38px; width: auto; max-width: 160px; display: block; margin-bottom: 6px;">
         </a>
-        <div style="font-size: 8px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase;">Painel Operacional</div>
+        <div style="font-size: 8px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase;">Gestão Financeira &amp; Estoque</div>
       </div>
 
       <nav class="sidebar-nav">
-        <button class="nav-link active" onclick="showTab('dashboard')">
-          <span>📊</span> Dashboard Geral
+        <button class="nav-link active" onclick="showTab('dre')">
+          <span>📈</span> Lucro Real &amp; DRE
         </button>
-        <button class="nav-link" onclick="showTab('pedidos')">
-          <span>📋</span> Pedidos & Envio
+        <button class="nav-link" onclick="showTab('compras')">
+          <span>🛒</span> Compras (Entradas)
+        </button>
+        <button class="nav-link" onclick="showTab('vendas')">
+          <span>💰</span> Vendas (Saídas)
+        </button>
+        <button class="nav-link" onclick="showTab('perdas')">
+          <span>⚠️</span> Perdas &amp; Avarias
+        </button>
+        <button class="nav-link" onclick="showTab('balanco')">
+          <span>⚖️</span> Balanço por Peptídeo
         </button>
         <button class="nav-link" onclick="showTab('estoque')">
-          <span>📦</span> Estoque & Disponibilidade
+          <span>📦</span> Estoque Pronta-Entrega
         </button>
         <button class="nav-link" onclick="showTab('precos')">
-          <span>💰</span> Gerenciar Preços
+          <span>🏷️</span> Editor de Preços (75%)
+        </button>
+        <button class="nav-link" onclick="showTab('pedidos')">
+          <span>🛍️</span> Pedidos da Loja
         </button>
         <button class="nav-link" onclick="showTab('crm')">
-          <span>👥</span> CRM & Recompra
-        </button>
-        <button class="nav-link" onclick="showTab('laudos')">
-          <span>🧪</span> Laudos HPLC (COA)
+          <span>👥</span> CRM &amp; Recompra
         </button>
         <a href="/marketing" target="_blank" class="nav-link" style="text-decoration: none; color: #25D366; font-weight: 700; border: 1px dashed rgba(37, 211, 102, 0.4);">
           <span>📢</span> Divulgação Status
@@ -624,151 +714,280 @@ const adminHtml = `<!DOCTYPE html>
       </div>
     </aside>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <main class="admin-main">
       
       <!-- Topbar -->
       <div class="admin-topbar">
-        <div class="topbar-title" id="page-title">📊 Dashboard Geral</div>
+        <div class="topbar-title" id="page-title">📈 Painel de Lucro Real &amp; DRE</div>
         <div style="display: flex; gap: 8px;">
+          <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
+          <button class="btn-sm btn-success" onclick="openModal('modal-venda')">+ Nova Venda</button>
+          <button class="btn-sm btn-danger" onclick="openModal('modal-perda')">+ Registrar Perda</button>
           <a href="/" target="_blank" class="btn-sm btn-outline">Abrir Loja ↗</a>
-          <button class="btn-sm btn-outline" onclick="logout()">Sair</button>
         </div>
       </div>
 
       <!-- Mobile Tabs Bar -->
       <div class="admin-mobile-tabs">
-        <button class="m-tab-btn active" onclick="showTab('dashboard')">📊 Métricas</button>
-        <button class="m-tab-btn" onclick="showTab('pedidos')">📋 Pedidos</button>
+        <button class="m-tab-btn active" onclick="showTab('dre')">📈 Lucro Real</button>
+        <button class="m-tab-btn" onclick="showTab('compras')">🛒 Compras</button>
+        <button class="m-tab-btn" onclick="showTab('vendas')">💰 Vendas</button>
+        <button class="m-tab-btn" onclick="showTab('perdas')">⚠️ Perdas</button>
+        <button class="m-tab-btn" onclick="showTab('balanco')">⚖️ Balanço</button>
         <button class="m-tab-btn" onclick="showTab('estoque')">📦 Estoque</button>
-        <button class="m-tab-btn" onclick="showTab('precos')">💰 Preços</button>
+        <button class="m-tab-btn" onclick="showTab('precos')">🏷️ Preços</button>
+        <button class="m-tab-btn" onclick="showTab('pedidos')">🛍️ Pedidos</button>
         <a href="/marketing" target="_blank" class="m-tab-btn" style="text-decoration: none; color: #25D366; font-weight: 700;">📢 Status</a>
-        <button class="m-tab-btn" onclick="showTab('crm')">👥 Recompra</button>
         <button class="m-tab-btn" onclick="showTab('config')">⚙️ Config</button>
       </div>
 
       <div class="admin-content">
 
-        <!-- TAB 1: DASHBOARD GERAL -->
-        <div id="tab-dashboard" class="view-tab active">
+        <!-- ========================================================= -->
+        <!-- TAB 1: DRE & LUCRO REAL (COMPRAS x VENDAS x PERDAS) -->
+        <!-- ========================================================= -->
+        <div id="tab-dre" class="view-tab active">
+          
+          <!-- Top KPI Cards -->
           <div class="metrics-grid">
             <div class="metric-card">
-              <div class="metric-label">Faturamento Estimado</div>
-              <div class="metric-val" id="stat-revenue">R$ 14.850,00</div>
-              <div class="metric-sub">▲ 18% este mês</div>
+              <div class="metric-label">💰 Faturamento Total (Vendas)</div>
+              <div class="metric-val" id="kpi-faturamento">R$ 0,00</div>
+              <div class="metric-sub" id="kpi-faturamento-sub">0 frascos vendidos</div>
             </div>
+
             <div class="metric-card">
-              <div class="metric-label">Lucro Líquido Real</div>
-              <div class="metric-val" style="color: #059669;" id="stat-profit">R$ 8.320,00</div>
-              <div class="metric-sub">Margem média real: 56%</div>
+              <div class="metric-label">📉 CMV (Custo das Vendas)</div>
+              <div class="metric-val" style="color: #64748B;" id="kpi-cmv">R$ 0,00</div>
+              <div class="metric-sub">Custo pó + insumos dos itens vendidos</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-label">Pedidos Concluídos</div>
-              <div class="metric-val" id="stat-orders-count">42</div>
-              <div class="metric-sub">Ticket médio: R$ 353,50</div>
+
+            <div class="metric-card loss-card">
+              <div class="metric-label">⚠️ Prejuízo com Perdas</div>
+              <div class="metric-val loss-val" id="kpi-perdas">R$ 0,00</div>
+              <div class="metric-sub" id="kpi-perdas-sub">0 frascos descartados/quebrados</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-label">Itens Pronta-Entrega SP</div>
-              <div class="metric-val" id="stat-stock-total">68 frascos</div>
-              <div class="metric-sub">Disponível p/ Uber Moto Flash</div>
+
+            <div class="metric-card highlight">
+              <div class="metric-label">💎 LUCRO LÍQUIDO REAL</div>
+              <div class="metric-val profit-val" id="kpi-lucro-real">R$ 0,00</div>
+              <div class="metric-sub" id="kpi-margem-real">Margem Líquida Real: 0%</div>
             </div>
           </div>
 
-          <!-- Top Sellers Panel -->
+          <!-- Secondary Inventory Financial Summary -->
+          <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 24px;">
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🛒 Total Investido em Compras</div>
+              <div style="font-size: 20px; font-weight: 800; color: var(--dark);" id="kpi-total-compras">R$ 0,00</div>
+              <div class="metric-sub" id="kpi-compras-sub">0 frascos adquiridos</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">📦 Estoque em Mãos (Frascos)</div>
+              <div style="font-size: 20px; font-weight: 800; color: #0284C7;" id="kpi-estoque-qtd">0 unidades</div>
+              <div class="metric-sub">Compras - Vendas - Perdas</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🏷️ Valor de Custo do Estoque</div>
+              <div style="font-size: 20px; font-weight: 800; color: #475569;" id="kpi-estoque-custo">R$ 0,00</div>
+              <div class="metric-sub">Capital imobilizado em estoque</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🚀 Potencial de Venda (75%)</div>
+              <div style="font-size: 20px; font-weight: 800; color: #059669;" id="kpi-estoque-venda">R$ 0,00</div>
+              <div class="metric-sub">Valor de mercado a 75% margem</div>
+            </div>
+          </div>
+
+          <!-- DRE Summary Card Table -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">🔥 Peptídeos Mais Vendidos (Giro Rápido)</div>
-              <span class="badge badge-in-stock">Estoque Saudável</span>
+              <div>
+                <div class="panel-title">📊 Demonstrativo de Resultado (DRE Gerencial Consolidado)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Visão executiva precisa do que entrou, o que saiu e o lucro limpo em caixa.</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-sm btn-outline" onclick="exportDataBackup()">💾 Exportar Backup (JSON)</button>
+                <button class="btn-sm btn-outline" onclick="resetToDemoData()">🔄 Restaurar Dados Demo</button>
+              </div>
             </div>
+
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Peptídeo</th>
-                    <th>Dose Mais Procurada</th>
-                    <th>Frascos Vendidos</th>
-                    <th>Faturamento</th>
-                    <th>Lucro Gerado</th>
+                    <th>Linha Financeira</th>
+                    <th>Fórmula Contábil</th>
+                    <th>Valor Consolidado</th>
+                    <th>% sobre Faturamento</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>Retatrutide</strong></td>
-                    <td>10mg</td>
-                    <td>16 frascos</td>
-                    <td>R$ 3.184,00</td>
-                    <td style="color: #059669; font-weight: 800;">R$ 1.776,00</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Tirzepatide</strong></td>
-                    <td>10mg</td>
-                    <td>14 frascos</td>
-                    <td>R$ 2.646,00</td>
-                    <td style="color: #059669; font-weight: 800;">R$ 1.500,80</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Blend BPC-157 + TB-500</strong></td>
-                    <td>10mg</td>
-                    <td>8 frascos</td>
-                    <td>R$ 1.992,00</td>
-                    <td style="color: #059669; font-weight: 800;">R$ 1.066,40</td>
-                  </tr>
-                  <tr>
-                    <td><strong>BPC-157</strong></td>
-                    <td>10mg</td>
-                    <td>7 frascos</td>
-                    <td>R$ 1.393,00</td>
-                    <td style="color: #059669; font-weight: 800;">R$ 777,00</td>
-                  </tr>
-                  <tr>
-                    <td><strong>NAD+ Longevidade</strong></td>
-                    <td>500mg</td>
-                    <td>5 frascos</td>
-                    <td>R$ 895,00</td>
-                    <td style="color: #059669; font-weight: 800;">R$ 517,00</td>
-                  </tr>
+                <tbody id="dre-table-body">
+                  <!-- Dynamically populated -->
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- TAB 2: GESTÃO DE PEDIDOS (PIPELINE) -->
-        <div id="tab-pedidos" class="view-tab">
+        <!-- ========================================================= -->
+        <!-- TAB 2: REGISTRO DE COMPRAS (ENTRADAS / FORNECEDOR) -->
+        <!-- ========================================================= -->
+        <div id="tab-compras" class="view-tab">
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">📋 Funil de Pedidos Recebidos</div>
-              <button class="btn-sm btn-primary" onclick="showNewOrderModal()">+ Registrar Pedido Manual</button>
+              <div>
+                <div class="panel-title">🛒 Registro de Compras de Estoque (Entradas)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Cadastre cada pedido de caixas ou frascos feito ao fornecedor.</div>
+              </div>
+              <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
             </div>
-            
+
             <div class="table-wrap">
-              <table id="orders-table">
+              <table>
                 <thead>
                   <tr>
-                    <th>Data / ID</th>
-                    <th>Cliente</th>
-                    <th>Itens / Dose</th>
-                    <th>Entrega</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Ações Rápidas</th>
+                    <th>ID / Data</th>
+                    <th>Peptídeo / Dose</th>
+                    <th>Qtd (Frascos)</th>
+                    <th>Custo Unit. (R$)</th>
+                    <th>Total Pago (R$)</th>
+                    <th>Fornecedor / Lote</th>
+                    <th>Obs</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
-                <tbody id="orders-tbody">
-                  <!-- Generated by JS -->
+                <tbody id="compras-table-body">
+                  <!-- Injected via JS -->
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- TAB 3: ESTOQUE & DISPONIBILIDADE (47 PEPTÍDEOS) -->
+        <!-- ========================================================= -->
+        <!-- TAB 3: REGISTRO DE VENDAS (SAÍDAS / CLIENTES) -->
+        <!-- ========================================================= -->
+        <div id="tab-vendas" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">💰 Registro e Acompanhamento de Vendas (Saídas)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Controle de todas as vendas com cálculo automático do lucro real de cada transação.</div>
+              </div>
+              <button class="btn-sm btn-success" onclick="openModal('modal-venda')">+ Lançar Nova Venda</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID / Data</th>
+                    <th>Cliente / Canal</th>
+                    <th>Peptídeo / Dose</th>
+                    <th>Qtd</th>
+                    <th>Preço Unit.</th>
+                    <th>Custo Unit.</th>
+                    <th>Total Venda</th>
+                    <th>Lucro Desta Venda</th>
+                    <th>Margem</th>
+                    <th>Pagto</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="vendas-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 4: REGISTRO DE PERDAS & AVARIAS (WASTE) -->
+        <!-- ========================================================= -->
+        <div id="tab-perdas" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">⚠️ Registro de Perdas de Produtos (Quebras, Descarte e Amostras)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Abata do estoque físico e contabilize o prejuízo financeiro real para não distorcer o lucro.</div>
+              </div>
+              <button class="btn-sm btn-danger" onclick="openModal('modal-perda')">+ Registrar Perda</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID / Data</th>
+                    <th>Peptídeo / Dose</th>
+                    <th>Qtd Perdida</th>
+                    <th>Motivo da Perda</th>
+                    <th>Custo Unit.</th>
+                    <th>Prejuízo Total (R$)</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="perdas-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 5: BALANÇO COMPRAS x VENDAS POR PEPTÍDEO -->
+        <!-- ========================================================= -->
+        <div id="tab-balanco" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">⚖️ Balanço Consolidado por Peptídeo (Comprado x Vendido x Lucro)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Veja exatamente quais compostos geraram mais lucro líquido e quanto resta de cada um.</div>
+              </div>
+              <input type="text" id="balanco-search" placeholder="Buscar peptídeo..." oninput="renderBalancoTable()" style="padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px;">
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Peptídeo / Dose</th>
+                    <th>Comprados</th>
+                    <th>Vendidos</th>
+                    <th>Perdidos</th>
+                    <th>Estoque Físico</th>
+                    <th>Total Compras (R$)</th>
+                    <th>Total Vendas (R$)</th>
+                    <th>CMV Vendas (R$)</th>
+                    <th>Prejuízo Perdas</th>
+                    <th>LUCRO REAL DO ITEM</th>
+                  </tr>
+                </thead>
+                <tbody id="balanco-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 6: CONTROLE DE ESTOQUE PRONTA ENTREGA (SP) -->
+        <!-- ========================================================= -->
         <div id="tab-estoque" class="view-tab">
           <div class="panel">
             <div class="panel-header">
               <div>
                 <div class="panel-title">📦 Controle de Estoque Pronta-Entrega (SP)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Altere o status para atualizar instantaneamente o catálogo do cliente.</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Altere o status para atualizar instantaneamente o catálogo do cliente no site.</div>
               </div>
               <input type="text" id="stock-search" placeholder="Filtrar composto..." oninput="filterStockTable()" style="padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px;">
             </div>
@@ -778,10 +997,11 @@ const adminHtml = `<!DOCTYPE html>
                 <thead>
                   <tr>
                     <th>Composto</th>
-                    <th>Dosagens Cadastradas</th>
-                    <th>Qtd em SP</th>
-                    <th>Status na Loja</th>
-                    <th>Ações</th>
+                    <th>Linha</th>
+                    <th>Doses Disponíveis</th>
+                    <th>Status Loja</th>
+                    <th>Frascos SP</th>
+                    <th>Ações Rápidas</th>
                   </tr>
                 </thead>
                 <tbody id="stock-tbody">
@@ -792,13 +1012,15 @@ const adminHtml = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- TAB 4: GERENCIAR PREÇOS -->
+        <!-- ========================================================= -->
+        <!-- TAB 7: EDITOR DE PREÇOS (75% MARGEM) -->
+        <!-- ========================================================= -->
         <div id="tab-precos" class="view-tab">
           <div class="panel">
             <div class="panel-header">
               <div>
-                <div class="panel-title">💰 Editor de Preços (B2C & B2B)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Qualquer valor alterado aqui substitui os preços padrão no catálogo em tempo real.</div>
+                <div class="panel-title">🏷️ Editor de Preços (B2C &amp; B2B)</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Preços padrão configurados com 75% de margem. Você pode personalizar qualquer preço aqui.</div>
               </div>
               <button class="btn-sm btn-outline" onclick="resetDefaultPrices()">Restaurar Preços Originais</button>
             </div>
@@ -824,13 +1046,45 @@ const adminHtml = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- TAB 5: CRM & ALERTA DE RECOMPRA -->
+        <!-- ========================================================= -->
+        <!-- TAB 8: PEDIDOS DA LOJA -->
+        <!-- ========================================================= -->
+        <div id="tab-pedidos" class="view-tab">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🛍️ Funil de Pedidos Recebidos</div>
+            </div>
+            
+            <div class="table-wrap">
+              <table id="orders-table">
+                <thead>
+                  <tr>
+                    <th>Data / ID</th>
+                    <th>Cliente</th>
+                    <th>Itens / Dose</th>
+                    <th>Entrega</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Ações Rápidas</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 9: CRM & ALERTA DE RECOMPRA -->
+        <!-- ========================================================= -->
         <div id="tab-crm" class="view-tab">
           <div class="panel">
             <div class="panel-header">
               <div>
                 <div class="panel-title">👥 Previsão de Recompra (LTV de Clientes)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Dispare mensagens preventivas antes que o frasco do cliente termine.</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Dispare lembretes no WhatsApp antes que o frasco do cliente acabe (ciclo de 21 a 30 dias).</div>
               </div>
             </div>
 
@@ -849,32 +1103,22 @@ const adminHtml = `<!DOCTYPE html>
                 <tbody>
                   <tr>
                     <td><strong>Dr. Marcelo Mendes</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 98877-6655</span></td>
-                    <td>Retatrutide 10mg (1 Frasco)</td>
-                    <td>19/10/2026</td>
+                    <td>Retatrutide 60mg (1 Frasco)</td>
+                    <td>22/10/2026</td>
                     <td><strong>Hoje (21 dias)</strong></td>
                     <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">Frasco Terminando</span></td>
                     <td>
-                      <button class="btn-sm btn-success" onclick="sendReorderReminder('Marcelo', 'Retatrutide 10mg', '5511988776655')">💬 Lembrete Recompra</button>
+                      <button class="btn-sm btn-success" onclick="sendReorderReminder('Dr. Marcelo', 'Retatrutide 60mg', '5511988776655')">💬 Lembrete Recompra</button>
                     </td>
                   </tr>
                   <tr>
                     <td><strong>Camila Albuquerque</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 97766-5544</span></td>
-                    <td>GHK-Cu 100mg + BPC-157</td>
-                    <td>26/10/2026</td>
-                    <td>Em 7 dias</td>
-                    <td><span class="badge" style="background: #FEF3C7; color: #92400E;">Meio do Ciclo</span></td>
+                    <td>GHK-Cu 50mg (1 Frasco)</td>
+                    <td>25/10/2026</td>
+                    <td>Em 3 dias</td>
+                    <td><span class="badge" style="background: #FEF3C7; color: #92400E;">Meio Ciclo</span></td>
                     <td>
-                      <button class="btn-sm btn-outline" onclick="sendSupportCheckin('Camila', 'GHK-Cu', '5511977665544')">💬 Checar Resultados</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Lucas Silveira</strong><br><span style="font-size: 11px; color: var(--gray-400);">11 96655-4433</span></td>
-                    <td>Tirzepatide 10mg (1 Frasco)</td>
-                    <td>01/11/2026</td>
-                    <td>Em 14 dias</td>
-                    <td><span class="badge badge-in-stock">Início do Ciclo</span></td>
-                    <td>
-                      <button class="btn-sm btn-outline" disabled style="opacity: 0.5;">Em andamento</button>
+                      <button class="btn-sm btn-success" onclick="sendReorderReminder('Camila', 'GHK-Cu 50mg', '5511977665544')">💬 Acompanhar Uso</button>
                     </td>
                   </tr>
                 </tbody>
@@ -883,25 +1127,9 @@ const adminHtml = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- TAB 6: LAUDOS HPLC -->
-        <div id="tab-laudos" class="view-tab">
-          <div class="panel">
-            <div class="panel-header">
-              <div class="panel-title">🧪 Certificados de Análise HPLC (Pureza &gt;99%)</div>
-            </div>
-            <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
-              Vincule os laudos laboratoriais de cada lote para exibição automática quando o cliente ou revendedor escanear o QR Code do frasco.
-            </p>
-            <div style="background: #F8FAFC; border: 2px dashed var(--gray-200); border-radius: var(--radius-md); padding: 30px; text-align: center;">
-              <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
-              <div style="font-weight: 700; margin-bottom: 4px;">Upload de Laudo HPLC / COA</div>
-              <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Formatos aceitos: PDF ou PNG (até 15MB)</div>
-              <button class="btn-sm btn-primary" onclick="alert('Selecione o arquivo de laudo do fornecedor no seu computador.')">Selecionar Laudo no Computador</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 7: CONFIGURAÇÕES -->
+        <!-- ========================================================= -->
+        <!-- TAB 10: CONFIGURAÇÕES -->
+        <!-- ========================================================= -->
         <div id="tab-config" class="view-tab">
           <div class="panel" style="max-width: 600px;">
             <div class="panel-header">
@@ -911,11 +1139,11 @@ const adminHtml = `<!DOCTYPE html>
             <div class="form-group">
               <label class="form-label">Número de WhatsApp Oficial para Receber Pedidos</label>
               <input type="text" id="cfg-wa" class="form-input" placeholder="Ex: 5511999999999">
-              <div style="font-size: 11px; color: var(--gray-400); margin-top: 4px;">Coloque código do país (55) + DDD + Telefone sem traços.</div>
+              <div style="font-size: 11px; color: var(--gray-400); margin-top: 4px;">Código do país (55) + DDD + Telefone sem traços.</div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Chave Pix Padrão da PSL Labs (CNPJ ou E-mail)</label>
+              <label class="form-label">Chave Pix Padrão da PSL Labs</label>
               <input type="text" id="cfg-pix" class="form-input" placeholder="Ex: financeiro@psllabs.com.br">
             </div>
 
@@ -934,93 +1162,468 @@ const adminHtml = `<!DOCTYPE html>
     </main>
   </div>
 
+  <!-- ========================================================= -->
+  <!-- MODAL 1: CADASTRAR COMPRA (ENTRADA) -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="modal-compra">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🛒 Registrar Nova Compra de Estoque</div>
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Peptídeo / Composto</label>
+          <select id="compra-compound" class="form-select" onchange="onCompraCompoundChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dosagem</label>
+          <select id="compra-dose" class="form-select" onchange="onCompraDoseChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Qtd de Frascos</label>
+            <input type="number" id="compra-qty" class="form-input" value="10" min="1" oninput="recalcCompraTotal()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Custo Unitário Pó (R$)</label>
+            <input type="number" id="compra-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcCompraTotal()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Valor Total Pago (R$)</label>
+          <input type="number" id="compra-total-cost" class="form-input" step="0.10" value="0.00" style="font-weight: 800; font-size: 16px; color: var(--primary);">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Data da Compra</label>
+            <input type="date" id="compra-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fornecedor / Lote</label>
+            <input type="text" id="compra-supplier" class="form-input" placeholder="Ex: SinoPept / Lote 2611">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <input type="text" id="compra-notes" class="form-input" placeholder="Ex: Frascos de 60mg com laudo HPLC">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">Cancelar</button>
+        <button class="btn-sm btn-primary" onclick="saveCompra()">Salvar Compra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: LANÇAR VENDA (SAÍDA) -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="modal-venda">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">💰 Lançar Nova Venda Manual</div>
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-venda')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Nome do Cliente</label>
+            <input type="text" id="venda-client" class="form-input" placeholder="Ex: Dr. Lucas ou Particular">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone / WhatsApp</label>
+            <input type="text" id="venda-phone" class="form-input" placeholder="11 99999-9999">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Peptídeo / Composto</label>
+          <select id="venda-compound" class="form-select" onchange="onVendaCompoundChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dosagem</label>
+          <select id="venda-dose" class="form-select" onchange="onVendaDoseChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Quantidade</label>
+            <input type="number" id="venda-qty" class="form-input" value="1" min="1" oninput="recalcVendaTotals()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preço Cobrado Unit. (R$)</label>
+            <input type="number" id="venda-unit-price" class="form-input" step="1" value="0.00" oninput="recalcVendaTotals()">
+          </div>
+        </div>
+
+        <!-- Preview Lucro Desta Venda -->
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #166534; margin-bottom: 4px;">
+            <span>Valor Total da Venda: <strong id="venda-preview-total">R$ 0,00</strong></span>
+            <span>Custo Total (CMV): <span id="venda-preview-custo">R$ 0,00</span></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; color: #059669;">
+            <span>LUCRO LÍQUIDO DESTA VENDA:</span>
+            <span id="venda-preview-lucro">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Forma de Pagamento</label>
+            <select id="venda-pagto" class="form-select">
+              <option value="Pix">Pix</option>
+              <option value="Cartão de Crédito">Cartão de Crédito</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Transferência / Outro">Transferência / Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Canal da Venda</label>
+            <select id="venda-canal" class="form-select">
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Loja Online">Loja Online</option>
+              <option value="Clínica / Atacado">Clínica / Atacado</option>
+              <option value="Indicação">Indicação</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data da Venda</label>
+          <input type="date" id="venda-date" class="form-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-venda')">Cancelar</button>
+        <button class="btn-sm btn-success" onclick="saveVenda()">Confirmar Venda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: REGISTRAR PERDA / AVARIA (WASTE) -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="modal-perda">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">⚠️ Registrar Perda ou Avaria de Produto</div>
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Peptídeo / Composto</label>
+          <select id="perda-compound" class="form-select" onchange="onPerdaCompoundChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dosagem</label>
+          <select id="perda-dose" class="form-select" onchange="onPerdaDoseChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Qtd de Frascos Perdidos</label>
+            <input type="number" id="perda-qty" class="form-input" value="1" min="1" oninput="recalcPerdaTotal()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Custo Unitário (R$)</label>
+            <input type="number" id="perda-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcPerdaTotal()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Motivo da Perda</label>
+          <select id="perda-reason" class="form-select">
+            <option value="Frasco quebrado no manuseio/transporte">Frasco quebrado no manuseio ou transporte</option>
+            <option value="Falha na reconstituição / diluição teste">Falha na reconstituição / diluição teste</option>
+            <option value="Perda de vácuo / descarte por validade">Perda de vácuo / descarte por validade</option>
+            <option value="Amostra grátis para médico / influenciador">Amostra grátis para médico / parceiro</option>
+            <option value="Extravio nos Correios ou Motoboy">Extravio nos Correios ou Motoboy</option>
+            <option value="Outro motivo operacional">Outro motivo operacional</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prejuízo Total Registrado (R$)</label>
+          <input type="number" id="perda-total-cost" class="form-input" step="0.10" value="0.00" style="font-weight: 800; font-size: 16px; color: #DC2626;" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data da Ocorrência</label>
+          <input type="date" id="perda-date" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <input type="text" id="perda-notes" class="form-input" placeholder="Detalhes do ocorrido...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">Cancelar</button>
+        <button class="btn-sm btn-danger" onclick="savePerda()">Registrar Prejuízo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast-msg">Mensagem salva com sucesso!</div>
+
+  <!-- JavaScript Application Engine -->
   <script>
     const INITIAL_COMPOUNDS = ${JSON.stringify(compoundList)};
     const DEFAULT_PIN = "psl2026";
 
-    // State
-    let activeTab = 'dashboard';
+    // Application State
+    let activeTab = 'dre';
     let stockData = JSON.parse(localStorage.getItem('psl_stock_data') || 'null');
     let customPrices = JSON.parse(localStorage.getItem('psl_custom_prices') || '{}');
     let orders = JSON.parse(localStorage.getItem('psl_orders') || 'null');
+
+    // Compras, Vendas and Perdas State
+    let compras = JSON.parse(localStorage.getItem('psl_compras') || 'null');
+    let vendas = JSON.parse(localStorage.getItem('psl_vendas') || 'null');
+    let perdas = JSON.parse(localStorage.getItem('psl_perdas') || 'null');
+
+    // Default Seed Data if Empty
+    if (!compras || compras.length === 0) {
+      compras = [
+        {
+          id: "CMP-001",
+          date: "2026-11-01",
+          compoundId: "retatrutide",
+          code: "RT60",
+          name: "Retatrutide",
+          dosage: "60mg",
+          qty: 20,
+          unitCost: 145.10,
+          totalCost: 2902.00,
+          supplier: "SinoPept Direct",
+          notes: "Lote HPLC >99.4%"
+        },
+        {
+          id: "CMP-002",
+          date: "2026-11-02",
+          compoundId: "ghk-cu",
+          code: "CU50",
+          name: "GHK-Cu",
+          dosage: "50mg",
+          qty: 20,
+          unitCost: 25.40,
+          totalCost: 508.00,
+          supplier: "PureCopper Labs",
+          notes: "Cristais azuis alta pureza"
+        },
+        {
+          id: "CMP-003",
+          date: "2026-11-03",
+          compoundId: "tirzepatide",
+          code: "TR50",
+          name: "Tirzepatide",
+          dosage: "50mg",
+          qty: 15,
+          unitCost: 108.60,
+          totalCost: 1629.00,
+          supplier: "Direct Labs Pharma",
+          notes: "Duplo agonista GLP-1/GIP"
+        },
+        {
+          id: "CMP-004",
+          date: "2026-11-04",
+          compoundId: "bpc157",
+          code: "BPC5",
+          name: "BPC-157",
+          dosage: "5mg",
+          qty: 20,
+          unitCost: 37.70,
+          totalCost: 754.00,
+          supplier: "SinoPept Direct",
+          notes: "Grau laboratorial"
+        }
+      ];
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
+    }
+
+    if (!vendas || vendas.length === 0) {
+      vendas = [
+        {
+          id: "VND-001",
+          date: "2026-11-05",
+          clientName: "Rodrigo Silveira",
+          clientPhone: "11988776655",
+          compoundId: "retatrutide",
+          code: "RT60",
+          name: "Retatrutide",
+          dosage: "60mg",
+          qty: 2,
+          unitPrice: 450.00,
+          unitCost: 186.10,
+          totalSale: 900.00,
+          totalCost: 372.20,
+          profit: 527.80,
+          margin: 58.6,
+          paymentMethod: "Pix",
+          channel: "WhatsApp",
+          status: "Pago"
+        },
+        {
+          id: "VND-002",
+          date: "2026-11-06",
+          clientName: "Dra. Vanessa Lima",
+          clientPhone: "11977665544",
+          compoundId: "ghk-cu",
+          code: "CU50",
+          name: "GHK-Cu",
+          dosage: "50mg",
+          qty: 3,
+          unitPrice: 250.00,
+          unitCost: 66.40,
+          totalSale: 750.00,
+          totalCost: 199.20,
+          profit: 550.80,
+          margin: 73.4,
+          paymentMethod: "Pix",
+          channel: "WhatsApp",
+          status: "Pago"
+        },
+        {
+          id: "VND-003",
+          date: "2026-11-08",
+          clientName: "Carlos Eduardo Santos",
+          clientPhone: "11999887711",
+          compoundId: "tirzepatide",
+          code: "TR50",
+          name: "Tirzepatide",
+          dosage: "50mg",
+          qty: 2,
+          unitPrice: 450.00,
+          unitCost: 149.60,
+          totalSale: 900.00,
+          totalCost: 299.20,
+          profit: 600.80,
+          margin: 66.8,
+          paymentMethod: "Pix",
+          channel: "Loja Online",
+          status: "Pago"
+        },
+        {
+          id: "VND-004",
+          date: "2026-11-09",
+          clientName: "Lucas Zanin",
+          clientPhone: "11988223344",
+          compoundId: "bpc157",
+          code: "BPC5",
+          name: "BPC-157",
+          dosage: "5mg",
+          qty: 2,
+          unitPrice: 319.00,
+          unitCost: 78.70,
+          totalSale: 638.00,
+          totalCost: 157.40,
+          profit: 480.60,
+          margin: 75.3,
+          paymentMethod: "Cartão de Crédito",
+          channel: "Loja Online",
+          status: "Pago"
+        }
+      ];
+      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+    }
+
+    if (!perdas || perdas.length === 0) {
+      perdas = [
+        {
+          id: "PRD-001",
+          date: "2026-11-08",
+          compoundId: "retatrutide",
+          code: "RT60",
+          name: "Retatrutide",
+          dosage: "60mg",
+          qty: 1,
+          unitCost: 145.10,
+          lossTotal: 145.10,
+          reason: "Frasco quebrado no manuseio/transporte",
+          notes: "Caiu durante preparação da embalagem de envio"
+        }
+      ];
+      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+    }
 
     // Default orders demo if empty
     if (!orders) {
       orders = [
         {
           id: "PED-1082",
-          date: "Hoje, 11:40",
-          client: "Rodrigo Carvalho",
-          phone: "5511988887777",
-          items: "1x Retatrutide 10mg",
-          shipping: "⚡ Uber Moto Flash (SP)",
-          total: 199.00,
-          status: "separando", // 'aguardando_pix', 'separando', 'despachado_uber', 'sedex', 'concluido'
-          uberLink: "https://trip.uber.com/share/abc123xyz",
-          trackingCode: ""
+          date: "Hoje, 14:20",
+          client: "Carlos Eduardo",
+          phone: "5511999887711",
+          items: "Tirzepatide 50mg (1 un)",
+          delivery: "Uber Flash SP (2h)",
+          total: 450.00,
+          status: "Aguardando Motoboy"
         },
         {
           id: "PED-1081",
-          date: "Hoje, 10:15",
+          date: "Ontem, 18:45",
           client: "Dra. Patricia Lima",
-          phone: "5511977776666",
-          items: "1x BPC-157 10mg + 1x TB-500",
-          shipping: "⚡ Uber Moto Flash (SP)",
-          total: 498.00,
-          status: "despachado_uber",
-          uberLink: "https://trip.uber.com/share/def456uvw",
-          trackingCode: ""
-        },
-        {
-          id: "PED-1080",
-          date: "Ontem, 16:30",
-          client: "Clinica BioIntegrativa",
-          phone: "5521999998888",
-          items: "2x Caixa Tirzepatide 10mg (Atacado)",
-          shipping: "📦 Correios Sedex",
-          total: 1620.00,
-          status: "sedex",
-          uberLink: "",
-          trackingCode: "BR987654321SP"
+          phone: "5511988776655",
+          items: "GHK-Cu 50mg (2 un)",
+          delivery: "Sedex Térmico BR",
+          total: 500.00,
+          status: "Enviado / Rastreio"
         }
       ];
       localStorage.setItem('psl_orders', JSON.stringify(orders));
     }
 
-    // Default stock map
-    if (!stockData) {
-      stockData = {};
-      INITIAL_COMPOUNDS.forEach(c => {
-        stockData[c.id] = {
-          status: 'in_stock',
-          qty: 6
-        };
-      });
-      localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+    // Auth verification
+    function checkAuthOnLoad() {
+      const isAuth = sessionStorage.getItem('psl_admin_auth');
+      if (isAuth === 'true') {
+        document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'flex';
+        initializeApp();
+      } else {
+        document.getElementById('auth-overlay').style.display = 'flex';
+        document.getElementById('admin-app').style.display = 'none';
+        document.getElementById('admin-pin-input').focus();
+      }
     }
 
-    // Verify PIN Auth
     function verifyPin() {
-      const pin = document.getElementById('admin-pin-input').value.trim();
       const savedPin = localStorage.getItem('psl_admin_pin') || DEFAULT_PIN;
-      if (pin === savedPin) {
+      const inputPin = document.getElementById('admin-pin-input').value.trim();
+      if (inputPin === savedPin) {
         sessionStorage.setItem('psl_admin_auth', 'true');
         document.getElementById('auth-overlay').style.display = 'none';
         document.getElementById('admin-app').style.display = 'flex';
-        initAdmin();
+        initializeApp();
       } else {
-        alert("PIN Incorreto! Tente novamente.");
-        document.getElementById('admin-pin-input').value = '';
+        alert("PIN Incorreto! O PIN padrão inicial é: " + DEFAULT_PIN);
       }
     }
 
-    function checkAuth() {
-      if (sessionStorage.getItem('psl_admin_auth') === 'true') {
-        document.getElementById('auth-overlay').style.display = 'none';
-        document.getElementById('admin-app').style.display = 'flex';
-        initAdmin();
-      }
-    }
+    document.getElementById('admin-pin-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') verifyPin();
+    });
 
     function logout() {
       sessionStorage.removeItem('psl_admin_auth');
@@ -1039,130 +1642,658 @@ const adminHtml = `<!DOCTYPE html>
       // Update sidebar nav
       const sideLinks = document.querySelectorAll('.nav-link');
       sideLinks.forEach(l => {
-        if (l.getAttribute('onclick').includes(tabId)) l.classList.add('active');
+        const onclick = l.getAttribute('onclick') || '';
+        if (onclick.includes(tabId)) l.classList.add('active');
       });
 
       // Update mobile tabs
       const mTabs = document.querySelectorAll('.m-tab-btn');
       mTabs.forEach(t => {
-        if (t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
+        const onclick = t.getAttribute('onclick') || '';
+        if (onclick.includes(tabId)) t.classList.add('active');
       });
 
+      // Update Topbar Title
       const titles = {
-        dashboard: "📊 Dashboard Geral",
-        pedidos: "📋 Gestão de Pedidos & Rastreamento",
-        estoque: "📦 Estoque & Disponibilidade em SP",
-        precos: "💰 Editor de Preços Dinâmicos",
-        crm: "👥 CRM & Previsão de Recompra",
-        laudos: "🧪 Certificados de Análise HPLC",
-        config: "⚙️ Configurações da PSL Labs"
+        'dre': '📈 Painel de Lucro Real & DRE',
+        'compras': '🛒 Registro de Compras de Estoque',
+        'vendas': '💰 Registro e Acompanhamento de Vendas',
+        'perdas': '⚠️ Registro de Perdas & Avarias',
+        'balanco': '⚖️ Balanço Compras x Vendas por Peptídeo',
+        'estoque': '📦 Estoque Pronta-Entrega',
+        'precos': '🏷️ Editor de Preços (75% Margem)',
+        'pedidos': '🛍️ Pedidos da Loja',
+        'crm': '👥 CRM & Previsão de Recompra',
+        'config': '⚙️ Configurações'
       };
-      document.getElementById('page-title').textContent = titles[tabId] || "Painel ADM";
+      if (titles[tabId]) document.getElementById('page-title').innerHTML = titles[tabId];
+
+      if (tabId === 'dre') renderDRE();
+      if (tabId === 'compras') renderComprasTable();
+      if (tabId === 'vendas') renderVendasTable();
+      if (tabId === 'perdas') renderPerdasTable();
+      if (tabId === 'balanco') renderBalancoTable();
     }
 
-    function initAdmin() {
-      renderOrders();
-      renderStock();
-      renderPrices();
-      loadSettings();
+    // Modal Helpers
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+      const today = new Date().toISOString().split('T')[0];
+
+      if (modalId === 'modal-compra') {
+        document.getElementById('compra-date').value = today;
+        populateCompoundSelect('compra-compound', 'compra-dose');
+        onCompraCompoundChange();
+      } else if (modalId === 'modal-venda') {
+        document.getElementById('venda-date').value = today;
+        populateCompoundSelect('venda-compound', 'venda-dose');
+        onVendaCompoundChange();
+      } else if (modalId === 'modal-perda') {
+        document.getElementById('perda-date').value = today;
+        populateCompoundSelect('perda-compound', 'perda-dose');
+        onPerdaCompoundChange();
+      }
     }
 
-    // Orders Logic
-    function renderOrders() {
-      const tbody = document.getElementById('orders-tbody');
-      tbody.innerHTML = '';
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
 
-      orders.forEach((o, idx) => {
-        const tr = document.createElement('tr');
-        
-        const statusBadges = {
-          aguardando_pix: '<span class="badge" style="background:#FEF3C7;color:#92400E;">Aguardando Pix</span>',
-          separando: '<span class="badge badge-in-stock">Separando Frasco</span>',
-          despachado_uber: '<span class="badge" style="background:#E0E7FF;color:#3730A3;">🛵 Uber Moto Flash</span>',
-          sedex: '<span class="badge" style="background:#E0F2FE;color:#0369A1;">📦 Postado Sedex</span>',
-          concluido: '<span class="badge" style="background:#DCFCE7;color:#166534;">✓ Concluído</span>'
-        };
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
 
-        tr.innerHTML = \`
-          <td><strong>\${o.id}</strong><br><span style="font-size:11px;color:var(--gray-400);">\${o.date}</span></td>
-          <td><strong>\${o.client}</strong><br><span style="font-size:11px;color:var(--gray-600);">\${o.phone}</span></td>
-          <td>\${o.items}</td>
-          <td>\${o.shipping}</td>
-          <td><strong>R$ \${o.total.toFixed(2).replace('.', ',')}</strong></td>
-          <td>
-            <select onchange="updateOrderStatus(\${idx}, this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;font-weight:700;">
-              <option value="aguardando_pix" \${o.status==='aguardando_pix'?'selected':''}>Aguardando Pix</option>
-              <option value="separando" \${o.status==='separando'?'selected':''}>Pix OK / Separando</option>
-              <option value="despachado_uber" \${o.status==='despachado_uber'?'selected':''}>Despachado Uber Flash</option>
-              <option value="sedex" \${o.status==='sedex'?'selected':''}>Postado Sedex</option>
-              <option value="concluido" \${o.status==='concluido'?'selected':''}>Concluído</option>
-            </select>
-          </td>
-          <td>
-            <button class="btn-sm btn-success" title="Mandar Atualização no WhatsApp" onclick="notifyClientWhatsapp(\${idx})">💬 Avisar Cliente</button>
-          </td>
-        \`;
-        tbody.appendChild(tr);
+    // Populate Selects from INITIAL_COMPOUNDS
+    function populateCompoundSelect(compSelectId, doseSelectId) {
+      const sel = document.getElementById(compSelectId);
+      sel.innerHTML = '';
+      INITIAL_COMPOUNDS.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = c.name + " (" + c.doses.length + " doses)";
+        sel.appendChild(opt);
       });
     }
 
-    function updateOrderStatus(idx, newStatus) {
-      orders[idx].status = newStatus;
-      if (newStatus === 'despachado_uber' && !orders[idx].uberLink) {
-        const link = prompt("Cole aqui o Link de Rastreio da Corrida do Uber Flash (opcional):");
-        if (link) orders[idx].uberLink = link.trim();
+    function onCompraCompoundChange() {
+      const compId = document.getElementById('compra-compound').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const doseSel = document.getElementById('compra-dose');
+      doseSel.innerHTML = '';
+      if (comp) {
+        comp.doses.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.code;
+          opt.innerText = d.label + " (" + d.spec + ")";
+          doseSel.appendChild(opt);
+        });
       }
-      if (newStatus === 'sedex' && !orders[idx].trackingCode) {
-        const code = prompt("Digite o Código de Rastreio dos Correios (ex: BR123456789SP):");
-        if (code) orders[idx].trackingCode = code.trim();
-      }
-      localStorage.setItem('psl_orders', JSON.stringify(orders));
-      renderOrders();
+      onCompraDoseChange();
     }
 
-    function notifyClientWhatsapp(idx) {
-      const o = orders[idx];
-      let msg = "Olá " + o.client + "! Aqui é da equipe PSL Labs.\\n\\n";
-      if (o.status === 'separando') {
-        msg += "✓ Seu pagamento Pix foi confirmado com sucesso! Seu pedido (" + o.items + ") já está sendo embalado.";
-      } else if (o.status === 'despachado_uber') {
-        msg += "🛵 Seu motoboy do Uber Flash já retirou seu frasco e está a caminho!\\n";
-        if (o.uberLink) msg += "Acompanhe o trajeto em tempo real: " + o.uberLink;
-      } else if (o.status === 'sedex') {
-        msg += "📦 Seu pedido foi postado nos Correios Sedex com proteção isotérmica!\\n";
-        if (o.trackingCode) msg += "Código de rastreio: " + o.trackingCode;
-      } else {
-        msg += "Seu pedido de " + o.items + " foi entregue! Conte conosco para dúvidas na reconstituição.";
+    function onCompraDoseChange() {
+      const compId = document.getElementById('compra-compound').value;
+      const doseCode = document.getElementById('compra-dose').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      if (comp) {
+        const dose = comp.doses.find(d => d.code === doseCode);
+        if (dose) {
+          document.getElementById('compra-unit-cost').value = dose.powderCostPerVial.toFixed(2);
+          recalcCompraTotal();
+        }
       }
-      const cleanPhone = o.phone.replace(/\\D/g, '');
-      window.open("https://wa.me/" + cleanPhone + "?text=" + encodeURI(msg), "_blank");
     }
 
-    // Stock Management Logic
-    function renderStock() {
+    function recalcCompraTotal() {
+      const qty = parseFloat(document.getElementById('compra-qty').value) || 0;
+      const unit = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
+      document.getElementById('compra-total-cost').value = (qty * unit).toFixed(2);
+    }
+
+    function onVendaCompoundChange() {
+      const compId = document.getElementById('venda-compound').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const doseSel = document.getElementById('venda-dose');
+      doseSel.innerHTML = '';
+      if (comp) {
+        comp.doses.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.code;
+          opt.innerText = d.label + " (" + d.spec + ")";
+          doseSel.appendChild(opt);
+        });
+      }
+      onVendaDoseChange();
+    }
+
+    function onVendaDoseChange() {
+      const compId = document.getElementById('venda-compound').value;
+      const doseCode = document.getElementById('venda-dose').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      if (comp) {
+        const dose = comp.doses.find(d => d.code === doseCode);
+        if (dose) {
+          // Preço sugerido do catálogo a 75%
+          document.getElementById('venda-unit-price').value = dose.suggestedPriceB2C.toFixed(2);
+          recalcVendaTotals();
+        }
+      }
+    }
+
+    function recalcVendaTotals() {
+      const compId = document.getElementById('venda-compound').value;
+      const doseCode = document.getElementById('venda-dose').value;
+      const qty = parseFloat(document.getElementById('venda-qty').value) || 0;
+      const unitPrice = parseFloat(document.getElementById('venda-unit-price').value) || 0;
+
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      let unitCost = 0;
+      if (comp) {
+        const dose = comp.doses.find(d => d.code === doseCode);
+        if (dose) unitCost = dose.totalCostB2C;
+      }
+
+      const totalSale = qty * unitPrice;
+      const totalCost = qty * unitCost;
+      const profit = totalSale - totalCost;
+
+      document.getElementById('venda-preview-total').innerText = 'R$ ' + totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('venda-preview-custo').innerText = 'R$ ' + totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('venda-preview-lucro').innerText = 'R$ ' + profit.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    }
+
+    function onPerdaCompoundChange() {
+      const compId = document.getElementById('perda-compound').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const doseSel = document.getElementById('perda-dose');
+      doseSel.innerHTML = '';
+      if (comp) {
+        comp.doses.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.code;
+          opt.innerText = d.label + " (" + d.spec + ")";
+          doseSel.appendChild(opt);
+        });
+      }
+      onPerdaDoseChange();
+    }
+
+    function onPerdaDoseChange() {
+      const compId = document.getElementById('perda-compound').value;
+      const doseCode = document.getElementById('perda-dose').value;
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      if (comp) {
+        const dose = comp.doses.find(d => d.code === doseCode);
+        if (dose) {
+          document.getElementById('perda-unit-cost').value = dose.powderCostPerVial.toFixed(2);
+          recalcPerdaTotal();
+        }
+      }
+    }
+
+    function recalcPerdaTotal() {
+      const qty = parseFloat(document.getElementById('perda-qty').value) || 0;
+      const unitCost = parseFloat(document.getElementById('perda-unit-cost').value) || 0;
+      document.getElementById('perda-total-cost').value = (qty * unitCost).toFixed(2);
+    }
+
+    // CRUD: Save Compra
+    function saveCompra() {
+      const compId = document.getElementById('compra-compound').value;
+      const doseCode = document.getElementById('compra-dose').value;
+      const qty = parseInt(document.getElementById('compra-qty').value) || 0;
+      const unitCost = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
+      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || 0;
+      const date = document.getElementById('compra-date').value || new Date().toISOString().split('T')[0];
+      const supplier = document.getElementById('compra-supplier').value.trim() || 'Fornecedor Padrão';
+      const notes = document.getElementById('compra-notes').value.trim() || '';
+
+      if (qty <= 0 || unitCost <= 0) {
+        alert("Por favor, preencha quantidade e custo válidos!");
+        return;
+      }
+
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+
+      const newCompra = {
+        id: "CMP-" + String(compras.length + 1).padStart(3, '0'),
+        date: date,
+        compoundId: compId,
+        code: doseCode,
+        name: comp ? comp.name : 'Peptídeo',
+        dosage: dose ? dose.label : 'Dose',
+        qty: qty,
+        unitCost: unitCost,
+        totalCost: totalCost,
+        supplier: supplier,
+        notes: notes
+      };
+
+      compras.unshift(newCompra);
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
+
+      closeModal('modal-compra');
+      showToast("Compra de " + qty + " un registrada com sucesso!");
+      renderDRE();
+      renderComprasTable();
+      renderBalancoTable();
+    }
+
+    function deleteCompra(id) {
+      if (!confirm("Tem certeza que deseja excluir esta compra?")) return;
+      compras = compras.filter(c => c.id !== id);
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
+      showToast("Compra excluída!");
+      renderDRE();
+      renderComprasTable();
+      renderBalancoTable();
+    }
+
+    // CRUD: Save Venda
+    function saveVenda() {
+      const clientName = document.getElementById('venda-client').value.trim() || 'Cliente';
+      const clientPhone = document.getElementById('venda-phone').value.trim() || '';
+      const compId = document.getElementById('venda-compound').value;
+      const doseCode = document.getElementById('venda-dose').value;
+      const qty = parseInt(document.getElementById('venda-qty').value) || 0;
+      const unitPrice = parseFloat(document.getElementById('venda-unit-price').value) || 0;
+      const paymentMethod = document.getElementById('venda-pagto').value;
+      const channel = document.getElementById('venda-canal').value;
+      const date = document.getElementById('venda-date').value || new Date().toISOString().split('T')[0];
+
+      if (qty <= 0 || unitPrice <= 0) {
+        alert("Por favor, preencha quantidade e preço válidos!");
+        return;
+      }
+
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+      const unitCost = dose ? dose.totalCostB2C : 0;
+
+      const totalSale = qty * unitPrice;
+      const totalCost = qty * unitCost;
+      const profit = totalSale - totalCost;
+      const margin = totalSale > 0 ? ((profit / totalSale) * 100) : 0;
+
+      const newVenda = {
+        id: "VND-" + String(vendas.length + 1).padStart(3, '0'),
+        date: date,
+        clientName: clientName,
+        clientPhone: clientPhone,
+        compoundId: compId,
+        code: doseCode,
+        name: comp ? comp.name : 'Peptídeo',
+        dosage: dose ? dose.label : 'Dose',
+        qty: qty,
+        unitPrice: unitPrice,
+        unitCost: unitCost,
+        totalSale: totalSale,
+        totalCost: totalCost,
+        profit: profit,
+        margin: Number(margin.toFixed(1)),
+        paymentMethod: paymentMethod,
+        channel: channel,
+        status: "Pago"
+      };
+
+      vendas.unshift(newVenda);
+      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+
+      closeModal('modal-venda');
+      showToast("Venda de R$ " + totalSale.toFixed(2) + " registrada!");
+      renderDRE();
+      renderVendasTable();
+      renderBalancoTable();
+    }
+
+    function deleteVenda(id) {
+      if (!confirm("Tem certeza que deseja excluir esta venda?")) return;
+      vendas = vendas.filter(v => v.id !== id);
+      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+      showToast("Venda excluída!");
+      renderDRE();
+      renderVendasTable();
+      renderBalancoTable();
+    }
+
+    // CRUD: Save Perda
+    function savePerda() {
+      const compId = document.getElementById('perda-compound').value;
+      const doseCode = document.getElementById('perda-dose').value;
+      const qty = parseInt(document.getElementById('perda-qty').value) || 0;
+      const unitCost = parseFloat(document.getElementById('perda-unit-cost').value) || 0;
+      const lossTotal = parseFloat(document.getElementById('perda-total-cost').value) || 0;
+      const reason = document.getElementById('perda-reason').value;
+      const date = document.getElementById('perda-date').value || new Date().toISOString().split('T')[0];
+      const notes = document.getElementById('perda-notes').value.trim() || '';
+
+      if (qty <= 0 || unitCost <= 0) {
+        alert("Por favor, informe a quantidade e custo do frasco perdido!");
+        return;
+      }
+
+      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
+      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+
+      const newPerda = {
+        id: "PRD-" + String(perdas.length + 1).padStart(3, '0'),
+        date: date,
+        compoundId: compId,
+        code: doseCode,
+        name: comp ? comp.name : 'Peptídeo',
+        dosage: dose ? dose.label : 'Dose',
+        qty: qty,
+        unitCost: unitCost,
+        lossTotal: lossTotal,
+        reason: reason,
+        notes: notes
+      };
+
+      perdas.unshift(newPerda);
+      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+
+      closeModal('modal-perda');
+      showToast("Perda de R$ " + lossTotal.toFixed(2) + " registrada no DRE.");
+      renderDRE();
+      renderPerdasTable();
+      renderBalancoTable();
+    }
+
+    function deletePerda(id) {
+      if (!confirm("Tem certeza que deseja excluir este registro de perda?")) return;
+      perdas = perdas.filter(p => p.id !== id);
+      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+      showToast("Registro de perda excluído!");
+      renderDRE();
+      renderPerdasTable();
+      renderBalancoTable();
+    }
+
+    // RENDER TABLES & DRE
+    function renderDRE() {
+      let totalVendido = 0;
+      let totalCMV = 0;
+      let totalFrascosVendidos = 0;
+      vendas.forEach(v => {
+        totalVendido += v.totalSale;
+        totalCMV += v.totalCost;
+        totalFrascosVendidos += v.qty;
+      });
+
+      let totalPerdas = 0;
+      let totalFrascosPerdidos = 0;
+      perdas.forEach(p => {
+        totalPerdas += p.lossTotal;
+        totalFrascosPerdidos += p.qty;
+      });
+
+      let totalComprado = 0;
+      let totalFrascosComprados = 0;
+      compras.forEach(c => {
+        totalComprado += c.totalCost;
+        totalFrascosComprados += c.qty;
+      });
+
+      // Lucro Líquido Real = Faturamento - CMV - Perdas
+      const lucroReal = totalVendido - totalCMV - totalPerdas;
+      const margemReal = totalVendido > 0 ? ((lucroReal / totalVendido) * 100) : 0;
+
+      // Estoque Físico Restante = Comprados - Vendidos - Perdidos
+      const estoqueQtd = Math.max(0, totalFrascosComprados - totalFrascosVendidos - totalFrascosPerdidos);
+
+      // Valor de Custo do Estoque Parado
+      let estoqueCusto = 0;
+      let estoqueVenda = 0;
+      INITIAL_COMPOUNDS.forEach(comp => {
+        comp.doses.forEach(dose => {
+          const compComprados = compras.filter(c => c.code === dose.code).reduce((a, b) => a + b.qty, 0);
+          const compVendidos = vendas.filter(v => v.code === dose.code).reduce((a, b) => a + b.qty, 0);
+          const compPerdidos = perdas.filter(p => p.code === dose.code).reduce((a, b) => a + b.qty, 0);
+          const saldo = Math.max(0, compComprados - compVendidos - compPerdidos);
+          estoqueCusto += saldo * dose.powderCostPerVial;
+          estoqueVenda += saldo * dose.suggestedPriceB2C;
+        });
+      });
+
+      // Update Top KPIs
+      document.getElementById('kpi-faturamento').innerText = 'R$ ' + totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('kpi-faturamento-sub').innerText = totalFrascosVendidos + ' frascos vendidos';
+
+      document.getElementById('kpi-cmv').innerText = 'R$ ' + totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      document.getElementById('kpi-perdas').innerText = 'R$ ' + totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('kpi-perdas-sub').innerText = totalFrascosPerdidos + ' frascos descartados/quebrados';
+
+      const lucroEl = document.getElementById('kpi-lucro-real');
+      lucroEl.innerText = (lucroReal >= 0 ? '+' : '') + 'R$ ' + lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      lucroEl.style.color = lucroReal >= 0 ? '#059669' : '#DC2626';
+
+      document.getElementById('kpi-margem-real').innerText = 'Margem Líquida Real: ' + margemReal.toFixed(1) + '%';
+
+      // Update Secondary KPIs
+      document.getElementById('kpi-total-compras').innerText = 'R$ ' + totalComprado.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('kpi-compras-sub').innerText = totalFrascosComprados + ' frascos adquiridos';
+
+      document.getElementById('kpi-estoque-qtd').innerText = estoqueQtd + ' unidades';
+      document.getElementById('kpi-estoque-custo').innerText = 'R$ ' + estoqueCusto.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      document.getElementById('kpi-estoque-venda').innerText = 'R$ ' + estoqueVenda.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      // Render DRE Breakdown Table
+      const dreTbody = document.getElementById('dre-table-body');
+      const lucroPercent = totalVendido > 0 ? ((lucroReal / totalVendido) * 100).toFixed(1) : '0.0';
+      const cmvPercent = totalVendido > 0 ? ((totalCMV / totalVendido) * 100).toFixed(1) : '0.0';
+      const perdasPercent = totalVendido > 0 ? ((totalPerdas / totalVendido) * 100).toFixed(1) : '0.0';
+
+      dreTbody.innerHTML = \`
+        <tr style="background: #F8FAFC; font-weight: 800;">
+          <td>(+) Receita Bruta de Vendas</td>
+          <td>Total cobrado dos clientes</td>
+          <td style="color: #059669; font-size: 15px;">R$ \${totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>100.0%</td>
+        </tr>
+        <tr>
+          <td>(-) Custo das Mercadorias Vendidas (CMV)</td>
+          <td>Custo do pó + insumos dos itens entregues</td>
+          <td style="color: #64748B;">- R$ \${totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>-\${cmvPercent}%</td>
+        </tr>
+        <tr style="background: #FEF2F2;">
+          <td style="color: #DC2626;">(-) Perdas / Quebras / Avarias</td>
+          <td>Frascos descartados ou danificados</td>
+          <td style="color: #DC2626; font-weight: 700;">- R$ \${totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>-\${perdasPercent}%</td>
+        </tr>
+        <tr style="background: #F0FDF4; font-weight: 900; font-size: 15px;">
+          <td style="color: #145C46;">(=) LUCRO LÍQUIDO REAL OPERACIONAL</td>
+          <td>(Vendas - CMV - Perdas)</td>
+          <td style="color: #059669; font-size: 18px;">R$ \${lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td style="color: #059669;">\${lucroPercent}%</td>
+        </tr>
+        <tr>
+          <td style="color: #475569;">Saldo de Fluxo de Caixa (Vendas - Compras Totais - Perdas)</td>
+          <td>Balanço de caixa imediato (inclui estoque parado)</td>
+          <td style="font-weight: 700;">R$ \${(totalVendido - totalComprado - totalPerdas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>—</td>
+        </tr>
+      \`;
+    }
+
+    function renderComprasTable() {
+      const tbody = document.getElementById('compras-table-body');
+      if (compras.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma compra registrada ainda. Clique em "+ Nova Compra" para lançar.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = compras.map(c => \`
+        <tr>
+          <td><strong>\${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${c.date}</span></td>
+          <td><strong>\${c.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${c.dosage}</span></td>
+          <td><strong>\${c.qty}</strong> un</td>
+          <td>R$ \${c.unitCost.toFixed(2)}</td>
+          <td style="font-weight: 800; color: var(--primary);">R$ \${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>\${c.supplier}</td>
+          <td style="font-size: 12px; color: var(--gray-600);">\${c.notes || '-'}</td>
+          <td>
+            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('\${c.id}')">Excluir</button>
+          </td>
+        </tr>
+      \`).join('');
+    }
+
+    function renderVendasTable() {
+      const tbody = document.getElementById('vendas-table-body');
+      if (vendas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = vendas.map(v => \`
+        <tr>
+          <td><strong>\${v.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.date}</span></td>
+          <td><strong>\${v.clientName}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.channel} · \${v.clientPhone || ''}</span></td>
+          <td><strong>\${v.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${v.dosage}</span></td>
+          <td><strong>\${v.qty}</strong></td>
+          <td>R$ \${v.unitPrice.toFixed(2)}</td>
+          <td style="color: var(--gray-400);">R$ \${v.unitCost.toFixed(2)}</td>
+          <td><strong>R$ \${v.totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+          <td style="color: #059669; font-weight: 800;">+ R$ \${v.profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td><span class="badge" style="background: #DCFCE7; color: #166534;">\${v.margin}%</span></td>
+          <td>\${v.paymentMethod}</td>
+          <td>
+            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('\${v.id}')">Excluir</button>
+          </td>
+        </tr>
+      \`).join('');
+    }
+
+    function renderPerdasTable() {
+      const tbody = document.getElementById('perdas-table-body');
+      if (perdas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma perda registrada. Estoque com 100% de aproveitamento!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = perdas.map(p => \`
+        <tr>
+          <td><strong>\${p.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${p.date}</span></td>
+          <td><strong>\${p.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${p.dosage}</span></td>
+          <td style="font-weight: 800; color: #DC2626;">\${p.qty} frasco(s)</td>
+          <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">\${p.reason}</span></td>
+          <td>R$ \${p.unitCost.toFixed(2)}</td>
+          <td style="font-weight: 800; color: #DC2626;">- R$ \${p.lossTotal.toFixed(2)}</td>
+          <td style="font-size: 12px; color: var(--gray-600);">\${p.notes || '-'}</td>
+          <td>
+            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('\${p.id}')">Excluir</button>
+          </td>
+        </tr>
+      \`).join('');
+    }
+
+    function renderBalancoTable() {
+      const tbody = document.getElementById('balanco-table-body');
+      const search = (document.getElementById('balanco-search').value || '').toLowerCase();
+
+      let rowsHtml = '';
+      INITIAL_COMPOUNDS.forEach(comp => {
+        comp.doses.forEach(dose => {
+          const fullName = (comp.name + " " + dose.label).toLowerCase();
+          if (search && !fullName.includes(search)) return;
+
+          const compComprados = compras.filter(c => c.code === dose.code).reduce((a, b) => a + b.qty, 0);
+          const compVendidos = vendas.filter(v => v.code === dose.code).reduce((a, b) => a + b.qty, 0);
+          const compPerdidos = perdas.filter(p => p.code === dose.code).reduce((a, b) => a + b.qty, 0);
+
+          const totalGasto = compras.filter(c => c.code === dose.code).reduce((a, b) => a + b.totalCost, 0);
+          const totalVendas = vendas.filter(v => v.code === dose.code).reduce((a, b) => a + b.totalSale, 0);
+          const cmvVendas = vendas.filter(v => v.code === dose.code).reduce((a, b) => a + b.totalCost, 0);
+          const prejPerdas = perdas.filter(p => p.code === dose.code).reduce((a, b) => a + b.lossTotal, 0);
+
+          const lucroItem = totalVendas - cmvVendas - prejPerdas;
+          const saldoEstoque = compComprados - compVendidos - compPerdidos;
+
+          // Only render items with movement or prominent items
+          if (compComprados > 0 || compVendidos > 0 || compPerdidos > 0 || ['RT60', 'CU50', 'TR50', 'BPC5'].includes(dose.code)) {
+            rowsHtml += \`
+              <tr>
+                <td><strong>\${comp.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${dose.label}</span></td>
+                <td>\${compComprados}</td>
+                <td>\${compVendidos}</td>
+                <td style="color: #DC2626;">\${compPerdidos}</td>
+                <td><strong style="color: \${saldoEstoque > 0 ? '#059669' : '#DC2626'};">\${saldoEstoque} un</strong></td>
+                <td>R$ \${totalGasto.toFixed(2)}</td>
+                <td><strong>R$ \${totalVendas.toFixed(2)}</strong></td>
+                <td style="color: var(--gray-400);">R$ \${cmvVendas.toFixed(2)}</td>
+                <td style="color: #DC2626;">\${prejPerdas > 0 ? '- R$ ' + prejPerdas.toFixed(2) : '-'}</td>
+                <td style="font-weight: 800; font-size: 14px; color: \${lucroItem >= 0 ? '#059669' : '#DC2626'};">
+                  \${lucroItem >= 0 ? '+ ' : ''}R$ \${lucroItem.toFixed(2)}
+                </td>
+              </tr>
+            \`;
+          }
+        });
+      });
+
+      if (!rowsHtml) {
+        rowsHtml = '<tr><td colspan="10" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhum composto encontrado com movimentação.</td></tr>';
+      }
+      tbody.innerHTML = rowsHtml;
+    }
+
+    // Backup & Export JSON
+    function exportDataBackup() {
+      const backup = {
+        exportedAt: new Date().toISOString(),
+        compras: compras,
+        vendas: vendas,
+        perdas: perdas,
+        customPrices: customPrices,
+        stockData: stockData
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "PSL_Labs_Backup_Financeiro_" + new Date().toISOString().split('T')[0] + ".json");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("Backup financeiro exportado com sucesso!");
+    }
+
+    function resetToDemoData() {
+      if (!confirm("Deseja resetar para os dados iniciais de demonstração?")) return;
+      localStorage.removeItem('psl_compras');
+      localStorage.removeItem('psl_vendas');
+      localStorage.removeItem('psl_perdas');
+      window.location.reload();
+    }
+
+    // Stock Management Tab
+    function renderStockTable() {
       const tbody = document.getElementById('stock-tbody');
       tbody.innerHTML = '';
 
-      INITIAL_COMPOUNDS.forEach(c => {
-        const current = stockData[c.id] || { status: 'in_stock', qty: 5 };
+      INITIAL_COMPOUNDS.forEach(comp => {
         const tr = document.createElement('tr');
-        tr.id = 'stock-row-' + c.id;
-
-        const badgeClass = current.status === 'in_stock' ? 'badge-in-stock' : (current.status === 'pre_order' ? 'badge-pre-order' : 'badge-out-of-stock');
-        const badgeLabel = current.status === 'in_stock' ? '🟢 Em Estoque' : (current.status === 'pre_order' ? '🟡 Sob Encomenda' : '🔴 Esgotado');
+        const st = (stockData && stockData[comp.id]) ? stockData[comp.id] : 'in_stock';
+        
+        let badgeHtml = '';
+        if (st === 'in_stock') badgeHtml = '<span class="badge badge-in-stock">Pronta Entrega SP</span>';
+        else if (st === 'pre_order') badgeHtml = '<span class="badge badge-pre-order">Sob Encomenda (3-5d)</span>';
+        else badgeHtml = '<span class="badge badge-out-of-stock">Esgotado</span>';
 
         tr.innerHTML = \`
-          <td><strong>\${c.name}</strong><br><span style="font-size:11px;color:var(--gray-400);">\${c.line}</span></td>
-          <td>\${c.doses.map(d => d.label).join(', ')}</td>
+          <td><strong>\${comp.name}</strong></td>
+          <td><span style="font-size: 11px; color: var(--gray-400);">\${comp.line}</span></td>
+          <td>\${comp.doses.map(d => '<span class="badge" style="background: var(--gray-100); color: var(--gray-700); margin-right: 4px;">' + d.label + '</span>').join('')}</td>
+          <td id="stock-badge-\${comp.id}">\${badgeHtml}</td>
+          <td><strong>\${comp.doses[0].stockQty} frascos</strong></td>
           <td>
-            <input type="number" min="0" value="\${current.qty}" onchange="updateStockQty('\${c.id}', this.value)" style="width:60px;padding:4px;border:1px solid var(--gray-200);border-radius:6px;font-weight:700;text-align:center;"> frascos
-          </td>
-          <td><span class="badge \${badgeClass}">\${badgeLabel}</span></td>
-          <td>
-            <select onchange="updateStockStatus('\${c.id}', this.value)" style="padding:5px 8px;border-radius:6px;border:1.5px solid var(--gray-200);font-weight:700;font-size:12px;">
-              <option value="in_stock" \${current.status==='in_stock'?'selected':''}>Disponível (Uber Flash)</option>
-              <option value="pre_order" \${current.status==='pre_order'?'selected':''}>Sob Encomenda (3-5d)</option>
-              <option value="out_of_stock" \${current.status==='out_of_stock'?'selected':''}>Esgotado</option>
+            <select class="form-select" style="padding: 4px 8px; font-size: 11px;" onchange="updateCompoundStock('\${comp.id}', this.value)">
+              <option value="in_stock" \${st === 'in_stock' ? 'selected' : ''}>Pronta Entrega</option>
+              <option value="pre_order" \${st === 'pre_order' ? 'selected' : ''}>Sob Encomenda</option>
+              <option value="out_of_stock" \${st === 'out_of_stock' ? 'selected' : ''}>Esgotado</option>
             </select>
           </td>
         \`;
@@ -1170,57 +2301,43 @@ const adminHtml = `<!DOCTYPE html>
       });
     }
 
-    function updateStockStatus(compoundId, newStatus) {
-      if (!stockData[compoundId]) stockData[compoundId] = { qty: 0 };
-      stockData[compoundId].status = newStatus;
+    function updateCompoundStock(compId, status) {
+      if (!stockData) stockData = {};
+      stockData[compId] = status;
       localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
-      renderStock();
-    }
-
-    function updateStockQty(compoundId, newQty) {
-      if (!stockData[compoundId]) stockData[compoundId] = { status: 'in_stock' };
-      stockData[compoundId].qty = parseInt(newQty) || 0;
-      if (stockData[compoundId].qty === 0) {
-        stockData[compoundId].status = 'out_of_stock';
-      }
-      localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
-      renderStock();
+      renderStockTable();
+      showToast("Estoque atualizado no catálogo!");
     }
 
     function filterStockTable() {
-      const q = document.getElementById('stock-search').value.toLowerCase().trim();
-      INITIAL_COMPOUNDS.forEach(c => {
-        const row = document.getElementById('stock-row-' + c.id);
-        if (!row) return;
-        const matches = c.name.toLowerCase().includes(q) || c.line.toLowerCase().includes(q);
-        row.style.display = matches ? '' : 'none';
+      const query = document.getElementById('stock-search').value.toLowerCase();
+      const rows = document.querySelectorAll('#stock-tbody tr');
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(query) ? '' : 'none';
       });
     }
 
-    // Prices Management Logic
-    function renderPrices() {
+    // Prices Management Tab (75% Margin)
+    function renderPricesTable() {
       const tbody = document.getElementById('prices-tbody');
       tbody.innerHTML = '';
 
-      INITIAL_COMPOUNDS.forEach(c => {
-        c.doses.forEach(d => {
-          const customB2C = customPrices[d.code + '_b2c'] || d.suggestedPriceB2C;
-          const customB2B = customPrices[d.code + '_b2b'] || d.b2bBoxPrice;
-
+      INITIAL_COMPOUNDS.forEach(comp => {
+        comp.doses.forEach(dose => {
+          const currentPrice = (customPrices && customPrices[dose.code]) ? customPrices[dose.code] : dose.suggestedPriceB2C;
           const tr = document.createElement('tr');
           tr.innerHTML = \`
-            <td><strong>\${c.name}</strong></td>
-            <td><span class="badge" style="background:var(--primary-light);color:var(--primary);">\${d.label}</span></td>
-            <td>R$ \${d.totalCostB2C.toFixed(2).replace('.', ',')}</td>
+            <td><strong>\${comp.name}</strong></td>
+            <td><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${dose.label}</span></td>
+            <td>R$ \${dose.totalCostB2C.toFixed(2)}</td>
             <td>
-              R$ <input type="number" id="p-b2c-\${d.code}" value="\${customB2C}" style="width:80px;padding:4px 6px;border:1px solid var(--gray-200);border-radius:6px;font-weight:800;color:var(--primary);">
+              <input type="number" id="price-input-\${dose.code}" value="\${currentPrice}" style="width: 100px; padding: 4px 8px; border: 1px solid var(--gray-200); border-radius: 4px; font-weight: 700;">
             </td>
+            <td>R$ \${dose.b2bBoxPrice.toFixed(2)}</td>
+            <td><span class="badge badge-in-stock">\${dose.marginPercent}%</span></td>
             <td>
-              R$ <input type="number" id="p-b2b-\${d.code}" value="\${customB2B}" style="width:90px;padding:4px 6px;border:1px solid var(--gray-200);border-radius:6px;font-weight:800;">
-            </td>
-            <td><span style="color:#059669;font-weight:700;">\${d.marginPercent}%</span></td>
-            <td>
-              <button class="btn-sm btn-primary" onclick="saveCustomPrice('\${d.code}')">Salvar</button>
+              <button class="btn-sm btn-primary" onclick="saveCustomPrice('\${dose.code}')">Salvar</button>
             </td>
           \`;
           tbody.appendChild(tr);
@@ -1229,42 +2346,55 @@ const adminHtml = `<!DOCTYPE html>
     }
 
     function saveCustomPrice(code) {
-      const b2cInput = document.getElementById('p-b2c-' + code);
-      const b2bInput = document.getElementById('p-b2b-' + code);
-      if (!b2cInput || !b2bInput) return;
-
-      customPrices[code + '_b2c'] = parseFloat(b2cInput.value) || 199;
-      customPrices[code + '_b2b'] = parseFloat(b2bInput.value) || 890;
-      localStorage.setItem('psl_custom_prices', JSON.stringify(customPrices));
-      alert("Preço do produto [" + code + "] atualizado com sucesso na loja!");
-    }
-
-    function resetDefaultPrices() {
-      if (confirm("Deseja restaurar todos os preços para os valores sugeridos originais?")) {
-        customPrices = {};
-        localStorage.removeItem('psl_custom_prices');
-        renderPrices();
-        alert("Preços originais restaurados!");
+      const val = parseFloat(document.getElementById('price-input-' + code).value);
+      if (val > 0) {
+        customPrices[code] = val;
+        localStorage.setItem('psl_custom_prices', JSON.stringify(customPrices));
+        showToast("Preço do SKU " + code + " atualizado para R$ " + val.toFixed(2));
       }
     }
 
-    // CRM Actions
-    function sendReorderReminder(clientName, product, phone) {
-      const msg = "Olá " + clientName + "! Tudo bem?\\n\\nAqui é da PSL Labs. Pelo cronograma do seu " + product + ", seu frasco deve estar nos últimos dias de aplicação.\\n\\nComo nosso envio em SP via Uber Moto é no mesmo dia (sujeito ao estoque), quer que eu já separe seu próximo frasco para você não pausar o protocolo?";
-      window.open("https://wa.me/" + phone + "?text=" + encodeURI(msg), "_blank");
+    function resetDefaultPrices() {
+      if (!confirm("Restaurar os preços padrão calculados com 75% de margem?")) return;
+      localStorage.removeItem('psl_custom_prices');
+      customPrices = {};
+      renderPricesTable();
+      showToast("Preços restaurados para 75% de margem!");
     }
 
-    function sendSupportCheckin(clientName, product, phone) {
-      const msg = "Olá " + clientName + "! Passando para acompanhar seus resultados com o " + product + ". Como está sendo a experiência? Ficou alguma dúvida sobre a reconstituição ou conservação?";
-      window.open("https://wa.me/" + phone + "?text=" + encodeURI(msg), "_blank");
+    // Orders Tab
+    function renderOrdersTable() {
+      const tbody = document.getElementById('orders-tbody');
+      tbody.innerHTML = '';
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--gray-400); padding: 20px;">Nenhum pedido pendente no momento.</td></tr>';
+        return;
+      }
+      orders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`
+          <td><strong>\${o.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${o.date}</span></td>
+          <td><strong>\${o.client}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${o.phone}</span></td>
+          <td>\${o.items}</td>
+          <td><span class="badge" style="background: #E0F2FE; color: #0369A1;">\${o.delivery}</span></td>
+          <td><strong>R$ \${o.total.toFixed(2)}</strong></td>
+          <td><span class="badge badge-in-stock">\${o.status}</span></td>
+          <td>
+            <button class="btn-sm btn-success" onclick="notifyOrderWhatsApp('\${o.phone}', '\${o.id}', '\${o.client}')">WhatsApp</button>
+          </td>
+        \`;
+        tbody.appendChild(tr);
+      });
     }
 
-    // Settings
-    function loadSettings() {
-      const wa = localStorage.getItem('psl_seller_wa') || '5511999999999';
-      const pix = localStorage.getItem('psl_pix_key') || 'financeiro@psllabs.com.br';
-      document.getElementById('cfg-wa').value = wa;
-      document.getElementById('cfg-pix').value = pix;
+    function notifyOrderWhatsApp(phone, id, client) {
+      const msg = encodeURI("Olá, " + client + "! Seu pedido " + id + " da PSL Labs foi processado e já está em preparação para envio imediato.");
+      window.open("https://wa.me/" + phone + "?text=" + msg, "_blank");
+    }
+
+    function sendReorderReminder(client, product, phone) {
+      const msg = encodeURI("Olá, " + client + "! Como estão seus resultados com o " + product + " da PSL Labs? Pelos nossos cálculos, seu frasco deve estar nos últimos dias. Gostaria de garantir o próximo para não interromper seu protocolo?");
+      window.open("https://wa.me/" + phone + "?text=" + msg, "_blank");
     }
 
     function saveAdminSettings() {
@@ -1272,23 +2402,44 @@ const adminHtml = `<!DOCTYPE html>
       const pix = document.getElementById('cfg-pix').value.trim();
       const newPin = document.getElementById('cfg-new-pin').value.trim();
 
-      if (wa) localStorage.setItem('psl_seller_wa', wa.replace(/\\D/g, ''));
+      if (wa) localStorage.setItem('psl_seller_wa', wa.replace(/\D/g, ''));
       if (pix) localStorage.setItem('psl_pix_key', pix);
-      if (newPin && newPin.length >= 4) {
+      if (newPin) {
+        if (newPin.length < 4) {
+          alert("O PIN deve ter no mínimo 4 dígitos.");
+          return;
+        }
         localStorage.setItem('psl_admin_pin', newPin);
-        alert("Configurações salvas e Novo PIN atualizado!");
-      } else {
-        alert("Configurações salvas com sucesso!");
+        alert("Novo PIN salvo com sucesso!");
       }
+      showToast("Configurações salvas!");
     }
 
-    // Run on load
-    checkAuth();
+    function initializeApp() {
+      renderDRE();
+      renderComprasTable();
+      renderVendasTable();
+      renderPerdasTable();
+      renderBalancoTable();
+      renderStockTable();
+      renderPricesTable();
+      renderOrdersTable();
+
+      const wa = localStorage.getItem('psl_seller_wa') || '5511999999999';
+      const pix = localStorage.getItem('psl_pix_key') || 'financeiro@psllabs.com.br';
+      if (document.getElementById('cfg-wa')) document.getElementById('cfg-wa').value = wa;
+      if (document.getElementById('cfg-pix')) document.getElementById('cfg-pix').value = pix;
+    }
+
+    // Auto-start auth check
+    checkAuthOnLoad();
   </script>
 </body>
-</html>
-`;
+</html>`;
 
-fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/admin.html", adminHtml, "utf8");
-fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/web/admin.html", adminHtml, "utf8");
-console.log("Admin Panel admin.html successfully generated.");
+fs.writeFileSync('web/admin.html', adminHtml, 'utf8');
+fs.writeFileSync('admin.html', adminHtml, 'utf8');
+fs.writeFileSync('admin/index.html', adminHtml, 'utf8');
+fs.writeFileSync('web/admin/index.html', adminHtml, 'utf8');
+
+console.log('✅ Admin Panel successfully upgraded with Compras, Vendas, Perdas, and Lucro Real DRE!');
