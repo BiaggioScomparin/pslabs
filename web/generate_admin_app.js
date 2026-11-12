@@ -492,6 +492,29 @@ const adminHtml = `<!DOCTYPE html>
     .badge-in-stock { background: #DCFCE7; color: #166534; }
     .badge-pre-order { background: #FEF3C7; color: #92400E; }
     .badge-out-of-stock { background: #FEE2E2; color: #991B1B; }
+    .badge-peptide { background: #DCFCE7; color: #166534; }
+    .badge-water { background: #CFFAFE; color: #0E7490; }
+    .badge-box { background: #FEF3C7; color: #92400E; }
+    .badge-label { background: #F3E8FF; color: #6B21A8; }
+    .badge-supplies { background: #FFE4E6; color: #BE123C; }
+    .badge-other { background: #F1F5F9; color: #475569; }
+
+    .filter-pill {
+      background: var(--white);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+      border-radius: 100px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .filter-pill:hover { background: var(--gray-100); }
+    .filter-pill.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
     /* Buttons */
     .btn-sm {
@@ -838,13 +861,55 @@ const adminHtml = `<!DOCTYPE html>
         <!-- TAB 2: REGISTRO DE COMPRAS (ENTRADAS / FORNECEDOR) -->
         <!-- ========================================================= -->
         <div id="tab-compras" class="view-tab">
+          
+          <!-- Summary Metrics Cards for Compras -->
+          <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 20px;">
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🛒 Total Geral Comprado</div>
+              <div style="font-size: 20px; font-weight: 800; color: var(--primary);" id="compras-metric-total">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-total-sub">0 compras cadastradas</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🧪 Peptídeos (Pó Liofilizado)</div>
+              <div style="font-size: 20px; font-weight: 800; color: #166534;" id="compras-metric-pep">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-pep-sub">0 frascos de pó</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">📦 Insumos & Embalagens</div>
+              <div style="font-size: 20px; font-weight: 800; color: #0E7490;" id="compras-metric-insumos">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-insumos-sub">Água, caixas, etiquetas e kits</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">📝 Outras Despesas / Frete</div>
+              <div style="font-size: 20px; font-weight: 800; color: #475569;" id="compras-metric-outros">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-outros-sub">Custos operacionais diversos</div>
+            </div>
+          </div>
+
           <div class="panel">
-            <div class="panel-header">
+            <div class="panel-header" style="flex-wrap: wrap; gap: 12px;">
               <div>
-                <div class="panel-title">🛒 Registro de Compras de Estoque (Entradas)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Cadastre cada pedido de caixas ou frascos feito ao fornecedor.</div>
+                <div class="panel-title">🛒 Registro de Compras de Estoque & Insumos</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Cadastre pedidos de peptídeos, água bacteriostática, caixas térmicas, etiquetas e insumos.</div>
               </div>
-              <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-sm btn-outline" onclick="seedSuppliesDemo()" title="Adiciona compras de água, caixas, etiquetas e insumos para demonstração">+ Insumos Exemplo</button>
+                <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
+              </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div style="padding: 12px 20px; border-bottom: 1px solid var(--gray-200); display: flex; gap: 8px; flex-wrap: wrap; background: #FAFAFA;">
+              <button class="filter-pill active" data-cat="all" onclick="filterCompras('all', this)">Todos (<span id="count-all">0</span>)</button>
+              <button class="filter-pill" data-cat="peptide" onclick="filterCompras('peptide', this)">🧪 Peptídeos (<span id="count-peptide">0</span>)</button>
+              <button class="filter-pill" data-cat="water" onclick="filterCompras('water', this)">💧 Água Bacteriostática (<span id="count-water">0</span>)</button>
+              <button class="filter-pill" data-cat="box" onclick="filterCompras('box', this)">📦 Caixas (<span id="count-box">0</span>)</button>
+              <button class="filter-pill" data-cat="label" onclick="filterCompras('label', this)">🏷️ Etiquetas (<span id="count-label">0</span>)</button>
+              <button class="filter-pill" data-cat="supplies" onclick="filterCompras('supplies', this)">💉 Insumos (<span id="count-supplies">0</span>)</button>
+              <button class="filter-pill" data-cat="other" onclick="filterCompras('other', this)">📝 Outros (<span id="count-other">0</span>)</button>
             </div>
 
             <div class="table-wrap">
@@ -852,8 +917,8 @@ const adminHtml = `<!DOCTYPE html>
                 <thead>
                   <tr>
                     <th>ID / Data</th>
-                    <th>Peptídeo / Dose</th>
-                    <th>Qtd (Frascos)</th>
+                    <th>Categoria & Item</th>
+                    <th>Qtd</th>
                     <th>Custo Unit. (R$)</th>
                     <th>Total Pago (R$)</th>
                     <th>Fornecedor / Lote</th>
@@ -972,6 +1037,35 @@ const adminHtml = `<!DOCTYPE html>
                   </tr>
                 </thead>
                 <tbody id="balanco-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Balanço de Insumos, Caixas & Outros Gastos -->
+          <div class="panel" style="margin-top: 24px;">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">📦 Balanço Consolidado de Insumos, Caixas & Despesas Operacionais</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Acompanhamento de custos com água bacteriostática, embalagens térmicas, etiquetas, insumos e frete.</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Descrição / Especificação</th>
+                    <th>Total Comprado (Qtd)</th>
+                    <th>Custo Médio Unitário</th>
+                    <th>Total Investido (R$)</th>
+                    <th>Perdas Registradas</th>
+                    <th>Saldo Investido Líquido</th>
+                  </tr>
+                </thead>
+                <tbody id="balanco-insumos-body">
                   <!-- Injected via JS -->
                 </tbody>
               </table>
@@ -1168,32 +1262,71 @@ const adminHtml = `<!DOCTYPE html>
   <div class="modal-backdrop" id="modal-compra">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">🛒 Registrar Nova Compra de Estoque</div>
+        <div class="modal-title">🛒 Registrar Nova Compra (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">✕</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Categoria do Item -->
         <div class="form-group">
-          <label class="form-label">Peptídeo / Composto</label>
-          <select id="compra-compound" class="form-select" onchange="onCompraCompoundChange()">
-            <!-- Populated via JS -->
+          <label class="form-label" style="font-weight: 800; color: var(--primary);">Categoria / Tipo de Item</label>
+          <select id="compra-category" class="form-select" onchange="onCompraCategoryChange()" style="border: 2px solid var(--primary-light);">
+            <option value="peptide">🧪 Peptídeo (Pó Liofilizado)</option>
+            <option value="water">💧 Água Bacteriostática</option>
+            <option value="box">📦 Caixa (Embalagem Térmica / Envio)</option>
+            <option value="label">🏷️ Etiquetas / Rótulos / Lacres</option>
+            <option value="supplies">💉 Insumos (Seringas, Swabs, Gelo)</option>
+            <option value="other">📝 Outros (Despesas e Gastos Gerais)</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Dosagem</label>
-          <select id="compra-dose" class="form-select" onchange="onCompraDoseChange()">
-            <!-- Populated via JS -->
-          </select>
+        <!-- Campos para Peptídeo -->
+        <div id="compra-fields-peptide">
+          <div class="form-group">
+            <label class="form-label">Peptídeo / Composto</label>
+            <select id="compra-compound" class="form-select" onchange="onCompraCompoundChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dosagem</label>
+            <select id="compra-dose" class="form-select" onchange="onCompraDoseChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos para Insumos / Presets (Água, Caixas, Etiquetas, Insumos) -->
+        <div id="compra-fields-preset" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" id="compra-preset-label">Item / Modelo Padrão</label>
+            <select id="compra-preset-select" class="form-select" onchange="onCompraPresetSelectChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+          <div class="form-group" id="compra-custom-spec-group" style="display: none;">
+            <label class="form-label">Especificação Personalizada</label>
+            <input type="text" id="compra-custom-spec" class="form-input" placeholder="Ex: Frasco 10ml tampa flip-off prata">
+          </div>
+        </div>
+
+        <!-- Campos para Outros -->
+        <div id="compra-fields-other" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Descrição do Item / Despesa</label>
+            <input type="text" id="compra-other-desc" class="form-input" placeholder="Ex: Frete Aéreo Internacional DHL, Fita gomada, etc.">
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
-            <label class="form-label">Qtd de Frascos</label>
+            <label class="form-label" id="compra-qty-label">Qtd de Frascos</label>
             <input type="number" id="compra-qty" class="form-input" value="10" min="1" oninput="recalcCompraTotal()">
           </div>
           <div class="form-group">
-            <label class="form-label">Custo Unitário Pó (R$)</label>
-            <input type="number" id="compra-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcCompraTotal()">
+            <label class="form-label" id="compra-unit-cost-label">Custo Unitário Pó (R$)</label>
+            <input type="number" id="compra-unit-cost" class="form-input" step="0.05" value="0.00" oninput="recalcCompraTotal()">
           </div>
         </div>
 
@@ -1208,14 +1341,14 @@ const adminHtml = `<!DOCTYPE html>
             <input type="date" id="compra-date" class="form-input">
           </div>
           <div class="form-group">
-            <label class="form-label">Fornecedor / Lote</label>
+            <label class="form-label">Fornecedor / Lote / Nota</label>
             <input type="text" id="compra-supplier" class="form-input" placeholder="Ex: SinoPept / Lote 2611">
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Observações</label>
-          <input type="text" id="compra-notes" class="form-input" placeholder="Ex: Frascos de 60mg com laudo HPLC">
+          <input type="text" id="compra-notes" class="form-input" placeholder="Ex: Lote HPLC >99.4%, frascos com vácuo">
         </div>
       </div>
       <div class="modal-footer">
@@ -1322,31 +1455,66 @@ const adminHtml = `<!DOCTYPE html>
   <div class="modal-backdrop" id="modal-perda">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">⚠️ Registrar Perda ou Avaria de Produto</div>
+        <div class="modal-title">⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">✕</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Categoria da Perda -->
         <div class="form-group">
-          <label class="form-label">Peptídeo / Composto</label>
-          <select id="perda-compound" class="form-select" onchange="onPerdaCompoundChange()">
-            <!-- Populated via JS -->
+          <label class="form-label" style="font-weight: 800; color: #DC2626;">Categoria do Item Perdido / Avariado</label>
+          <select id="perda-category" class="form-select" onchange="onPerdaCategoryChange()">
+            <option value="peptide">🧪 Peptídeo (Pó Liofilizado)</option>
+            <option value="water">💧 Água Bacteriostática</option>
+            <option value="box">📦 Caixa / Embalagem Térmica Danificada</option>
+            <option value="label">🏷️ Etiquetas / Rótulos Inutilizados</option>
+            <option value="supplies">💉 Insumos Gerais (Seringas, Swabs, Gelo)</option>
+            <option value="other">📝 Outro Item / Despesa Extra</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Dosagem</label>
-          <select id="perda-dose" class="form-select" onchange="onPerdaDoseChange()">
-            <!-- Populated via JS -->
-          </select>
+        <!-- Campos Peptídeo -->
+        <div id="perda-fields-peptide">
+          <div class="form-group">
+            <label class="form-label">Peptídeo / Composto</label>
+            <select id="perda-compound" class="form-select" onchange="onPerdaCompoundChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dosagem</label>
+            <select id="perda-dose" class="form-select" onchange="onPerdaDoseChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos Preset (Água, Caixas, Etiquetas, Insumos) -->
+        <div id="perda-fields-preset" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" id="perda-preset-label">Item / Modelo</label>
+            <select id="perda-preset-select" class="form-select" onchange="onPerdaPresetSelectChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos Outros -->
+        <div id="perda-fields-other" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Descrição do Item Perdido</label>
+            <input type="text" id="perda-other-desc" class="form-input" placeholder="Ex: Ampola quebrada, caixa esmagada, etc.">
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
-            <label class="form-label">Qtd de Frascos Perdidos</label>
+            <label class="form-label" id="perda-qty-label">Qtd Perdida (Frascos)</label>
             <input type="number" id="perda-qty" class="form-input" value="1" min="1" oninput="recalcPerdaTotal()">
           </div>
           <div class="form-group">
-            <label class="form-label">Custo Unitário (R$)</label>
+            <label class="form-label" id="perda-unit-cost-label">Custo Unitário (R$)</label>
             <input type="number" id="perda-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcPerdaTotal()">
           </div>
         </div>
@@ -1355,6 +1523,7 @@ const adminHtml = `<!DOCTYPE html>
           <label class="form-label">Motivo da Perda</label>
           <select id="perda-reason" class="form-select">
             <option value="Frasco quebrado no manuseio/transporte">Frasco quebrado no manuseio ou transporte</option>
+            <option value="Embalagem/caixa amassada ou danificada">Embalagem/caixa amassada ou danificada</option>
             <option value="Falha na reconstituição / diluição teste">Falha na reconstituição / diluição teste</option>
             <option value="Perda de vácuo / descarte por validade">Perda de vácuo / descarte por validade</option>
             <option value="Amostra grátis para médico / influenciador">Amostra grátis para médico / parceiro</option>
@@ -1392,8 +1561,73 @@ const adminHtml = `<!DOCTYPE html>
     const INITIAL_COMPOUNDS = ${JSON.stringify(compoundList)};
     const DEFAULT_PIN = "psl2026";
 
+    // Insumos & Suprimentos Presets
+    const SUPPLY_PRESETS = {
+      water: {
+        label: "Água Bacteriostática",
+        unitName: "frascos",
+        defaultQty: 20,
+        items: [
+          { name: "Água Bacteriostática 10ml (Álcool Benzílico 0.9%)", defaultCost: 25.00, spec: "Frasco Ampola 10ml" },
+          { name: "Água Bacteriostática 20ml (Álcool Benzílico 0.9%)", defaultCost: 35.00, spec: "Frasco Ampola 20ml" },
+          { name: "Água Bacteriostática 30ml (Álcool Benzílico 0.9%)", defaultCost: 45.00, spec: "Frasco 30ml" },
+          { name: "Ampola Água para Injeção 10ml Estéril", defaultCost: 10.00, spec: "Ampola 10ml" },
+          { name: "Outro Volume / Personalizado", defaultCost: 25.00, spec: "Personalizado" }
+        ]
+      },
+      box: {
+        label: "Caixas e Embalagens Térmicas",
+        unitName: "caixas",
+        defaultQty: 50,
+        items: [
+          { name: "Caixa Térmica Isopor c/ Tampa (Padrão 2-4 Frascos)", defaultCost: 6.50, spec: "Isopor 0.5L" },
+          { name: "Caixa Térmica Isopor Média (6-10 Frascos / Kits)", defaultCost: 10.00, spec: "Isopor 1.5L" },
+          { name: "Caixa de Papelão Personalizada PSL Labs (Exterior)", defaultCost: 4.80, spec: "Papelão Kraft Branco" },
+          { name: "Caixa Padrão Correios / Sedex Pequena", defaultCost: 5.50, spec: "Papelão Sedex" },
+          { name: "Outro Tipo de Caixa / Personalizado", defaultCost: 6.00, spec: "Personalizado" }
+        ]
+      },
+      label: {
+        label: "Etiquetas, Rótulos e Lacres",
+        unitName: "etiquetas",
+        defaultQty: 200,
+        items: [
+          { name: "Rótulos Frasco 58x26mm (Adesivo Vinil Fosco PSL)", defaultCost: 0.80, spec: "Vinil Fosco 58x26" },
+          { name: "Lacres de Segurança Holográficos / Destrutíveis", defaultCost: 0.45, spec: "Lacre Holográfico" },
+          { name: "Adesivos Selo / Logo PSL Labs para Caixa", defaultCost: 1.20, spec: "Adesivo Redondo 50mm" },
+          { name: "Rolo de Etiquetas Térmicas (1.000 un)", defaultCost: 65.00, spec: "Rolo 1.000 un" },
+          { name: "Outro Rótulo / Personalizado", defaultCost: 1.00, spec: "Personalizado" }
+        ]
+      },
+      supplies: {
+        label: "Insumos Gerais e Acessórios",
+        unitName: "unidades",
+        defaultQty: 100,
+        items: [
+          { name: "Seringas de Insulina 1ml Ultra-Fine 31G (BD/Uniqmed)", defaultCost: 1.60, spec: "Seringa 1ml 31G" },
+          { name: "Lenços Antissépticos Álcool 70% (Swabs BD)", defaultCost: 0.35, spec: "Swab Álcool 70%" },
+          { name: "Gelo Gel Reutilizável Térmico (Bolsas 150ml)", defaultCost: 2.50, spec: "Bolsa Gelo Gel" },
+          { name: "Sacos Herméticos Zip-Lock c/ Proteção Bolha", defaultCost: 0.60, spec: "Envelope Zip Bolha" },
+          { name: "Kit Completo de Aplicação (Seringa + Swab + Gelo)", defaultCost: 4.50, spec: "Kit Aplicação" },
+          { name: "Outro Insumo / Personalizado", defaultCost: 2.00, spec: "Personalizado" }
+        ]
+      },
+      other: {
+        label: "Outros Gastos e Despesas",
+        unitName: "unidades",
+        defaultQty: 1,
+        items: [
+          { name: "Frete Aéreo Internacional (DHL / FedEx / Aéreo)", defaultCost: 380.00, spec: "Logística Externa" },
+          { name: "Taxa Alfandegária / Imposto de Importação", defaultCost: 200.00, spec: "Tributação" },
+          { name: "Material de Expedição (Fitas, Embalagens)", defaultCost: 80.00, spec: "Expedição" },
+          { name: "Outra Despesa Operacional", defaultCost: 50.00, spec: "Diversos" }
+        ]
+      }
+    };
+
     // Application State
     let activeTab = 'dre';
+    let currentComprasFilter = 'all';
     let stockData = JSON.parse(localStorage.getItem('psl_stock_data') || 'null');
     let customPrices = JSON.parse(localStorage.getItem('psl_custom_prices') || '{}');
     let orders = JSON.parse(localStorage.getItem('psl_orders') || 'null');
@@ -1409,6 +1643,7 @@ const adminHtml = `<!DOCTYPE html>
         {
           id: "CMP-001",
           date: "2026-11-01",
+          category: "peptide",
           compoundId: "retatrutide",
           code: "RT60",
           name: "Retatrutide",
@@ -1422,19 +1657,63 @@ const adminHtml = `<!DOCTYPE html>
         {
           id: "CMP-002",
           date: "2026-11-02",
-          compoundId: "ghk-cu",
-          code: "CU50",
-          name: "GHK-Cu",
-          dosage: "50mg",
-          qty: 20,
-          unitCost: 25.40,
-          totalCost: 508.00,
-          supplier: "PureCopper Labs",
-          notes: "Cristais azuis alta pureza"
+          category: "water",
+          compoundId: "water",
+          code: "AGUA-10ML",
+          name: "Água Bacteriostática",
+          dosage: "10ml (Álcool Benzílico 0.9%)",
+          qty: 50,
+          unitCost: 25.00,
+          totalCost: 1250.00,
+          supplier: "PharmaGrade Soluções",
+          notes: "Frascos ampolas lacrados estéreis"
         },
         {
           id: "CMP-003",
+          date: "2026-11-02",
+          category: "box",
+          compoundId: "box",
+          code: "CAIXA-TER",
+          name: "Caixa Térmica Isopor",
+          dosage: "Padrão 2-4 Frascos c/ Tampa",
+          qty: 100,
+          unitCost: 6.50,
+          totalCost: 650.00,
+          supplier: "Térmicas Express SP",
+          notes: "Isopor EPS alta densidade anti-impacto"
+        },
+        {
+          id: "CMP-004",
           date: "2026-11-03",
+          category: "label",
+          compoundId: "label",
+          code: "ROT-VINIL",
+          name: "Etiquetas & Rótulos",
+          dosage: "Rótulo Frasco 58x26mm Vinil Fosco",
+          qty: 500,
+          unitCost: 0.80,
+          totalCost: 400.00,
+          supplier: "LabelPrint Tech",
+          notes: "Adesivo impermeável fosco PSL Labs"
+        },
+        {
+          id: "CMP-005",
+          date: "2026-11-03",
+          category: "supplies",
+          compoundId: "supplies",
+          code: "INS-SER",
+          name: "Insumos Gerais",
+          dosage: "Seringas BD 1ml 31G + Swabs Álcool",
+          qty: 200,
+          unitCost: 1.60,
+          totalCost: 320.00,
+          supplier: "MedCirúrgica Distribuidora",
+          notes: "Agulha ultrafina 31G confortável"
+        },
+        {
+          id: "CMP-006",
+          date: "2026-11-03",
+          category: "peptide",
           compoundId: "tirzepatide",
           code: "TR50",
           name: "Tirzepatide",
@@ -1446,8 +1725,23 @@ const adminHtml = `<!DOCTYPE html>
           notes: "Duplo agonista GLP-1/GIP"
         },
         {
-          id: "CMP-004",
+          id: "CMP-007",
           date: "2026-11-04",
+          category: "peptide",
+          compoundId: "ghk-cu",
+          code: "CU50",
+          name: "GHK-Cu",
+          dosage: "50mg",
+          qty: 20,
+          unitCost: 25.40,
+          totalCost: 508.00,
+          supplier: "PureCopper Labs",
+          notes: "Cristais azuis alta pureza"
+        },
+        {
+          id: "CMP-008",
+          date: "2026-11-04",
+          category: "peptide",
           compoundId: "bpc157",
           code: "BPC5",
           name: "BPC-157",
@@ -1456,10 +1750,34 @@ const adminHtml = `<!DOCTYPE html>
           unitCost: 37.70,
           totalCost: 754.00,
           supplier: "SinoPept Direct",
-          notes: "Grau laboratorial"
+          notes: "Grau laboratorial regenerativo"
+        },
+        {
+          id: "CMP-009",
+          date: "2026-11-05",
+          category: "other",
+          compoundId: "other",
+          code: "OUT-FRETE",
+          name: "Outras Despesas",
+          dosage: "Frete Aéreo Internacional Importação",
+          qty: 1,
+          unitCost: 380.00,
+          totalCost: 380.00,
+          supplier: "DHL Express Brasil",
+          notes: "Desembaraço prioritário lote laboratorial"
         }
       ];
       localStorage.setItem('psl_compras', JSON.stringify(compras));
+    } else {
+      // Auto-migrate: ensure every record has category defined
+      let migrated = false;
+      compras.forEach(c => {
+        if (!c.category) {
+          c.category = 'peptide';
+          migrated = true;
+        }
+      });
+      if (migrated) localStorage.setItem('psl_compras', JSON.stringify(compras));
     }
 
     if (!vendas || vendas.length === 0) {
@@ -1553,6 +1871,7 @@ const adminHtml = `<!DOCTYPE html>
         {
           id: "PRD-001",
           date: "2026-11-08",
+          category: "peptide",
           compoundId: "retatrutide",
           code: "RT60",
           name: "Retatrutide",
@@ -1562,9 +1881,32 @@ const adminHtml = `<!DOCTYPE html>
           lossTotal: 145.10,
           reason: "Frasco quebrado no manuseio/transporte",
           notes: "Caiu durante preparação da embalagem de envio"
+        },
+        {
+          id: "PRD-002",
+          date: "2026-11-09",
+          category: "water",
+          compoundId: "water",
+          code: "AGUA-10ML",
+          name: "Água Bacteriostática",
+          dosage: "10ml",
+          qty: 2,
+          unitCost: 25.00,
+          lossTotal: 50.00,
+          reason: "Frasco quebrado no manuseio/transporte",
+          notes: "Ampola trincada no recebimento da remessa"
         }
       ];
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+    } else {
+      let migratedP = false;
+      perdas.forEach(p => {
+        if (!p.category) {
+          p.category = 'peptide';
+          migratedP = true;
+        }
+      });
+      if (migratedP) localStorage.setItem('psl_perdas', JSON.stringify(perdas));
     }
 
     // Default orders demo if empty
@@ -1683,7 +2025,8 @@ const adminHtml = `<!DOCTYPE html>
       if (modalId === 'modal-compra') {
         document.getElementById('compra-date').value = today;
         populateCompoundSelect('compra-compound', 'compra-dose');
-        onCompraCompoundChange();
+        document.getElementById('compra-category').value = 'peptide';
+        onCompraCategoryChange();
       } else if (modalId === 'modal-venda') {
         document.getElementById('venda-date').value = today;
         populateCompoundSelect('venda-compound', 'venda-dose');
@@ -1691,7 +2034,8 @@ const adminHtml = `<!DOCTYPE html>
       } else if (modalId === 'modal-perda') {
         document.getElementById('perda-date').value = today;
         populateCompoundSelect('perda-compound', 'perda-dose');
-        onPerdaCompoundChange();
+        document.getElementById('perda-category').value = 'peptide';
+        onPerdaCategoryChange();
       }
     }
 
@@ -1716,6 +2060,175 @@ const adminHtml = `<!DOCTYPE html>
         opt.innerText = c.name + " (" + c.doses.length + " doses)";
         sel.appendChild(opt);
       });
+    }
+
+// Category Switcher for Compra Modal
+    function onCompraCategoryChange() {
+      const cat = document.getElementById('compra-category').value;
+      const peptideFields = document.getElementById('compra-fields-peptide');
+      const presetFields = document.getElementById('compra-fields-preset');
+      const otherFields = document.getElementById('compra-fields-other');
+      const qtyLabel = document.getElementById('compra-qty-label');
+      const costLabel = document.getElementById('compra-unit-cost-label');
+      const customSpecGroup = document.getElementById('compra-custom-spec-group');
+
+      if (cat === 'peptide') {
+        peptideFields.style.display = 'block';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'none';
+        if (customSpecGroup) customSpecGroup.style.display = 'none';
+        qtyLabel.innerText = 'Qtd de Frascos';
+        costLabel.innerText = 'Custo Unitário Pó (R$)';
+        document.getElementById('compra-qty').value = 10;
+        onCompraCompoundChange();
+      } else if (cat === 'other') {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'block';
+        if (customSpecGroup) customSpecGroup.style.display = 'none';
+        qtyLabel.innerText = 'Quantidade';
+        costLabel.innerText = 'Valor / Custo Unit. (R$)';
+        document.getElementById('compra-qty').value = 1;
+        document.getElementById('compra-unit-cost').value = '50.00';
+        recalcCompraTotal();
+      } else {
+        // water, box, label, supplies
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'block';
+        otherFields.style.display = 'none';
+
+        const info = SUPPLY_PRESETS[cat];
+        qtyLabel.innerText = 'Qtd de ' + info.unitName;
+        costLabel.innerText = 'Custo Unitário (R$)';
+
+        const sel = document.getElementById('compra-preset-select');
+        sel.innerHTML = '';
+        info.items.forEach((it, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = it.name + ' (R$ ' + it.defaultCost.toFixed(2) + ')';
+          sel.appendChild(opt);
+        });
+
+        document.getElementById('compra-qty').value = info.defaultQty;
+        onCompraPresetSelectChange();
+      }
+    }
+
+    function onCompraPresetSelectChange() {
+      const cat = document.getElementById('compra-category').value;
+      const sel = document.getElementById('compra-preset-select');
+      const idx = parseInt(sel.value) || 0;
+      const info = SUPPLY_PRESETS[cat];
+      if (info && info.items[idx]) {
+        const item = info.items[idx];
+        document.getElementById('compra-unit-cost').value = item.defaultCost.toFixed(2);
+        const customGroup = document.getElementById('compra-custom-spec-group');
+        if (item.spec === 'Personalizado') {
+          customGroup.style.display = 'block';
+        } else {
+          customGroup.style.display = 'none';
+        }
+      }
+      recalcCompraTotal();
+    }
+
+    // Category Switcher for Perda Modal
+    function onPerdaCategoryChange() {
+      const cat = document.getElementById('perda-category').value;
+      const peptideFields = document.getElementById('perda-fields-peptide');
+      const presetFields = document.getElementById('perda-fields-preset');
+      const otherFields = document.getElementById('perda-fields-other');
+      const qtyLabel = document.getElementById('perda-qty-label');
+      const costLabel = document.getElementById('perda-unit-cost-label');
+
+      if (cat === 'peptide') {
+        peptideFields.style.display = 'block';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'none';
+        qtyLabel.innerText = 'Qtd Perdida (Frascos)';
+        costLabel.innerText = 'Custo Unitário Pó (R$)';
+        onPerdaCompoundChange();
+      } else if (cat === 'other') {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'block';
+        qtyLabel.innerText = 'Qtd Perdida';
+        costLabel.innerText = 'Custo / Valor Unit. (R$)';
+        document.getElementById('perda-qty').value = 1;
+        document.getElementById('perda-unit-cost').value = '50.00';
+        recalcPerdaTotal();
+      } else {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'block';
+        otherFields.style.display = 'none';
+
+        const info = SUPPLY_PRESETS[cat];
+        qtyLabel.innerText = 'Qtd Perdida (' + info.unitName + ')';
+        costLabel.innerText = 'Custo Unitário (R$)';
+
+        const sel = document.getElementById('perda-preset-select');
+        sel.innerHTML = '';
+        info.items.forEach((it, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = it.name + ' (R$ ' + it.defaultCost.toFixed(2) + ')';
+          sel.appendChild(opt);
+        });
+
+        document.getElementById('perda-qty').value = 1;
+        onPerdaPresetSelectChange();
+      }
+    }
+
+    function onPerdaPresetSelectChange() {
+      const cat = document.getElementById('perda-category').value;
+      const sel = document.getElementById('perda-preset-select');
+      const idx = parseInt(sel.value) || 0;
+      const info = SUPPLY_PRESETS[cat];
+      if (info && info.items[idx]) {
+        document.getElementById('perda-unit-cost').value = info.items[idx].defaultCost.toFixed(2);
+      }
+      recalcPerdaTotal();
+    }
+
+    function filterCompras(cat, btn) {
+      currentComprasFilter = cat;
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderComprasTable();
+    }
+
+    function getCategoryBadge(cat) {
+      switch(cat) {
+        case 'water':
+          return '<span class="badge badge-water">💧 Água Bacteriostática</span>';
+        case 'box':
+          return '<span class="badge badge-box">📦 Caixa Térmica</span>';
+        case 'label':
+          return '<span class="badge badge-label">🏷️ Etiquetas / Rótulos</span>';
+        case 'supplies':
+          return '<span class="badge badge-supplies">💉 Insumos Gerais</span>';
+        case 'other':
+          return '<span class="badge badge-other">📝 Outros Gastos</span>';
+        default:
+          return '<span class="badge badge-peptide">🧪 Peptídeo</span>';
+      }
+    }
+
+    function seedSuppliesDemo() {
+      const samples = [
+        { id: "CMP-" + String(compras.length + 1).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "water", compoundId: "water", code: "AGUA-10ML", name: "Água Bacteriostática", dosage: "10ml (Álcool Benzílico 0.9%)", qty: 50, unitCost: 25.00, totalCost: 1250.00, supplier: "PharmaGrade Soluções", notes: "Frascos ampolas lacrados estéreis" },
+        { id: "CMP-" + String(compras.length + 2).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "box", compoundId: "box", code: "CAIXA-TER", name: "Caixa Térmica Isopor", dosage: "Padrão 2-4 Frascos c/ Tampa", qty: 100, unitCost: 6.50, totalCost: 650.00, supplier: "Térmicas Express SP", notes: "Isopor EPS alta densidade" },
+        { id: "CMP-" + String(compras.length + 3).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "label", compoundId: "label", code: "ROT-VINIL", name: "Etiquetas & Rótulos", dosage: "Rótulo Frasco 58x26mm Vinil Fosco", qty: 500, unitCost: 0.80, totalCost: 400.00, supplier: "LabelPrint Tech", notes: "Adesivo impermeável fosco PSL" },
+        { id: "CMP-" + String(compras.length + 4).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "supplies", compoundId: "supplies", code: "INS-SER", name: "Insumos Gerais", dosage: "Seringas BD 1ml 31G + Swabs", qty: 200, unitCost: 1.60, totalCost: 320.00, supplier: "MedCirúrgica Distribuidora", notes: "Agulha ultrafina 31G" }
+      ];
+      samples.forEach(s => compras.unshift(s));
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
+      showToast("4 compras de insumos adicionadas com sucesso!");
+      renderDRE();
+      renderComprasTable();
+      renderBalancoTable();
     }
 
     function onCompraCompoundChange() {
@@ -1841,12 +2354,12 @@ const adminHtml = `<!DOCTYPE html>
     }
 
     // CRUD: Save Compra
+    // CRUD: Save Compra (Peptídeos & Insumos)
     function saveCompra() {
-      const compId = document.getElementById('compra-compound').value;
-      const doseCode = document.getElementById('compra-dose').value;
+      const cat = document.getElementById('compra-category').value;
       const qty = parseInt(document.getElementById('compra-qty').value) || 0;
       const unitCost = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
-      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || 0;
+      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || (qty * unitCost);
       const date = document.getElementById('compra-date').value || new Date().toISOString().split('T')[0];
       const supplier = document.getElementById('compra-supplier').value.trim() || 'Fornecedor Padrão';
       const notes = document.getElementById('compra-notes').value.trim() || '';
@@ -1856,16 +2369,52 @@ const adminHtml = `<!DOCTYPE html>
         return;
       }
 
-      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
-      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+      let compoundId = '';
+      let code = '';
+      let name = '';
+      let dosage = '';
+
+      if (cat === 'peptide') {
+        compoundId = document.getElementById('compra-compound').value;
+        code = document.getElementById('compra-dose').value;
+        const comp = INITIAL_COMPOUNDS.find(c => c.id === compoundId);
+        const dose = comp ? comp.doses.find(d => d.code === code) : null;
+        name = comp ? comp.name : 'Peptídeo';
+        dosage = dose ? dose.label : 'Dose';
+      } else if (cat === 'other') {
+        const otherDesc = document.getElementById('compra-other-desc').value.trim() || 'Despesa Operacional';
+        compoundId = 'other';
+        code = 'OUT-' + Date.now().toString().slice(-4);
+        name = 'Outros Gastos';
+        dosage = otherDesc;
+      } else {
+        // water, box, label, supplies
+        const info = SUPPLY_PRESETS[cat];
+        const sel = document.getElementById('compra-preset-select');
+        const idx = parseInt(sel.value) || 0;
+        const item = (info && info.items[idx]) ? info.items[idx] : { name: info.label, spec: info.label };
+
+        let specText = item.name;
+        const customInput = document.getElementById('compra-custom-spec');
+        if (item.spec === 'Personalizado' && customInput && customInput.value.trim()) {
+          specText = customInput.value.trim();
+        }
+
+        const codePrefixes = { water: 'AGUA', box: 'CAIXA', label: 'ETIQ', supplies: 'INS' };
+        compoundId = cat;
+        code = (codePrefixes[cat] || 'ITEM') + '-' + Date.now().toString().slice(-4);
+        name = info.label;
+        dosage = specText;
+      }
 
       const newCompra = {
         id: "CMP-" + String(compras.length + 1).padStart(3, '0'),
         date: date,
-        compoundId: compId,
-        code: doseCode,
-        name: comp ? comp.name : 'Peptídeo',
-        dosage: dose ? dose.label : 'Dose',
+        category: cat,
+        compoundId: compoundId,
+        code: code,
+        name: name,
+        dosage: dosage,
         qty: qty,
         unitCost: unitCost,
         totalCost: totalCost,
@@ -1877,7 +2426,7 @@ const adminHtml = `<!DOCTYPE html>
       localStorage.setItem('psl_compras', JSON.stringify(compras));
 
       closeModal('modal-compra');
-      showToast("Compra de " + qty + " un registrada com sucesso!");
+      showToast("Compra registrada: " + name + " (" + qty + " un)");
       renderDRE();
       renderComprasTable();
       renderBalancoTable();
@@ -1961,31 +2510,58 @@ const adminHtml = `<!DOCTYPE html>
     }
 
     // CRUD: Save Perda
+    // CRUD: Save Perda (Peptídeos & Insumos)
     function savePerda() {
-      const compId = document.getElementById('perda-compound').value;
-      const doseCode = document.getElementById('perda-dose').value;
+      const cat = document.getElementById('perda-category').value;
       const qty = parseInt(document.getElementById('perda-qty').value) || 0;
       const unitCost = parseFloat(document.getElementById('perda-unit-cost').value) || 0;
-      const lossTotal = parseFloat(document.getElementById('perda-total-cost').value) || 0;
+      const lossTotal = parseFloat(document.getElementById('perda-total-cost').value) || (qty * unitCost);
       const reason = document.getElementById('perda-reason').value;
       const date = document.getElementById('perda-date').value || new Date().toISOString().split('T')[0];
       const notes = document.getElementById('perda-notes').value.trim() || '';
 
       if (qty <= 0 || unitCost <= 0) {
-        alert("Por favor, informe a quantidade e custo do frasco perdido!");
+        alert("Por favor, informe a quantidade e custo do item avariado!");
         return;
       }
 
-      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
-      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+      let compoundId = '';
+      let code = '';
+      let name = '';
+      let dosage = '';
+
+      if (cat === 'peptide') {
+        compoundId = document.getElementById('perda-compound').value;
+        code = document.getElementById('perda-dose').value;
+        const comp = INITIAL_COMPOUNDS.find(c => c.id === compoundId);
+        const dose = comp ? comp.doses.find(d => d.code === code) : null;
+        name = comp ? comp.name : 'Peptídeo';
+        dosage = dose ? dose.label : 'Dose';
+      } else if (cat === 'other') {
+        const otherDesc = document.getElementById('perda-other-desc').value.trim() || 'Despesa / Item Diverso';
+        compoundId = 'other';
+        code = 'PRD-OUT';
+        name = 'Outro Item';
+        dosage = otherDesc;
+      } else {
+        const info = SUPPLY_PRESETS[cat];
+        const sel = document.getElementById('perda-preset-select');
+        const idx = parseInt(sel.value) || 0;
+        const item = (info && info.items[idx]) ? info.items[idx] : { name: info.label };
+        compoundId = cat;
+        code = 'PRD-' + cat.toUpperCase();
+        name = info.label;
+        dosage = item.name;
+      }
 
       const newPerda = {
         id: "PRD-" + String(perdas.length + 1).padStart(3, '0'),
         date: date,
-        compoundId: compId,
-        code: doseCode,
-        name: comp ? comp.name : 'Peptídeo',
-        dosage: dose ? dose.label : 'Dose',
+        category: cat,
+        compoundId: compoundId,
+        code: code,
+        name: name,
+        dosage: dosage,
         qty: qty,
         unitCost: unitCost,
         lossTotal: lossTotal,
@@ -2014,6 +2590,7 @@ const adminHtml = `<!DOCTYPE html>
     }
 
     // RENDER TABLES & DRE
+    // RENDER TABLES & DRE
     function renderDRE() {
       let totalVendido = 0;
       let totalCMV = 0;
@@ -2032,17 +2609,29 @@ const adminHtml = `<!DOCTYPE html>
       });
 
       let totalComprado = 0;
+      let totalPeptideosComprados = 0;
       let totalFrascosComprados = 0;
+      let totalInsumosComprados = 0;
+      let totalOutrosComprados = 0;
+
       compras.forEach(c => {
         totalComprado += c.totalCost;
-        totalFrascosComprados += c.qty;
+        const cat = c.category || 'peptide';
+        if (cat === 'peptide') {
+          totalPeptideosComprados += c.totalCost;
+          totalFrascosComprados += c.qty;
+        } else if (['water', 'box', 'label', 'supplies'].includes(cat)) {
+          totalInsumosComprados += c.totalCost;
+        } else {
+          totalOutrosComprados += c.totalCost;
+        }
       });
 
       // Lucro Líquido Real = Faturamento - CMV - Perdas
       const lucroReal = totalVendido - totalCMV - totalPerdas;
       const margemReal = totalVendido > 0 ? ((lucroReal / totalVendido) * 100) : 0;
 
-      // Estoque Físico Restante = Comprados - Vendidos - Perdidos
+      // Estoque Físico Restante de Peptídeos = Comprados - Vendidos - Perdidos
       const estoqueQtd = Math.max(0, totalFrascosComprados - totalFrascosVendidos - totalFrascosPerdidos);
 
       // Valor de Custo do Estoque Parado
@@ -2061,12 +2650,12 @@ const adminHtml = `<!DOCTYPE html>
 
       // Update Top KPIs
       document.getElementById('kpi-faturamento').innerText = 'R$ ' + totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-faturamento-sub').innerText = totalFrascosVendidos + ' frascos vendidos';
+      document.getElementById('kpi-faturamento-sub').innerText = totalFrascosVendidos + ' frascos entregues';
 
       document.getElementById('kpi-cmv').innerText = 'R$ ' + totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2});
 
       document.getElementById('kpi-perdas').innerText = 'R$ ' + totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-perdas-sub').innerText = totalFrascosPerdidos + ' frascos descartados/quebrados';
+      document.getElementById('kpi-perdas-sub').innerText = totalFrascosPerdidos + ' itens avariados/descartados';
 
       const lucroEl = document.getElementById('kpi-lucro-real');
       lucroEl.innerText = (lucroReal >= 0 ? '+' : '') + 'R$ ' + lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
@@ -2076,9 +2665,9 @@ const adminHtml = `<!DOCTYPE html>
 
       // Update Secondary KPIs
       document.getElementById('kpi-total-compras').innerText = 'R$ ' + totalComprado.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-compras-sub').innerText = totalFrascosComprados + ' frascos adquiridos';
+      document.getElementById('kpi-compras-sub').innerText = totalFrascosComprados + ' frascos pó + insumos';
 
-      document.getElementById('kpi-estoque-qtd').innerText = estoqueQtd + ' unidades';
+      document.getElementById('kpi-estoque-qtd').innerText = estoqueQtd + ' frascos pó';
       document.getElementById('kpi-estoque-custo').innerText = 'R$ ' + estoqueCusto.toLocaleString('pt-BR', {minimumFractionDigits: 2});
       document.getElementById('kpi-estoque-venda').innerText = 'R$ ' + estoqueVenda.toLocaleString('pt-BR', {minimumFractionDigits: 2});
 
@@ -2087,36 +2676,45 @@ const adminHtml = `<!DOCTYPE html>
       const lucroPercent = totalVendido > 0 ? ((lucroReal / totalVendido) * 100).toFixed(1) : '0.0';
       const cmvPercent = totalVendido > 0 ? ((totalCMV / totalVendido) * 100).toFixed(1) : '0.0';
       const perdasPercent = totalVendido > 0 ? ((totalPerdas / totalVendido) * 100).toFixed(1) : '0.0';
+      const saldoFluxoCaixa = totalVendido - totalComprado - totalPerdas;
 
       dreTbody.innerHTML = \`
         <tr style="background: #F8FAFC; font-weight: 800;">
           <td>(+) Receita Bruta de Vendas</td>
-          <td>Total cobrado dos clientes</td>
+          <td>Total cobrado dos clientes por todos os pedidos pagos</td>
           <td style="color: #059669; font-size: 15px;">R$ \${totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>100.0%</td>
         </tr>
         <tr>
-          <td>(-) Custo das Mercadorias Vendidas (CMV)</td>
-          <td>Custo do pó + insumos dos itens entregues</td>
+          <td>(-) CMV (Custo dos Peptídeos + Insumos Vendidos)</td>
+          <td>Custo do pó liofilizado + água + embalagem + kits dos itens entregues</td>
           <td style="color: #64748B;">- R$ \${totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>-\${cmvPercent}%</td>
         </tr>
         <tr style="background: #FEF2F2;">
           <td style="color: #DC2626;">(-) Perdas / Quebras / Avarias</td>
-          <td>Frascos descartados ou danificados</td>
+          <td>Frascos quebrados, água avariada, caixas danificadas ou descarte de validade</td>
           <td style="color: #DC2626; font-weight: 700;">- R$ \${totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>-\${perdasPercent}%</td>
         </tr>
         <tr style="background: #F0FDF4; font-weight: 900; font-size: 15px;">
           <td style="color: #145C46;">(=) LUCRO LÍQUIDO REAL OPERACIONAL</td>
-          <td>(Vendas - CMV - Perdas)</td>
+          <td>(Faturamento - CMV - Perdas Reais)</td>
           <td style="color: #059669; font-size: 18px;">R$ \${lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td style="color: #059669;">\${lucroPercent}%</td>
         </tr>
+        <tr style="background: #FFFBEB; font-weight: 700;">
+          <td style="color: #92400E;">📦 Total Investido em Compras de Estoque & Insumos</td>
+          <td>Peptídeos (R$ \${totalPeptideosComprados.toLocaleString('pt-BR', {minimumFractionDigits: 2})}) + Insumos/Caixas (R$ \${(totalInsumosComprados + totalOutrosComprados).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</td>
+          <td style="color: #92400E;">R$ \${totalComprado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>—</td>
+        </tr>
         <tr>
-          <td style="color: #475569;">Saldo de Fluxo de Caixa (Vendas - Compras Totais - Perdas)</td>
-          <td>Balanço de caixa imediato (inclui estoque parado)</td>
-          <td style="font-weight: 700;">R$ \${(totalVendido - totalComprado - totalPerdas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td style="color: #475569;">💵 Saldo de Fluxo de Caixa Imediato</td>
+          <td>(Vendas Recebidas - Compras Totais Pagas - Perdas)</td>
+          <td style="font-weight: 800; font-size: 15px; color: \${saldoFluxoCaixa >= 0 ? '#059669' : '#DC2626'};">
+            \${saldoFluxoCaixa >= 0 ? '+' : ''}R$ \${saldoFluxoCaixa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+          </td>
           <td>—</td>
         </tr>
       \`;
@@ -2124,49 +2722,101 @@ const adminHtml = `<!DOCTYPE html>
 
     function renderComprasTable() {
       const tbody = document.getElementById('compras-table-body');
-      if (compras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma compra registrada ainda. Clique em "+ Nova Compra" para lançar.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = compras.map(c => \`
-        <tr>
-          <td><strong>\${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${c.date}</span></td>
-          <td><strong>\${c.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${c.dosage}</span></td>
-          <td><strong>\${c.qty}</strong> un</td>
-          <td>R$ \${c.unitCost.toFixed(2)}</td>
-          <td style="font-weight: 800; color: var(--primary);">R$ \${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td>\${c.supplier}</td>
-          <td style="font-size: 12px; color: var(--gray-600);">\${c.notes || '-'}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('\${c.id}')">Excluir</button>
-          </td>
-        </tr>
-      \`).join('');
-    }
 
-    function renderVendasTable() {
-      const tbody = document.getElementById('vendas-table-body');
-      if (vendas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
+      // Calculate summary metrics
+      let totalComprasGeral = 0;
+      let totalPepCost = 0;
+      let totalPepQty = 0;
+      let totalInsumosCost = 0;
+      let totalOutrosCost = 0;
+
+      let countAll = compras.length;
+      let countPeptide = 0;
+      let countWater = 0;
+      let countBox = 0;
+      let countLabel = 0;
+      let countSupplies = 0;
+      let countOther = 0;
+
+      compras.forEach(c => {
+        totalComprasGeral += c.totalCost;
+        const cat = c.category || 'peptide';
+        if (cat === 'peptide') {
+          countPeptide++;
+          totalPepCost += c.totalCost;
+          totalPepQty += c.qty;
+        } else if (cat === 'water') {
+          countWater++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'box') {
+          countBox++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'label') {
+          countLabel++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'supplies') {
+          countSupplies++;
+          totalInsumosCost += c.totalCost;
+        } else {
+          countOther++;
+          totalOutrosCost += c.totalCost;
+        }
+      });
+
+      // Update pill counters
+      if (document.getElementById('count-all')) document.getElementById('count-all').innerText = countAll;
+      if (document.getElementById('count-peptide')) document.getElementById('count-peptide').innerText = countPeptide;
+      if (document.getElementById('count-water')) document.getElementById('count-water').innerText = countWater;
+      if (document.getElementById('count-box')) document.getElementById('count-box').innerText = countBox;
+      if (document.getElementById('count-label')) document.getElementById('count-label').innerText = countLabel;
+      if (document.getElementById('count-supplies')) document.getElementById('count-supplies').innerText = countSupplies;
+      if (document.getElementById('count-other')) document.getElementById('count-other').innerText = countOther;
+
+      // Update top metric cards in Compras tab
+      if (document.getElementById('compras-metric-total')) {
+        document.getElementById('compras-metric-total').innerText = 'R$ ' + totalComprasGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-total-sub').innerText = compras.length + ' compras registradas';
+        document.getElementById('compras-metric-pep').innerText = 'R$ ' + totalPepCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-pep-sub').innerText = totalPepQty + ' frascos de pó liofilizado';
+        document.getElementById('compras-metric-insumos').innerText = 'R$ ' + totalInsumosCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-insumos-sub').innerText = (countWater + countBox + countLabel + countSupplies) + ' itens (água, caixas, rótulos, kits)';
+        document.getElementById('compras-metric-outros').innerText = 'R$ ' + totalOutrosCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-outros-sub').innerText = countOther + ' lançamentos operacionais';
+      }
+
+      // Filter
+      let filtered = compras;
+      if (currentComprasFilter !== 'all') {
+        filtered = compras.filter(c => (c.category || 'peptide') === currentComprasFilter);
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma compra encontrada nesta categoria. Clique em "+ Nova Compra" para lançar.</td></tr>';
         return;
       }
-      tbody.innerHTML = vendas.map(v => \`
-        <tr>
-          <td><strong>\${v.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.date}</span></td>
-          <td><strong>\${v.clientName}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.channel} · \${v.clientPhone || ''}</span></td>
-          <td><strong>\${v.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${v.dosage}</span></td>
-          <td><strong>\${v.qty}</strong></td>
-          <td>R$ \${v.unitPrice.toFixed(2)}</td>
-          <td style="color: var(--gray-400);">R$ \${v.unitCost.toFixed(2)}</td>
-          <td><strong>R$ \${v.totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
-          <td style="color: #059669; font-weight: 800;">+ R$ \${v.profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td><span class="badge" style="background: #DCFCE7; color: #166534;">\${v.margin}%</span></td>
-          <td>\${v.paymentMethod}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('\${v.id}')">Excluir</button>
-          </td>
-        </tr>
-      \`).join('');
+
+      tbody.innerHTML = filtered.map(c => {
+        const cat = c.category || 'peptide';
+        const badge = getCategoryBadge(cat);
+        return \`
+          <tr>
+            <td><strong>\${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${c.date}</span></td>
+            <td>
+              <div style="margin-bottom: 4px;">\${badge}</div>
+              <strong style="color: var(--dark); font-size: 13px;">\${c.name}</strong>
+              <div style="font-size: 12px; color: var(--gray-600);">\${c.dosage}</div>
+            </td>
+            <td><strong>\${c.qty}</strong> un</td>
+            <td>R$ \${c.unitCost.toFixed(2)}</td>
+            <td style="font-weight: 800; color: var(--primary);">R$ \${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>\${c.supplier}</td>
+            <td style="font-size: 12px; color: var(--gray-600);">\${c.notes || '-'}</td>
+            <td>
+              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('\${c.id}')">Excluir</button>
+            </td>
+          </tr>
+        \`;
+      }).join('');
     }
 
     function renderPerdasTable() {
@@ -2175,20 +2825,27 @@ const adminHtml = `<!DOCTYPE html>
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma perda registrada. Estoque com 100% de aproveitamento!</td></tr>';
         return;
       }
-      tbody.innerHTML = perdas.map(p => \`
-        <tr>
-          <td><strong>\${p.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${p.date}</span></td>
-          <td><strong>\${p.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${p.dosage}</span></td>
-          <td style="font-weight: 800; color: #DC2626;">\${p.qty} frasco(s)</td>
-          <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">\${p.reason}</span></td>
-          <td>R$ \${p.unitCost.toFixed(2)}</td>
-          <td style="font-weight: 800; color: #DC2626;">- R$ \${p.lossTotal.toFixed(2)}</td>
-          <td style="font-size: 12px; color: var(--gray-600);">\${p.notes || '-'}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('\${p.id}')">Excluir</button>
-          </td>
-        </tr>
-      \`).join('');
+      tbody.innerHTML = perdas.map(p => {
+        const cat = p.category || 'peptide';
+        const badge = getCategoryBadge(cat);
+        return \`
+          <tr>
+            <td><strong>\${p.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${p.date}</span></td>
+            <td>
+              <div style="margin-bottom: 4px;">\${badge}</div>
+              <strong style="color: var(--dark);">\${p.name}</strong><br><span style="font-size: 12px; color: var(--gray-600);">\${p.dosage}</span>
+            </td>
+            <td style="font-weight: 800; color: #DC2626;">\${p.qty} un</td>
+            <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">\${p.reason}</span></td>
+            <td>R$ \${p.unitCost.toFixed(2)}</td>
+            <td style="font-weight: 800; color: #DC2626;">- R$ \${p.lossTotal.toFixed(2)}</td>
+            <td style="font-size: 12px; color: var(--gray-600);">\${p.notes || '-'}</td>
+            <td>
+              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('\${p.id}')">Excluir</button>
+            </td>
+          </tr>
+        \`;
+      }).join('');
     }
 
     function renderBalancoTable() {
@@ -2239,6 +2896,43 @@ const adminHtml = `<!DOCTYPE html>
         rowsHtml = '<tr><td colspan="10" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhum composto encontrado com movimentação.</td></tr>';
       }
       tbody.innerHTML = rowsHtml;
+
+      // Populate Balanço de Insumos & Suprimentos
+      const insumosBody = document.getElementById('balanco-insumos-body');
+      if (insumosBody) {
+        const cats = [
+          { key: 'water', label: '💧 Água Bacteriostática', desc: 'Frascos ampolas com álcool benzílico 0.9%' },
+          { key: 'box', label: '📦 Caixas Térmicas', desc: 'Embalagens EPS alta densidade e caixas de envio' },
+          { key: 'label', label: '🏷️ Etiquetas e Rótulos', desc: 'Rótulos vinil fosco e lacres de segurança' },
+          { key: 'supplies', label: '💉 Insumos Gerais', desc: 'Seringas BD 1ml, swabs álcool 70%, bolsas gelo gel' },
+          { key: 'other', label: '📝 Outras Despesas', desc: 'Fretes internacionais DHL, taxas e suprimentos' }
+        ];
+
+        insumosBody.innerHTML = cats.map(c => {
+          const items = compras.filter(item => (item.category || 'peptide') === c.key);
+          const totalQtd = items.reduce((acc, it) => acc + it.qty, 0);
+          const totalInvestido = items.reduce((acc, it) => acc + it.totalCost, 0);
+          const avgCost = totalQtd > 0 ? (totalInvestido / totalQtd) : 0;
+          const perdasCat = perdas.filter(p => (p.category || 'peptide') === c.key);
+          const totalPerdasVal = perdasCat.reduce((acc, p) => acc + p.lossTotal, 0);
+          const totalPerdasQtd = perdasCat.reduce((acc, p) => acc + p.qty, 0);
+          const saldoLiquido = totalInvestido - totalPerdasVal;
+
+          return \`
+            <tr>
+              <td><strong>\${c.label}</strong></td>
+              <td style="font-size: 12px; color: var(--gray-600);">\${c.desc}</td>
+              <td><strong>\${totalQtd}</strong> un (\${items.length} compras)</td>
+              <td>\${totalQtd > 0 ? 'R$ ' + avgCost.toFixed(2) : '—'}</td>
+              <td style="font-weight: 700; color: var(--dark);">R$ \${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td style="color: \${totalPerdasVal > 0 ? '#DC2626' : 'var(--gray-400)'};">
+                \${totalPerdasVal > 0 ? totalPerdasQtd + ' un (- R$ ' + totalPerdasVal.toFixed(2) + ')' : '0 un'}
+              </td>
+              <td style="font-weight: 800; color: var(--primary);">R$ \${saldoLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            </tr>
+          \`;
+        }).join('');
+      }
     }
 
     // Backup & Export JSON

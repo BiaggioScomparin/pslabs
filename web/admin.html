@@ -372,6 +372,29 @@
     .badge-in-stock { background: #DCFCE7; color: #166534; }
     .badge-pre-order { background: #FEF3C7; color: #92400E; }
     .badge-out-of-stock { background: #FEE2E2; color: #991B1B; }
+    .badge-peptide { background: #DCFCE7; color: #166534; }
+    .badge-water { background: #CFFAFE; color: #0E7490; }
+    .badge-box { background: #FEF3C7; color: #92400E; }
+    .badge-label { background: #F3E8FF; color: #6B21A8; }
+    .badge-supplies { background: #FFE4E6; color: #BE123C; }
+    .badge-other { background: #F1F5F9; color: #475569; }
+
+    .filter-pill {
+      background: var(--white);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+      border-radius: 100px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .filter-pill:hover { background: var(--gray-100); }
+    .filter-pill.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
 
     /* Buttons */
     .btn-sm {
@@ -718,13 +741,55 @@
         <!-- TAB 2: REGISTRO DE COMPRAS (ENTRADAS / FORNECEDOR) -->
         <!-- ========================================================= -->
         <div id="tab-compras" class="view-tab">
+          
+          <!-- Summary Metrics Cards for Compras -->
+          <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 20px;">
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🛒 Total Geral Comprado</div>
+              <div style="font-size: 20px; font-weight: 800; color: var(--primary);" id="compras-metric-total">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-total-sub">0 compras cadastradas</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">🧪 Peptídeos (Pó Liofilizado)</div>
+              <div style="font-size: 20px; font-weight: 800; color: #166534;" id="compras-metric-pep">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-pep-sub">0 frascos de pó</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">📦 Insumos & Embalagens</div>
+              <div style="font-size: 20px; font-weight: 800; color: #0E7490;" id="compras-metric-insumos">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-insumos-sub">Água, caixas, etiquetas e kits</div>
+            </div>
+
+            <div class="metric-card" style="padding: 14px 18px;">
+              <div class="metric-label">📝 Outras Despesas / Frete</div>
+              <div style="font-size: 20px; font-weight: 800; color: #475569;" id="compras-metric-outros">R$ 0,00</div>
+              <div class="metric-sub" id="compras-metric-outros-sub">Custos operacionais diversos</div>
+            </div>
+          </div>
+
           <div class="panel">
-            <div class="panel-header">
+            <div class="panel-header" style="flex-wrap: wrap; gap: 12px;">
               <div>
-                <div class="panel-title">🛒 Registro de Compras de Estoque (Entradas)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Cadastre cada pedido de caixas ou frascos feito ao fornecedor.</div>
+                <div class="panel-title">🛒 Registro de Compras de Estoque & Insumos</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Cadastre pedidos de peptídeos, água bacteriostática, caixas térmicas, etiquetas e insumos.</div>
               </div>
-              <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-sm btn-outline" onclick="seedSuppliesDemo()" title="Adiciona compras de água, caixas, etiquetas e insumos para demonstração">+ Insumos Exemplo</button>
+                <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
+              </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div style="padding: 12px 20px; border-bottom: 1px solid var(--gray-200); display: flex; gap: 8px; flex-wrap: wrap; background: #FAFAFA;">
+              <button class="filter-pill active" data-cat="all" onclick="filterCompras('all', this)">Todos (<span id="count-all">0</span>)</button>
+              <button class="filter-pill" data-cat="peptide" onclick="filterCompras('peptide', this)">🧪 Peptídeos (<span id="count-peptide">0</span>)</button>
+              <button class="filter-pill" data-cat="water" onclick="filterCompras('water', this)">💧 Água Bacteriostática (<span id="count-water">0</span>)</button>
+              <button class="filter-pill" data-cat="box" onclick="filterCompras('box', this)">📦 Caixas (<span id="count-box">0</span>)</button>
+              <button class="filter-pill" data-cat="label" onclick="filterCompras('label', this)">🏷️ Etiquetas (<span id="count-label">0</span>)</button>
+              <button class="filter-pill" data-cat="supplies" onclick="filterCompras('supplies', this)">💉 Insumos (<span id="count-supplies">0</span>)</button>
+              <button class="filter-pill" data-cat="other" onclick="filterCompras('other', this)">📝 Outros (<span id="count-other">0</span>)</button>
             </div>
 
             <div class="table-wrap">
@@ -732,8 +797,8 @@
                 <thead>
                   <tr>
                     <th>ID / Data</th>
-                    <th>Peptídeo / Dose</th>
-                    <th>Qtd (Frascos)</th>
+                    <th>Categoria & Item</th>
+                    <th>Qtd</th>
                     <th>Custo Unit. (R$)</th>
                     <th>Total Pago (R$)</th>
                     <th>Fornecedor / Lote</th>
@@ -852,6 +917,35 @@
                   </tr>
                 </thead>
                 <tbody id="balanco-table-body">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Balanço de Insumos, Caixas & Outros Gastos -->
+          <div class="panel" style="margin-top: 24px;">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">📦 Balanço Consolidado de Insumos, Caixas & Despesas Operacionais</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Acompanhamento de custos com água bacteriostática, embalagens térmicas, etiquetas, insumos e frete.</div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Descrição / Especificação</th>
+                    <th>Total Comprado (Qtd)</th>
+                    <th>Custo Médio Unitário</th>
+                    <th>Total Investido (R$)</th>
+                    <th>Perdas Registradas</th>
+                    <th>Saldo Investido Líquido</th>
+                  </tr>
+                </thead>
+                <tbody id="balanco-insumos-body">
                   <!-- Injected via JS -->
                 </tbody>
               </table>
@@ -1048,32 +1142,71 @@
   <div class="modal-backdrop" id="modal-compra">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">🛒 Registrar Nova Compra de Estoque</div>
+        <div class="modal-title">🛒 Registrar Nova Compra (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">✕</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Categoria do Item -->
         <div class="form-group">
-          <label class="form-label">Peptídeo / Composto</label>
-          <select id="compra-compound" class="form-select" onchange="onCompraCompoundChange()">
-            <!-- Populated via JS -->
+          <label class="form-label" style="font-weight: 800; color: var(--primary);">Categoria / Tipo de Item</label>
+          <select id="compra-category" class="form-select" onchange="onCompraCategoryChange()" style="border: 2px solid var(--primary-light);">
+            <option value="peptide">🧪 Peptídeo (Pó Liofilizado)</option>
+            <option value="water">💧 Água Bacteriostática</option>
+            <option value="box">📦 Caixa (Embalagem Térmica / Envio)</option>
+            <option value="label">🏷️ Etiquetas / Rótulos / Lacres</option>
+            <option value="supplies">💉 Insumos (Seringas, Swabs, Gelo)</option>
+            <option value="other">📝 Outros (Despesas e Gastos Gerais)</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Dosagem</label>
-          <select id="compra-dose" class="form-select" onchange="onCompraDoseChange()">
-            <!-- Populated via JS -->
-          </select>
+        <!-- Campos para Peptídeo -->
+        <div id="compra-fields-peptide">
+          <div class="form-group">
+            <label class="form-label">Peptídeo / Composto</label>
+            <select id="compra-compound" class="form-select" onchange="onCompraCompoundChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dosagem</label>
+            <select id="compra-dose" class="form-select" onchange="onCompraDoseChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos para Insumos / Presets (Água, Caixas, Etiquetas, Insumos) -->
+        <div id="compra-fields-preset" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" id="compra-preset-label">Item / Modelo Padrão</label>
+            <select id="compra-preset-select" class="form-select" onchange="onCompraPresetSelectChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+          <div class="form-group" id="compra-custom-spec-group" style="display: none;">
+            <label class="form-label">Especificação Personalizada</label>
+            <input type="text" id="compra-custom-spec" class="form-input" placeholder="Ex: Frasco 10ml tampa flip-off prata">
+          </div>
+        </div>
+
+        <!-- Campos para Outros -->
+        <div id="compra-fields-other" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Descrição do Item / Despesa</label>
+            <input type="text" id="compra-other-desc" class="form-input" placeholder="Ex: Frete Aéreo Internacional DHL, Fita gomada, etc.">
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
-            <label class="form-label">Qtd de Frascos</label>
+            <label class="form-label" id="compra-qty-label">Qtd de Frascos</label>
             <input type="number" id="compra-qty" class="form-input" value="10" min="1" oninput="recalcCompraTotal()">
           </div>
           <div class="form-group">
-            <label class="form-label">Custo Unitário Pó (R$)</label>
-            <input type="number" id="compra-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcCompraTotal()">
+            <label class="form-label" id="compra-unit-cost-label">Custo Unitário Pó (R$)</label>
+            <input type="number" id="compra-unit-cost" class="form-input" step="0.05" value="0.00" oninput="recalcCompraTotal()">
           </div>
         </div>
 
@@ -1088,14 +1221,14 @@
             <input type="date" id="compra-date" class="form-input">
           </div>
           <div class="form-group">
-            <label class="form-label">Fornecedor / Lote</label>
+            <label class="form-label">Fornecedor / Lote / Nota</label>
             <input type="text" id="compra-supplier" class="form-input" placeholder="Ex: SinoPept / Lote 2611">
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Observações</label>
-          <input type="text" id="compra-notes" class="form-input" placeholder="Ex: Frascos de 60mg com laudo HPLC">
+          <input type="text" id="compra-notes" class="form-input" placeholder="Ex: Lote HPLC >99.4%, frascos com vácuo">
         </div>
       </div>
       <div class="modal-footer">
@@ -1202,31 +1335,66 @@
   <div class="modal-backdrop" id="modal-perda">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">⚠️ Registrar Perda ou Avaria de Produto</div>
+        <div class="modal-title">⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">✕</button>
       </div>
       <div class="modal-body">
+        
+        <!-- Categoria da Perda -->
         <div class="form-group">
-          <label class="form-label">Peptídeo / Composto</label>
-          <select id="perda-compound" class="form-select" onchange="onPerdaCompoundChange()">
-            <!-- Populated via JS -->
+          <label class="form-label" style="font-weight: 800; color: #DC2626;">Categoria do Item Perdido / Avariado</label>
+          <select id="perda-category" class="form-select" onchange="onPerdaCategoryChange()">
+            <option value="peptide">🧪 Peptídeo (Pó Liofilizado)</option>
+            <option value="water">💧 Água Bacteriostática</option>
+            <option value="box">📦 Caixa / Embalagem Térmica Danificada</option>
+            <option value="label">🏷️ Etiquetas / Rótulos Inutilizados</option>
+            <option value="supplies">💉 Insumos Gerais (Seringas, Swabs, Gelo)</option>
+            <option value="other">📝 Outro Item / Despesa Extra</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Dosagem</label>
-          <select id="perda-dose" class="form-select" onchange="onPerdaDoseChange()">
-            <!-- Populated via JS -->
-          </select>
+        <!-- Campos Peptídeo -->
+        <div id="perda-fields-peptide">
+          <div class="form-group">
+            <label class="form-label">Peptídeo / Composto</label>
+            <select id="perda-compound" class="form-select" onchange="onPerdaCompoundChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dosagem</label>
+            <select id="perda-dose" class="form-select" onchange="onPerdaDoseChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos Preset (Água, Caixas, Etiquetas, Insumos) -->
+        <div id="perda-fields-preset" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" id="perda-preset-label">Item / Modelo</label>
+            <select id="perda-preset-select" class="form-select" onchange="onPerdaPresetSelectChange()">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos Outros -->
+        <div id="perda-fields-other" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Descrição do Item Perdido</label>
+            <input type="text" id="perda-other-desc" class="form-input" placeholder="Ex: Ampola quebrada, caixa esmagada, etc.">
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
-            <label class="form-label">Qtd de Frascos Perdidos</label>
+            <label class="form-label" id="perda-qty-label">Qtd Perdida (Frascos)</label>
             <input type="number" id="perda-qty" class="form-input" value="1" min="1" oninput="recalcPerdaTotal()">
           </div>
           <div class="form-group">
-            <label class="form-label">Custo Unitário (R$)</label>
+            <label class="form-label" id="perda-unit-cost-label">Custo Unitário (R$)</label>
             <input type="number" id="perda-unit-cost" class="form-input" step="0.10" value="0.00" oninput="recalcPerdaTotal()">
           </div>
         </div>
@@ -1235,6 +1403,7 @@
           <label class="form-label">Motivo da Perda</label>
           <select id="perda-reason" class="form-select">
             <option value="Frasco quebrado no manuseio/transporte">Frasco quebrado no manuseio ou transporte</option>
+            <option value="Embalagem/caixa amassada ou danificada">Embalagem/caixa amassada ou danificada</option>
             <option value="Falha na reconstituição / diluição teste">Falha na reconstituição / diluição teste</option>
             <option value="Perda de vácuo / descarte por validade">Perda de vácuo / descarte por validade</option>
             <option value="Amostra grátis para médico / influenciador">Amostra grátis para médico / parceiro</option>
@@ -1272,8 +1441,73 @@
     const INITIAL_COMPOUNDS = [{"id":"lcarnitine","name":"L-Carnitina Injetável","desc":"Auxilia no transporte de ácidos graxos para a mitocôndria para oxidação e geração de energia.","line":"Metabolismo & Shape","doses":[{"code":"LC600","label":"600mg","spec":"600mg por frasco, caixa com 10 frascos","doseNum":600,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"LC1200","label":"1200mg","spec":"1200mg por frasco, caixa com 10 frascos","doseNum":1200,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":429,"b2bBoxPrice":1220,"profitUnitB2C":322.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"lemonbottle","name":"Lemon Bottle","desc":"Solução lipolítica de alta concentração para gordura localizada e contorno corporal.","line":"Metabolismo & Shape","doses":[{"code":"LemonBottle","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"lipoc","name":"Lipo-C","desc":"Formula lipotrópica para otimização da queima de gordura e suporte à saúde do fígado.","line":"Metabolismo & Shape","doses":[{"code":"Lipo-C","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":459,"b2bBoxPrice":1320,"profitUnitB2C":346.4,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"mic","name":"MIC (Lipo C com B12)","desc":"Combinação lipotrópica de Metionina, Inositol e Colina enriquecida com Vitamina B12.","line":"Metabolismo & Shape","doses":[{"code":"MIC","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":429,"b2bBoxPrice":1220,"profitUnitB2C":322.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"bpc157","name":"BPC-157","desc":"Peptídeo de cicatrização celular para ligamentos, tendões, articulações e mucosa gástrica.","line":"Regeneração & Articulações","doses":[{"code":"BC5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":319,"b2bBoxPrice":760,"profitUnitB2C":240.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BC10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BC20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":429,"b2bBoxPrice":1220,"profitUnitB2C":322.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"tb500","name":"TB-500 (Full Chain)","desc":"Regeneração tecidual sistêmica, angiogênese e redução de processos inflamatórios.","line":"Regeneração & Articulações","doses":[{"code":"BT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":409,"b2bBoxPrice":1120,"profitUnitB2C":308.7,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":549,"b2bBoxPrice":1720,"profitUnitB2C":411.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"ghk-cu","name":"GHK-Cu (Blue Copper)","desc":"Peptídeo de cobre para estímulo de colágeno, firmeza da pele e densidade capilar.","line":"Estética & Pele","doses":[{"code":"CU50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":25.4,"totalCostB2C":66.4,"suggestedPriceB2C":269,"b2bBoxPrice":560,"profitUnitB2C":202.6,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"CU100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":30,"totalCostB2C":71,"suggestedPriceB2C":289,"b2bBoxPrice":630,"profitUnitB2C":218,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"ahk-cu","name":"AHK-Cu","desc":"Peptídeo formulado especificamente para fortalecimento e crescimento folicular capilar.","line":"Imunidade & Vitalidade","doses":[{"code":"AU20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":28.5,"totalCostB2C":69.5,"suggestedPriceB2C":279,"b2bBoxPrice":610,"profitUnitB2C":209.5,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"AU50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":309,"b2bBoxPrice":710,"profitUnitB2C":233.4,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"AU100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":349,"b2bBoxPrice":860,"profitUnitB2C":264.1,"marginPercent":76,"stockQty":5,"status":"in_stock"}]},{"id":"sermorelin","name":"Sermorelin","desc":"Secretagogo de GH clássico para restauração do bem-estar, tônus e anti-envelhecimento.","line":"Massa Magra & GH","doses":[{"code":"SMO5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":419,"b2bBoxPrice":1170,"profitUnitB2C":315.6,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SMO10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":105.5,"totalCostB2C":146.5,"suggestedPriceB2C":589,"b2bBoxPrice":1880,"profitUnitB2C":442.5,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"tesamorelin","name":"Tesamorelin","desc":"Análogo do GHRH com efeito comprovado na redução de gordura visceral e saúde cardiovascular.","line":"Metabolismo & Shape","doses":[{"code":"TSM2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":329,"b2bBoxPrice":810,"profitUnitB2C":247.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TSM5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":489,"b2bBoxPrice":1470,"profitUnitB2C":367.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TSM10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":120.9,"totalCostB2C":161.9,"suggestedPriceB2C":649,"b2bBoxPrice":2130,"profitUnitB2C":487.1,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TSM20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":160.2,"totalCostB2C":201.2,"suggestedPriceB2C":809,"b2bBoxPrice":2780,"profitUnitB2C":607.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"igf1","name":"IGF-1 LR3","desc":"Fator de crescimento tipo insulina potente para retenção de nitrogênio e síntese proteica muscular.","line":"Massa Magra & GH","doses":[{"code":"IG01","label":"100mcg","spec":"100mcg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mcg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":329,"b2bBoxPrice":810,"profitUnitB2C":247.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"IG1-1","label":"1mg","spec":"1mg por frasco, caixa com 10 frascos","doseNum":1,"doseUnit":"mg","powderCostPerVial":131.3,"totalCostB2C":172.3,"suggestedPriceB2C":699,"b2bBoxPrice":2300,"profitUnitB2C":526.7,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"tirzepatide","name":"Tirzepatide","desc":"Duplo agonista GLP-1 / GIP de alta eficácia na sensibilidade à insulina e queima de gordura.","line":"Metabolismo & Shape","doses":[{"code":"TR5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":33.1,"totalCostB2C":74.1,"suggestedPriceB2C":299,"b2bBoxPrice":680,"profitUnitB2C":224.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":329,"b2bBoxPrice":810,"profitUnitB2C":247.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":369,"b2bBoxPrice":960,"profitUnitB2C":278,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":60.8,"totalCostB2C":101.8,"suggestedPriceB2C":409,"b2bBoxPrice":1140,"profitUnitB2C":307.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":489,"b2bBoxPrice":1470,"profitUnitB2C":367.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":529,"b2bBoxPrice":1620,"profitUnitB2C":397.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":108.6,"totalCostB2C":149.6,"suggestedPriceB2C":599,"b2bBoxPrice":1930,"profitUnitB2C":449.4,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":128.6,"totalCostB2C":169.6,"suggestedPriceB2C":679,"b2bBoxPrice":2260,"profitUnitB2C":509.4,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR80","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":144,"totalCostB2C":185,"suggestedPriceB2C":749,"b2bBoxPrice":2510,"profitUnitB2C":564,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TR100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":164.8,"totalCostB2C":205.8,"suggestedPriceB2C":829,"b2bBoxPrice":2860,"profitUnitB2C":623.2,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"semaglutide","name":"Semaglutide","desc":"Agonista clássico de receptores GLP-1 com controle de apetite comprovado.","line":"Metabolismo & Shape","doses":[{"code":"SM10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":319,"b2bBoxPrice":760,"profitUnitB2C":240.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SM20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":369,"b2bBoxPrice":960,"profitUnitB2C":278,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SM30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":74.7,"totalCostB2C":115.7,"suggestedPriceB2C":469,"b2bBoxPrice":1370,"profitUnitB2C":353.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SM40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":519,"b2bBoxPrice":1570,"profitUnitB2C":391,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SM50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":114.7,"totalCostB2C":155.7,"suggestedPriceB2C":629,"b2bBoxPrice":2030,"profitUnitB2C":473.3,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"retatrutide","name":"Retatrutide","desc":"Triplo agonista (GLP-1, GIP, Glucagon) para máxima aceleração metabólica e saciedade.","line":"Metabolismo & Shape","doses":[{"code":"RT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":309,"b2bBoxPrice":710,"profitUnitB2C":233.4,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"RT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":459,"b2bBoxPrice":1320,"profitUnitB2C":346.4,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":489,"b2bBoxPrice":1470,"profitUnitB2C":367.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":105.5,"totalCostB2C":146.5,"suggestedPriceB2C":589,"b2bBoxPrice":1880,"profitUnitB2C":442.5,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":123.2,"totalCostB2C":164.2,"suggestedPriceB2C":659,"b2bBoxPrice":2170,"profitUnitB2C":494.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":125.5,"totalCostB2C":166.5,"suggestedPriceB2C":669,"b2bBoxPrice":2210,"profitUnitB2C":502.5,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":145.1,"totalCostB2C":186.1,"suggestedPriceB2C":749,"b2bBoxPrice":2530,"profitUnitB2C":562.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT80","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":153.2,"totalCostB2C":194.2,"suggestedPriceB2C":779,"b2bBoxPrice":2660,"profitUnitB2C":584.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":217.9,"totalCostB2C":258.9,"suggestedPriceB2C":1039,"b2bBoxPrice":3730,"profitUnitB2C":780.1,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RT120","label":"120mg","spec":"120mg por frasco, caixa com 10 frascos","doseNum":120,"doseUnit":"mg","powderCostPerVial":287.2,"totalCostB2C":328.2,"suggestedPriceB2C":1319,"b2bBoxPrice":4880,"profitUnitB2C":990.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"nad","name":"NAD+","desc":"Combustível mitocondrial essencial para energia celular (ATP), reparo de DNA e sirtuínas.","line":"Longevidade & Biohacking","doses":[{"code":"NJ100","label":"100mg","spec":"100mg por frasco, caixa com 10 frascos","doseNum":100,"doseUnit":"mg","powderCostPerVial":28.5,"totalCostB2C":69.5,"suggestedPriceB2C":279,"b2bBoxPrice":610,"profitUnitB2C":209.5,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"NJ500","label":"500mg","spec":"500mg por frasco, caixa com 10 frascos","doseNum":500,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":309,"b2bBoxPrice":710,"profitUnitB2C":233.4,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"NJ1000","label":"1000mg","spec":"1000mg por frasco, caixa com 10 frascos","doseNum":1000,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":349,"b2bBoxPrice":860,"profitUnitB2C":264.1,"marginPercent":76,"stockQty":5,"status":"in_stock"}]},{"id":"glow","name":"Kit Glow & Klow","desc":"Blend de rejuvenescimento estético para síntese de colágeno, viço e hidratação cutânea.","line":"Estética & Pele","doses":[{"code":"GLOW","label":"70mg","spec":"70mg por frasco, caixa com 10 frascos","doseNum":70,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"Klow","label":"80mg","spec":"80mg por frasco, caixa com 10 frascos","doseNum":80,"doseUnit":"mg","powderCostPerVial":128.6,"totalCostB2C":169.6,"suggestedPriceB2C":679,"b2bBoxPrice":2260,"profitUnitB2C":509.4,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"dsip","name":"DSIP","desc":"Peptídeo indutor do sono de ondas lentas delta, recuperação hormonal e neuromuscular.","line":"Regeneração & Articulações","doses":[{"code":"DS5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":349,"b2bBoxPrice":860,"profitUnitB2C":264.1,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"DS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":65.4,"totalCostB2C":106.4,"suggestedPriceB2C":429,"b2bBoxPrice":1220,"profitUnitB2C":322.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"selank","name":"Selank","desc":"Ansiolítico peptídico que estabiliza o humor e reduz o estresse sem causar sonolência.","line":"Cérebro & Foco","doses":[{"code":"SK5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":36.2,"totalCostB2C":77.2,"suggestedPriceB2C":309,"b2bBoxPrice":730,"profitUnitB2C":231.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SK10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":50,"totalCostB2C":91,"suggestedPriceB2C":369,"b2bBoxPrice":960,"profitUnitB2C":278,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"adamax","name":"Adamax","desc":"Variante nootrópica avançada com biodisponibilidade aprimorada para alta performance mental.","line":"Cérebro & Foco","doses":[{"code":"AX5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":389,"b2bBoxPrice":1060,"profitUnitB2C":291.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"AX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":93.2,"totalCostB2C":134.2,"suggestedPriceB2C":539,"b2bBoxPrice":1670,"profitUnitB2C":404.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"melanotan-ii","name":"Melanotan II","desc":"Bronzeamento & Libido","line":"Estética & Pele","doses":[{"code":"MT210","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":419,"b2bBoxPrice":1170,"profitUnitB2C":315.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"mots-c","name":"MOTS-c","desc":"Peptídeo codificado mitocondrialmente que imita os efeitos do exercício físico e melhora o endurance.","line":"Metabolismo & Shape","doses":[{"code":"MS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":389,"b2bBoxPrice":1060,"profitUnitB2C":291.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"MS15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":459,"b2bBoxPrice":1320,"profitUnitB2C":346.4,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"MS20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":529,"b2bBoxPrice":1620,"profitUnitB2C":397.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"MS40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":669,"b2bBoxPrice":2210,"profitUnitB2C":502.1,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"b12","name":"Vitamina B12","desc":"Cofator vital para produção de glóbulos vermelhos, energia metabólica e sistema nervoso.","line":"Imunidade & Vitalidade","doses":[{"code":"B12","label":"10ml","spec":"10ml por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"ml","powderCostPerVial":31.6,"totalCostB2C":72.6,"suggestedPriceB2C":299,"b2bBoxPrice":660,"profitUnitB2C":226.4,"marginPercent":76,"stockQty":5,"status":"in_stock"}]},{"id":"pt141","name":"PT-141 (Bremelanotide)","desc":"Atuador central no SNC para estímulo direto da libido e vigor sexual masculino e feminino.","line":"Imunidade & Vitalidade","doses":[{"code":"P41","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":419,"b2bBoxPrice":1170,"profitUnitB2C":315.6,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"kpv","name":"KPV","desc":"Potente anti-inflamatório peptídico para proteção intestinal, microbioma e inflamação sistêmica.","line":"Imunidade & Vitalidade","doses":[{"code":"KPV2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":23.9,"totalCostB2C":64.9,"suggestedPriceB2C":269,"b2bBoxPrice":530,"profitUnitB2C":204.1,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"KPV5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":30,"totalCostB2C":71,"suggestedPriceB2C":289,"b2bBoxPrice":630,"profitUnitB2C":218,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"KPV10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"vip","name":"VIP","desc":"Peptídeo intestinal vasoativo para imunomodulação, saúde pulmonar e regulação microvascular.","line":"Imunidade & Vitalidade","doses":[{"code":"VP5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":120.9,"totalCostB2C":161.9,"suggestedPriceB2C":649,"b2bBoxPrice":2130,"profitUnitB2C":487.1,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"VP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":137,"totalCostB2C":178,"suggestedPriceB2C":719,"b2bBoxPrice":2400,"profitUnitB2C":541,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"ara290","name":"ARA-290","desc":"Alívio de dores neuropáticas e regeneração de pequenas fibras nervosas periféricas.","line":"Regeneração & Articulações","doses":[{"code":"RA10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":62.4,"totalCostB2C":103.4,"suggestedPriceB2C":419,"b2bBoxPrice":1170,"profitUnitB2C":315.6,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"RA16","label":"16mg","spec":"16mg por frasco, caixa com 10 frascos","doseNum":16,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":519,"b2bBoxPrice":1570,"profitUnitB2C":391,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"bpc-tb","name":"Blend BPC-157 + TB-500","desc":"Super combo de regeneração tecidual acelerada para articulações e músculos.","line":"Regeneração & Articulações","doses":[{"code":"BB10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":74.7,"totalCostB2C":115.7,"suggestedPriceB2C":469,"b2bBoxPrice":1370,"profitUnitB2C":353.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BB20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BB30","label":"30mg","spec":"30mg por frasco, caixa com 10 frascos","doseNum":30,"doseUnit":"mg","powderCostPerVial":130.1,"totalCostB2C":171.1,"suggestedPriceB2C":689,"b2bBoxPrice":2280,"profitUnitB2C":517.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"BB40","label":"40mg","spec":"40mg por frasco, caixa com 10 frascos","doseNum":40,"doseUnit":"mg","powderCostPerVial":171.7,"totalCostB2C":212.7,"suggestedPriceB2C":859,"b2bBoxPrice":2970,"profitUnitB2C":646.3,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"semax-selank","name":"Blend Semax + Selank","desc":"Sinergia de foco cirúrgico e redução de cortisol sem sedação.","line":"Cérebro & Foco","doses":[{"code":"XS20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"cjc-ipa","name":"Blend CJC-1295 + Ipamorelin","desc":"Estimulação sinérgica de GH e IGF-1 para ganho de massa magra e recuperação.","line":"Massa Magra & GH","doses":[{"code":"CP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":519,"b2bBoxPrice":1570,"profitUnitB2C":391,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"CP20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":120.5,"totalCostB2C":161.5,"suggestedPriceB2C":649,"b2bBoxPrice":2130,"profitUnitB2C":487.5,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"reta-tirz","name":"Blend Retatrutide + Tirzepatide","desc":"Sinergia metabólica máxima de controle glicêmico e lipólise profunda.","line":"Imunidade & Vitalidade","doses":[{"code":"RET60","label":"60mg","spec":"60mg por frasco, caixa com 10 frascos","doseNum":60,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"tesa-ipa","name":"Blend Tesamorelin + Ipamorelin","desc":"Foco em redução potente de gordura visceral profunda e estímulo de GH.","line":"Metabolismo & Shape","doses":[{"code":"TI10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":90.1,"totalCostB2C":131.1,"suggestedPriceB2C":529,"b2bBoxPrice":1620,"profitUnitB2C":397.9,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TI15","label":"15mg","spec":"15mg por frasco, caixa com 10 frascos","doseNum":15,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":669,"b2bBoxPrice":2210,"profitUnitB2C":502.1,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"cagrilintide","name":"Cagrilintide","desc":"Análogo de amilina de longa ação para retardo do esvaziamento gástrico e saciedade extrema.","line":"Metabolismo & Shape","doses":[{"code":"CGL5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":93.2,"totalCostB2C":134.2,"suggestedPriceB2C":539,"b2bBoxPrice":1670,"profitUnitB2C":404.8,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"CGL10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"aod9604","name":"AOD-9604","desc":"Fragmento C-terminal do hGH que induz lipólise seletiva sem impactar a glicemia.","line":"Massa Magra & GH","doses":[{"code":"AD5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":71.6,"totalCostB2C":112.6,"suggestedPriceB2C":459,"b2bBoxPrice":1320,"profitUnitB2C":346.4,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"AD10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":114.7,"totalCostB2C":155.7,"suggestedPriceB2C":629,"b2bBoxPrice":2030,"profitUnitB2C":473.3,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"5amino1mq","name":"5-AMINO-1MQ","desc":"Inibidor da enzima NNMT que reprograma o gasto energético e a queima lipídica celular.","line":"Metabolismo & Shape","doses":[{"code":"5AM","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":31.6,"totalCostB2C":72.6,"suggestedPriceB2C":299,"b2bBoxPrice":660,"profitUnitB2C":226.4,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"10AM","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":40.8,"totalCostB2C":81.8,"suggestedPriceB2C":329,"b2bBoxPrice":810,"profitUnitB2C":247.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"50AM","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":389,"b2bBoxPrice":1060,"profitUnitB2C":291.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"epithalon","name":"Epithalon","desc":"Bio-regulador da telomerase e pineal para reprogramação dos ritmos de longevidade.","line":"Longevidade & Biohacking","doses":[{"code":"ET10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":47,"totalCostB2C":88,"suggestedPriceB2C":359,"b2bBoxPrice":910,"profitUnitB2C":271,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"ET50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":108.6,"totalCostB2C":149.6,"suggestedPriceB2C":599,"b2bBoxPrice":1930,"profitUnitB2C":449.4,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"foxo4-dri","name":"FOXO4-DRI","desc":"Senolítico (Eliminação de Células Zumbis)","line":"Longevidade & Biohacking","doses":[{"code":"F42","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":87,"totalCostB2C":128,"suggestedPriceB2C":519,"b2bBoxPrice":1570,"profitUnitB2C":391,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"FOX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":345,"totalCostB2C":386,"suggestedPriceB2C":1549,"b2bBoxPrice":5830,"profitUnitB2C":1163,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"snap-8","name":"Snap-8","desc":"Anti-Rugas (Efeito Botox-like)","line":"Estética & Pele","doses":[{"code":"NP810","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":389,"b2bBoxPrice":1060,"profitUnitB2C":291.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"ss-31","name":"SS-31","desc":"Rejuvenescimento Mitocondrial","line":"Imunidade & Vitalidade","doses":[{"code":"2S10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":77.8,"totalCostB2C":118.8,"suggestedPriceB2C":479,"b2bBoxPrice":1420,"profitUnitB2C":360.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"2S20","label":"20mg","spec":"20mg por frasco, caixa com 10 frascos","doseNum":20,"doseUnit":"mg","powderCostPerVial":125.9,"totalCostB2C":166.9,"suggestedPriceB2C":669,"b2bBoxPrice":2210,"profitUnitB2C":502.1,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"2S50","label":"50mg","spec":"50mg por frasco, caixa com 10 frascos","doseNum":50,"doseUnit":"mg","powderCostPerVial":167.1,"totalCostB2C":208.1,"suggestedPriceB2C":839,"b2bBoxPrice":2890,"profitUnitB2C":630.9,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"semax","name":"Semax","desc":"Nootrópico avançado derivado de ACTH; potencializa BDNF, foco cognitivo e memória.","line":"Cérebro & Foco","doses":[{"code":"SX5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":319,"b2bBoxPrice":760,"profitUnitB2C":240.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"SX10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":48.5,"totalCostB2C":89.5,"suggestedPriceB2C":359,"b2bBoxPrice":940,"profitUnitB2C":269.5,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"oxytocin","name":"Oxytocin","desc":"Vínculo, Humor & Calma","line":"Cérebro & Foco","doses":[{"code":"OT2","label":"2mg","spec":"2mg por frasco, caixa com 10 frascos","doseNum":2,"doseUnit":"mg","powderCostPerVial":25.4,"totalCostB2C":66.4,"suggestedPriceB2C":269,"b2bBoxPrice":560,"profitUnitB2C":202.6,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"OT5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":319,"b2bBoxPrice":760,"profitUnitB2C":240.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"OT10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":43.9,"totalCostB2C":84.9,"suggestedPriceB2C":349,"b2bBoxPrice":860,"profitUnitB2C":264.1,"marginPercent":76,"stockQty":5,"status":"in_stock"}]},{"id":"ipamorelin","name":"Ipamorelin","desc":"Agonista seletivo do receptor de grelina para liberação limpa de GH sem pico de prolactina/cortisol.","line":"Massa Magra & GH","doses":[{"code":"IP5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":34.6,"totalCostB2C":75.6,"suggestedPriceB2C":309,"b2bBoxPrice":710,"profitUnitB2C":233.4,"marginPercent":76,"stockQty":5,"status":"in_stock"},{"code":"IP10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":53.1,"totalCostB2C":94.1,"suggestedPriceB2C":379,"b2bBoxPrice":1010,"profitUnitB2C":284.9,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"cjc-dac","name":"CJC-1295 (com DAC)","desc":"Análogo de GHRH com meia-vida prolongada para liberação estável contínua de GH.","line":"Massa Magra & GH","doses":[{"code":"CD5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":117.8,"totalCostB2C":158.8,"suggestedPriceB2C":639,"b2bBoxPrice":2080,"profitUnitB2C":480.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"CD10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":155.5,"totalCostB2C":196.5,"suggestedPriceB2C":789,"b2bBoxPrice":2700,"profitUnitB2C":592.5,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"cjc1295-no-dac","name":"CJC1295 no DAC","desc":"GH Pulsátil","line":"Massa Magra & GH","doses":[{"code":"CND5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":409,"b2bBoxPrice":1120,"profitUnitB2C":308.7,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"CND10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":549,"b2bBoxPrice":1720,"profitUnitB2C":411.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"kisspeptin","name":"Kisspeptin-10","desc":"Regulador mestre do eixo hipotálamo-hipófise-gonadal para modulação natural de LH/FSH.","line":"Imunidade & Vitalidade","doses":[{"code":"KS5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":409,"b2bBoxPrice":1120,"profitUnitB2C":308.7,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"KS10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":96.2,"totalCostB2C":137.2,"suggestedPriceB2C":549,"b2bBoxPrice":1720,"profitUnitB2C":411.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"thymalin","name":"Thymalin","desc":"Bio-regulador peptídico do timo para reativação do sistema imunológico celular.","line":"Regeneração & Articulações","doses":[{"code":"TY10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":59.3,"totalCostB2C":100.3,"suggestedPriceB2C":409,"b2bBoxPrice":1120,"profitUnitB2C":308.7,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"thymosin-alpha-1","name":"Thymosin alpha 1","desc":"Super Imunomodulador T","line":"Imunidade & Vitalidade","doses":[{"code":"TA5","label":"5mg","spec":"5mg por frasco, caixa com 10 frascos","doseNum":5,"doseUnit":"mg","powderCostPerVial":80.8,"totalCostB2C":121.8,"suggestedPriceB2C":489,"b2bBoxPrice":1470,"profitUnitB2C":367.2,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"TA10","label":"10mg","spec":"10mg por frasco, caixa com 10 frascos","doseNum":10,"doseUnit":"mg","powderCostPerVial":123.2,"totalCostB2C":164.2,"suggestedPriceB2C":659,"b2bBoxPrice":2170,"profitUnitB2C":494.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]},{"id":"glutathione","name":"Glutathione","desc":"Antioxidante mestre do organismo para desintoxicação hepática e eliminação de radicais livres.","line":"Longevidade & Biohacking","doses":[{"code":"GTT600","label":"600mg","spec":"600mg por frasco, caixa com 10 frascos","doseNum":600,"doseUnit":"mg","powderCostPerVial":37.7,"totalCostB2C":78.7,"suggestedPriceB2C":319,"b2bBoxPrice":760,"profitUnitB2C":240.3,"marginPercent":75,"stockQty":5,"status":"in_stock"},{"code":"GTT1500","label":"1500mg","spec":"1500mg por frasco, caixa com 10 frascos","doseNum":1500,"doseUnit":"mg","powderCostPerVial":56.2,"totalCostB2C":97.2,"suggestedPriceB2C":389,"b2bBoxPrice":1060,"profitUnitB2C":291.8,"marginPercent":75,"stockQty":5,"status":"in_stock"}]}];
     const DEFAULT_PIN = "psl2026";
 
+    // Insumos & Suprimentos Presets
+    const SUPPLY_PRESETS = {
+      water: {
+        label: "Água Bacteriostática",
+        unitName: "frascos",
+        defaultQty: 20,
+        items: [
+          { name: "Água Bacteriostática 10ml (Álcool Benzílico 0.9%)", defaultCost: 25.00, spec: "Frasco Ampola 10ml" },
+          { name: "Água Bacteriostática 20ml (Álcool Benzílico 0.9%)", defaultCost: 35.00, spec: "Frasco Ampola 20ml" },
+          { name: "Água Bacteriostática 30ml (Álcool Benzílico 0.9%)", defaultCost: 45.00, spec: "Frasco 30ml" },
+          { name: "Ampola Água para Injeção 10ml Estéril", defaultCost: 10.00, spec: "Ampola 10ml" },
+          { name: "Outro Volume / Personalizado", defaultCost: 25.00, spec: "Personalizado" }
+        ]
+      },
+      box: {
+        label: "Caixas e Embalagens Térmicas",
+        unitName: "caixas",
+        defaultQty: 50,
+        items: [
+          { name: "Caixa Térmica Isopor c/ Tampa (Padrão 2-4 Frascos)", defaultCost: 6.50, spec: "Isopor 0.5L" },
+          { name: "Caixa Térmica Isopor Média (6-10 Frascos / Kits)", defaultCost: 10.00, spec: "Isopor 1.5L" },
+          { name: "Caixa de Papelão Personalizada PSL Labs (Exterior)", defaultCost: 4.80, spec: "Papelão Kraft Branco" },
+          { name: "Caixa Padrão Correios / Sedex Pequena", defaultCost: 5.50, spec: "Papelão Sedex" },
+          { name: "Outro Tipo de Caixa / Personalizado", defaultCost: 6.00, spec: "Personalizado" }
+        ]
+      },
+      label: {
+        label: "Etiquetas, Rótulos e Lacres",
+        unitName: "etiquetas",
+        defaultQty: 200,
+        items: [
+          { name: "Rótulos Frasco 58x26mm (Adesivo Vinil Fosco PSL)", defaultCost: 0.80, spec: "Vinil Fosco 58x26" },
+          { name: "Lacres de Segurança Holográficos / Destrutíveis", defaultCost: 0.45, spec: "Lacre Holográfico" },
+          { name: "Adesivos Selo / Logo PSL Labs para Caixa", defaultCost: 1.20, spec: "Adesivo Redondo 50mm" },
+          { name: "Rolo de Etiquetas Térmicas (1.000 un)", defaultCost: 65.00, spec: "Rolo 1.000 un" },
+          { name: "Outro Rótulo / Personalizado", defaultCost: 1.00, spec: "Personalizado" }
+        ]
+      },
+      supplies: {
+        label: "Insumos Gerais e Acessórios",
+        unitName: "unidades",
+        defaultQty: 100,
+        items: [
+          { name: "Seringas de Insulina 1ml Ultra-Fine 31G (BD/Uniqmed)", defaultCost: 1.60, spec: "Seringa 1ml 31G" },
+          { name: "Lenços Antissépticos Álcool 70% (Swabs BD)", defaultCost: 0.35, spec: "Swab Álcool 70%" },
+          { name: "Gelo Gel Reutilizável Térmico (Bolsas 150ml)", defaultCost: 2.50, spec: "Bolsa Gelo Gel" },
+          { name: "Sacos Herméticos Zip-Lock c/ Proteção Bolha", defaultCost: 0.60, spec: "Envelope Zip Bolha" },
+          { name: "Kit Completo de Aplicação (Seringa + Swab + Gelo)", defaultCost: 4.50, spec: "Kit Aplicação" },
+          { name: "Outro Insumo / Personalizado", defaultCost: 2.00, spec: "Personalizado" }
+        ]
+      },
+      other: {
+        label: "Outros Gastos e Despesas",
+        unitName: "unidades",
+        defaultQty: 1,
+        items: [
+          { name: "Frete Aéreo Internacional (DHL / FedEx / Aéreo)", defaultCost: 380.00, spec: "Logística Externa" },
+          { name: "Taxa Alfandegária / Imposto de Importação", defaultCost: 200.00, spec: "Tributação" },
+          { name: "Material de Expedição (Fitas, Embalagens)", defaultCost: 80.00, spec: "Expedição" },
+          { name: "Outra Despesa Operacional", defaultCost: 50.00, spec: "Diversos" }
+        ]
+      }
+    };
+
     // Application State
     let activeTab = 'dre';
+    let currentComprasFilter = 'all';
     let stockData = JSON.parse(localStorage.getItem('psl_stock_data') || 'null');
     let customPrices = JSON.parse(localStorage.getItem('psl_custom_prices') || '{}');
     let orders = JSON.parse(localStorage.getItem('psl_orders') || 'null');
@@ -1289,6 +1523,7 @@
         {
           id: "CMP-001",
           date: "2026-11-01",
+          category: "peptide",
           compoundId: "retatrutide",
           code: "RT60",
           name: "Retatrutide",
@@ -1302,19 +1537,63 @@
         {
           id: "CMP-002",
           date: "2026-11-02",
-          compoundId: "ghk-cu",
-          code: "CU50",
-          name: "GHK-Cu",
-          dosage: "50mg",
-          qty: 20,
-          unitCost: 25.40,
-          totalCost: 508.00,
-          supplier: "PureCopper Labs",
-          notes: "Cristais azuis alta pureza"
+          category: "water",
+          compoundId: "water",
+          code: "AGUA-10ML",
+          name: "Água Bacteriostática",
+          dosage: "10ml (Álcool Benzílico 0.9%)",
+          qty: 50,
+          unitCost: 25.00,
+          totalCost: 1250.00,
+          supplier: "PharmaGrade Soluções",
+          notes: "Frascos ampolas lacrados estéreis"
         },
         {
           id: "CMP-003",
+          date: "2026-11-02",
+          category: "box",
+          compoundId: "box",
+          code: "CAIXA-TER",
+          name: "Caixa Térmica Isopor",
+          dosage: "Padrão 2-4 Frascos c/ Tampa",
+          qty: 100,
+          unitCost: 6.50,
+          totalCost: 650.00,
+          supplier: "Térmicas Express SP",
+          notes: "Isopor EPS alta densidade anti-impacto"
+        },
+        {
+          id: "CMP-004",
           date: "2026-11-03",
+          category: "label",
+          compoundId: "label",
+          code: "ROT-VINIL",
+          name: "Etiquetas & Rótulos",
+          dosage: "Rótulo Frasco 58x26mm Vinil Fosco",
+          qty: 500,
+          unitCost: 0.80,
+          totalCost: 400.00,
+          supplier: "LabelPrint Tech",
+          notes: "Adesivo impermeável fosco PSL Labs"
+        },
+        {
+          id: "CMP-005",
+          date: "2026-11-03",
+          category: "supplies",
+          compoundId: "supplies",
+          code: "INS-SER",
+          name: "Insumos Gerais",
+          dosage: "Seringas BD 1ml 31G + Swabs Álcool",
+          qty: 200,
+          unitCost: 1.60,
+          totalCost: 320.00,
+          supplier: "MedCirúrgica Distribuidora",
+          notes: "Agulha ultrafina 31G confortável"
+        },
+        {
+          id: "CMP-006",
+          date: "2026-11-03",
+          category: "peptide",
           compoundId: "tirzepatide",
           code: "TR50",
           name: "Tirzepatide",
@@ -1326,8 +1605,23 @@
           notes: "Duplo agonista GLP-1/GIP"
         },
         {
-          id: "CMP-004",
+          id: "CMP-007",
           date: "2026-11-04",
+          category: "peptide",
+          compoundId: "ghk-cu",
+          code: "CU50",
+          name: "GHK-Cu",
+          dosage: "50mg",
+          qty: 20,
+          unitCost: 25.40,
+          totalCost: 508.00,
+          supplier: "PureCopper Labs",
+          notes: "Cristais azuis alta pureza"
+        },
+        {
+          id: "CMP-008",
+          date: "2026-11-04",
+          category: "peptide",
           compoundId: "bpc157",
           code: "BPC5",
           name: "BPC-157",
@@ -1336,10 +1630,34 @@
           unitCost: 37.70,
           totalCost: 754.00,
           supplier: "SinoPept Direct",
-          notes: "Grau laboratorial"
+          notes: "Grau laboratorial regenerativo"
+        },
+        {
+          id: "CMP-009",
+          date: "2026-11-05",
+          category: "other",
+          compoundId: "other",
+          code: "OUT-FRETE",
+          name: "Outras Despesas",
+          dosage: "Frete Aéreo Internacional Importação",
+          qty: 1,
+          unitCost: 380.00,
+          totalCost: 380.00,
+          supplier: "DHL Express Brasil",
+          notes: "Desembaraço prioritário lote laboratorial"
         }
       ];
       localStorage.setItem('psl_compras', JSON.stringify(compras));
+    } else {
+      // Auto-migrate: ensure every record has category defined
+      let migrated = false;
+      compras.forEach(c => {
+        if (!c.category) {
+          c.category = 'peptide';
+          migrated = true;
+        }
+      });
+      if (migrated) localStorage.setItem('psl_compras', JSON.stringify(compras));
     }
 
     if (!vendas || vendas.length === 0) {
@@ -1433,6 +1751,7 @@
         {
           id: "PRD-001",
           date: "2026-11-08",
+          category: "peptide",
           compoundId: "retatrutide",
           code: "RT60",
           name: "Retatrutide",
@@ -1442,9 +1761,32 @@
           lossTotal: 145.10,
           reason: "Frasco quebrado no manuseio/transporte",
           notes: "Caiu durante preparação da embalagem de envio"
+        },
+        {
+          id: "PRD-002",
+          date: "2026-11-09",
+          category: "water",
+          compoundId: "water",
+          code: "AGUA-10ML",
+          name: "Água Bacteriostática",
+          dosage: "10ml",
+          qty: 2,
+          unitCost: 25.00,
+          lossTotal: 50.00,
+          reason: "Frasco quebrado no manuseio/transporte",
+          notes: "Ampola trincada no recebimento da remessa"
         }
       ];
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+    } else {
+      let migratedP = false;
+      perdas.forEach(p => {
+        if (!p.category) {
+          p.category = 'peptide';
+          migratedP = true;
+        }
+      });
+      if (migratedP) localStorage.setItem('psl_perdas', JSON.stringify(perdas));
     }
 
     // Default orders demo if empty
@@ -1563,7 +1905,8 @@
       if (modalId === 'modal-compra') {
         document.getElementById('compra-date').value = today;
         populateCompoundSelect('compra-compound', 'compra-dose');
-        onCompraCompoundChange();
+        document.getElementById('compra-category').value = 'peptide';
+        onCompraCategoryChange();
       } else if (modalId === 'modal-venda') {
         document.getElementById('venda-date').value = today;
         populateCompoundSelect('venda-compound', 'venda-dose');
@@ -1571,7 +1914,8 @@
       } else if (modalId === 'modal-perda') {
         document.getElementById('perda-date').value = today;
         populateCompoundSelect('perda-compound', 'perda-dose');
-        onPerdaCompoundChange();
+        document.getElementById('perda-category').value = 'peptide';
+        onPerdaCategoryChange();
       }
     }
 
@@ -1596,6 +1940,175 @@
         opt.innerText = c.name + " (" + c.doses.length + " doses)";
         sel.appendChild(opt);
       });
+    }
+
+// Category Switcher for Compra Modal
+    function onCompraCategoryChange() {
+      const cat = document.getElementById('compra-category').value;
+      const peptideFields = document.getElementById('compra-fields-peptide');
+      const presetFields = document.getElementById('compra-fields-preset');
+      const otherFields = document.getElementById('compra-fields-other');
+      const qtyLabel = document.getElementById('compra-qty-label');
+      const costLabel = document.getElementById('compra-unit-cost-label');
+      const customSpecGroup = document.getElementById('compra-custom-spec-group');
+
+      if (cat === 'peptide') {
+        peptideFields.style.display = 'block';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'none';
+        if (customSpecGroup) customSpecGroup.style.display = 'none';
+        qtyLabel.innerText = 'Qtd de Frascos';
+        costLabel.innerText = 'Custo Unitário Pó (R$)';
+        document.getElementById('compra-qty').value = 10;
+        onCompraCompoundChange();
+      } else if (cat === 'other') {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'block';
+        if (customSpecGroup) customSpecGroup.style.display = 'none';
+        qtyLabel.innerText = 'Quantidade';
+        costLabel.innerText = 'Valor / Custo Unit. (R$)';
+        document.getElementById('compra-qty').value = 1;
+        document.getElementById('compra-unit-cost').value = '50.00';
+        recalcCompraTotal();
+      } else {
+        // water, box, label, supplies
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'block';
+        otherFields.style.display = 'none';
+
+        const info = SUPPLY_PRESETS[cat];
+        qtyLabel.innerText = 'Qtd de ' + info.unitName;
+        costLabel.innerText = 'Custo Unitário (R$)';
+
+        const sel = document.getElementById('compra-preset-select');
+        sel.innerHTML = '';
+        info.items.forEach((it, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = it.name + ' (R$ ' + it.defaultCost.toFixed(2) + ')';
+          sel.appendChild(opt);
+        });
+
+        document.getElementById('compra-qty').value = info.defaultQty;
+        onCompraPresetSelectChange();
+      }
+    }
+
+    function onCompraPresetSelectChange() {
+      const cat = document.getElementById('compra-category').value;
+      const sel = document.getElementById('compra-preset-select');
+      const idx = parseInt(sel.value) || 0;
+      const info = SUPPLY_PRESETS[cat];
+      if (info && info.items[idx]) {
+        const item = info.items[idx];
+        document.getElementById('compra-unit-cost').value = item.defaultCost.toFixed(2);
+        const customGroup = document.getElementById('compra-custom-spec-group');
+        if (item.spec === 'Personalizado') {
+          customGroup.style.display = 'block';
+        } else {
+          customGroup.style.display = 'none';
+        }
+      }
+      recalcCompraTotal();
+    }
+
+    // Category Switcher for Perda Modal
+    function onPerdaCategoryChange() {
+      const cat = document.getElementById('perda-category').value;
+      const peptideFields = document.getElementById('perda-fields-peptide');
+      const presetFields = document.getElementById('perda-fields-preset');
+      const otherFields = document.getElementById('perda-fields-other');
+      const qtyLabel = document.getElementById('perda-qty-label');
+      const costLabel = document.getElementById('perda-unit-cost-label');
+
+      if (cat === 'peptide') {
+        peptideFields.style.display = 'block';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'none';
+        qtyLabel.innerText = 'Qtd Perdida (Frascos)';
+        costLabel.innerText = 'Custo Unitário Pó (R$)';
+        onPerdaCompoundChange();
+      } else if (cat === 'other') {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'none';
+        otherFields.style.display = 'block';
+        qtyLabel.innerText = 'Qtd Perdida';
+        costLabel.innerText = 'Custo / Valor Unit. (R$)';
+        document.getElementById('perda-qty').value = 1;
+        document.getElementById('perda-unit-cost').value = '50.00';
+        recalcPerdaTotal();
+      } else {
+        peptideFields.style.display = 'none';
+        presetFields.style.display = 'block';
+        otherFields.style.display = 'none';
+
+        const info = SUPPLY_PRESETS[cat];
+        qtyLabel.innerText = 'Qtd Perdida (' + info.unitName + ')';
+        costLabel.innerText = 'Custo Unitário (R$)';
+
+        const sel = document.getElementById('perda-preset-select');
+        sel.innerHTML = '';
+        info.items.forEach((it, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = it.name + ' (R$ ' + it.defaultCost.toFixed(2) + ')';
+          sel.appendChild(opt);
+        });
+
+        document.getElementById('perda-qty').value = 1;
+        onPerdaPresetSelectChange();
+      }
+    }
+
+    function onPerdaPresetSelectChange() {
+      const cat = document.getElementById('perda-category').value;
+      const sel = document.getElementById('perda-preset-select');
+      const idx = parseInt(sel.value) || 0;
+      const info = SUPPLY_PRESETS[cat];
+      if (info && info.items[idx]) {
+        document.getElementById('perda-unit-cost').value = info.items[idx].defaultCost.toFixed(2);
+      }
+      recalcPerdaTotal();
+    }
+
+    function filterCompras(cat, btn) {
+      currentComprasFilter = cat;
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderComprasTable();
+    }
+
+    function getCategoryBadge(cat) {
+      switch(cat) {
+        case 'water':
+          return '<span class="badge badge-water">💧 Água Bacteriostática</span>';
+        case 'box':
+          return '<span class="badge badge-box">📦 Caixa Térmica</span>';
+        case 'label':
+          return '<span class="badge badge-label">🏷️ Etiquetas / Rótulos</span>';
+        case 'supplies':
+          return '<span class="badge badge-supplies">💉 Insumos Gerais</span>';
+        case 'other':
+          return '<span class="badge badge-other">📝 Outros Gastos</span>';
+        default:
+          return '<span class="badge badge-peptide">🧪 Peptídeo</span>';
+      }
+    }
+
+    function seedSuppliesDemo() {
+      const samples = [
+        { id: "CMP-" + String(compras.length + 1).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "water", compoundId: "water", code: "AGUA-10ML", name: "Água Bacteriostática", dosage: "10ml (Álcool Benzílico 0.9%)", qty: 50, unitCost: 25.00, totalCost: 1250.00, supplier: "PharmaGrade Soluções", notes: "Frascos ampolas lacrados estéreis" },
+        { id: "CMP-" + String(compras.length + 2).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "box", compoundId: "box", code: "CAIXA-TER", name: "Caixa Térmica Isopor", dosage: "Padrão 2-4 Frascos c/ Tampa", qty: 100, unitCost: 6.50, totalCost: 650.00, supplier: "Térmicas Express SP", notes: "Isopor EPS alta densidade" },
+        { id: "CMP-" + String(compras.length + 3).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "label", compoundId: "label", code: "ROT-VINIL", name: "Etiquetas & Rótulos", dosage: "Rótulo Frasco 58x26mm Vinil Fosco", qty: 500, unitCost: 0.80, totalCost: 400.00, supplier: "LabelPrint Tech", notes: "Adesivo impermeável fosco PSL" },
+        { id: "CMP-" + String(compras.length + 4).padStart(3, '0'), date: new Date().toISOString().split('T')[0], category: "supplies", compoundId: "supplies", code: "INS-SER", name: "Insumos Gerais", dosage: "Seringas BD 1ml 31G + Swabs", qty: 200, unitCost: 1.60, totalCost: 320.00, supplier: "MedCirúrgica Distribuidora", notes: "Agulha ultrafina 31G" }
+      ];
+      samples.forEach(s => compras.unshift(s));
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
+      showToast("4 compras de insumos adicionadas com sucesso!");
+      renderDRE();
+      renderComprasTable();
+      renderBalancoTable();
     }
 
     function onCompraCompoundChange() {
@@ -1721,12 +2234,12 @@
     }
 
     // CRUD: Save Compra
+    // CRUD: Save Compra (Peptídeos & Insumos)
     function saveCompra() {
-      const compId = document.getElementById('compra-compound').value;
-      const doseCode = document.getElementById('compra-dose').value;
+      const cat = document.getElementById('compra-category').value;
       const qty = parseInt(document.getElementById('compra-qty').value) || 0;
       const unitCost = parseFloat(document.getElementById('compra-unit-cost').value) || 0;
-      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || 0;
+      const totalCost = parseFloat(document.getElementById('compra-total-cost').value) || (qty * unitCost);
       const date = document.getElementById('compra-date').value || new Date().toISOString().split('T')[0];
       const supplier = document.getElementById('compra-supplier').value.trim() || 'Fornecedor Padrão';
       const notes = document.getElementById('compra-notes').value.trim() || '';
@@ -1736,16 +2249,52 @@
         return;
       }
 
-      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
-      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+      let compoundId = '';
+      let code = '';
+      let name = '';
+      let dosage = '';
+
+      if (cat === 'peptide') {
+        compoundId = document.getElementById('compra-compound').value;
+        code = document.getElementById('compra-dose').value;
+        const comp = INITIAL_COMPOUNDS.find(c => c.id === compoundId);
+        const dose = comp ? comp.doses.find(d => d.code === code) : null;
+        name = comp ? comp.name : 'Peptídeo';
+        dosage = dose ? dose.label : 'Dose';
+      } else if (cat === 'other') {
+        const otherDesc = document.getElementById('compra-other-desc').value.trim() || 'Despesa Operacional';
+        compoundId = 'other';
+        code = 'OUT-' + Date.now().toString().slice(-4);
+        name = 'Outros Gastos';
+        dosage = otherDesc;
+      } else {
+        // water, box, label, supplies
+        const info = SUPPLY_PRESETS[cat];
+        const sel = document.getElementById('compra-preset-select');
+        const idx = parseInt(sel.value) || 0;
+        const item = (info && info.items[idx]) ? info.items[idx] : { name: info.label, spec: info.label };
+
+        let specText = item.name;
+        const customInput = document.getElementById('compra-custom-spec');
+        if (item.spec === 'Personalizado' && customInput && customInput.value.trim()) {
+          specText = customInput.value.trim();
+        }
+
+        const codePrefixes = { water: 'AGUA', box: 'CAIXA', label: 'ETIQ', supplies: 'INS' };
+        compoundId = cat;
+        code = (codePrefixes[cat] || 'ITEM') + '-' + Date.now().toString().slice(-4);
+        name = info.label;
+        dosage = specText;
+      }
 
       const newCompra = {
         id: "CMP-" + String(compras.length + 1).padStart(3, '0'),
         date: date,
-        compoundId: compId,
-        code: doseCode,
-        name: comp ? comp.name : 'Peptídeo',
-        dosage: dose ? dose.label : 'Dose',
+        category: cat,
+        compoundId: compoundId,
+        code: code,
+        name: name,
+        dosage: dosage,
         qty: qty,
         unitCost: unitCost,
         totalCost: totalCost,
@@ -1757,7 +2306,7 @@
       localStorage.setItem('psl_compras', JSON.stringify(compras));
 
       closeModal('modal-compra');
-      showToast("Compra de " + qty + " un registrada com sucesso!");
+      showToast("Compra registrada: " + name + " (" + qty + " un)");
       renderDRE();
       renderComprasTable();
       renderBalancoTable();
@@ -1841,31 +2390,58 @@
     }
 
     // CRUD: Save Perda
+    // CRUD: Save Perda (Peptídeos & Insumos)
     function savePerda() {
-      const compId = document.getElementById('perda-compound').value;
-      const doseCode = document.getElementById('perda-dose').value;
+      const cat = document.getElementById('perda-category').value;
       const qty = parseInt(document.getElementById('perda-qty').value) || 0;
       const unitCost = parseFloat(document.getElementById('perda-unit-cost').value) || 0;
-      const lossTotal = parseFloat(document.getElementById('perda-total-cost').value) || 0;
+      const lossTotal = parseFloat(document.getElementById('perda-total-cost').value) || (qty * unitCost);
       const reason = document.getElementById('perda-reason').value;
       const date = document.getElementById('perda-date').value || new Date().toISOString().split('T')[0];
       const notes = document.getElementById('perda-notes').value.trim() || '';
 
       if (qty <= 0 || unitCost <= 0) {
-        alert("Por favor, informe a quantidade e custo do frasco perdido!");
+        alert("Por favor, informe a quantidade e custo do item avariado!");
         return;
       }
 
-      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
-      const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
+      let compoundId = '';
+      let code = '';
+      let name = '';
+      let dosage = '';
+
+      if (cat === 'peptide') {
+        compoundId = document.getElementById('perda-compound').value;
+        code = document.getElementById('perda-dose').value;
+        const comp = INITIAL_COMPOUNDS.find(c => c.id === compoundId);
+        const dose = comp ? comp.doses.find(d => d.code === code) : null;
+        name = comp ? comp.name : 'Peptídeo';
+        dosage = dose ? dose.label : 'Dose';
+      } else if (cat === 'other') {
+        const otherDesc = document.getElementById('perda-other-desc').value.trim() || 'Despesa / Item Diverso';
+        compoundId = 'other';
+        code = 'PRD-OUT';
+        name = 'Outro Item';
+        dosage = otherDesc;
+      } else {
+        const info = SUPPLY_PRESETS[cat];
+        const sel = document.getElementById('perda-preset-select');
+        const idx = parseInt(sel.value) || 0;
+        const item = (info && info.items[idx]) ? info.items[idx] : { name: info.label };
+        compoundId = cat;
+        code = 'PRD-' + cat.toUpperCase();
+        name = info.label;
+        dosage = item.name;
+      }
 
       const newPerda = {
         id: "PRD-" + String(perdas.length + 1).padStart(3, '0'),
         date: date,
-        compoundId: compId,
-        code: doseCode,
-        name: comp ? comp.name : 'Peptídeo',
-        dosage: dose ? dose.label : 'Dose',
+        category: cat,
+        compoundId: compoundId,
+        code: code,
+        name: name,
+        dosage: dosage,
         qty: qty,
         unitCost: unitCost,
         lossTotal: lossTotal,
@@ -1894,6 +2470,7 @@
     }
 
     // RENDER TABLES & DRE
+    // RENDER TABLES & DRE
     function renderDRE() {
       let totalVendido = 0;
       let totalCMV = 0;
@@ -1912,17 +2489,29 @@
       });
 
       let totalComprado = 0;
+      let totalPeptideosComprados = 0;
       let totalFrascosComprados = 0;
+      let totalInsumosComprados = 0;
+      let totalOutrosComprados = 0;
+
       compras.forEach(c => {
         totalComprado += c.totalCost;
-        totalFrascosComprados += c.qty;
+        const cat = c.category || 'peptide';
+        if (cat === 'peptide') {
+          totalPeptideosComprados += c.totalCost;
+          totalFrascosComprados += c.qty;
+        } else if (['water', 'box', 'label', 'supplies'].includes(cat)) {
+          totalInsumosComprados += c.totalCost;
+        } else {
+          totalOutrosComprados += c.totalCost;
+        }
       });
 
       // Lucro Líquido Real = Faturamento - CMV - Perdas
       const lucroReal = totalVendido - totalCMV - totalPerdas;
       const margemReal = totalVendido > 0 ? ((lucroReal / totalVendido) * 100) : 0;
 
-      // Estoque Físico Restante = Comprados - Vendidos - Perdidos
+      // Estoque Físico Restante de Peptídeos = Comprados - Vendidos - Perdidos
       const estoqueQtd = Math.max(0, totalFrascosComprados - totalFrascosVendidos - totalFrascosPerdidos);
 
       // Valor de Custo do Estoque Parado
@@ -1941,12 +2530,12 @@
 
       // Update Top KPIs
       document.getElementById('kpi-faturamento').innerText = 'R$ ' + totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-faturamento-sub').innerText = totalFrascosVendidos + ' frascos vendidos';
+      document.getElementById('kpi-faturamento-sub').innerText = totalFrascosVendidos + ' frascos entregues';
 
       document.getElementById('kpi-cmv').innerText = 'R$ ' + totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2});
 
       document.getElementById('kpi-perdas').innerText = 'R$ ' + totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-perdas-sub').innerText = totalFrascosPerdidos + ' frascos descartados/quebrados';
+      document.getElementById('kpi-perdas-sub').innerText = totalFrascosPerdidos + ' itens avariados/descartados';
 
       const lucroEl = document.getElementById('kpi-lucro-real');
       lucroEl.innerText = (lucroReal >= 0 ? '+' : '') + 'R$ ' + lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
@@ -1956,9 +2545,9 @@
 
       // Update Secondary KPIs
       document.getElementById('kpi-total-compras').innerText = 'R$ ' + totalComprado.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-      document.getElementById('kpi-compras-sub').innerText = totalFrascosComprados + ' frascos adquiridos';
+      document.getElementById('kpi-compras-sub').innerText = totalFrascosComprados + ' frascos pó + insumos';
 
-      document.getElementById('kpi-estoque-qtd').innerText = estoqueQtd + ' unidades';
+      document.getElementById('kpi-estoque-qtd').innerText = estoqueQtd + ' frascos pó';
       document.getElementById('kpi-estoque-custo').innerText = 'R$ ' + estoqueCusto.toLocaleString('pt-BR', {minimumFractionDigits: 2});
       document.getElementById('kpi-estoque-venda').innerText = 'R$ ' + estoqueVenda.toLocaleString('pt-BR', {minimumFractionDigits: 2});
 
@@ -1967,36 +2556,45 @@
       const lucroPercent = totalVendido > 0 ? ((lucroReal / totalVendido) * 100).toFixed(1) : '0.0';
       const cmvPercent = totalVendido > 0 ? ((totalCMV / totalVendido) * 100).toFixed(1) : '0.0';
       const perdasPercent = totalVendido > 0 ? ((totalPerdas / totalVendido) * 100).toFixed(1) : '0.0';
+      const saldoFluxoCaixa = totalVendido - totalComprado - totalPerdas;
 
       dreTbody.innerHTML = `
         <tr style="background: #F8FAFC; font-weight: 800;">
           <td>(+) Receita Bruta de Vendas</td>
-          <td>Total cobrado dos clientes</td>
+          <td>Total cobrado dos clientes por todos os pedidos pagos</td>
           <td style="color: #059669; font-size: 15px;">R$ ${totalVendido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>100.0%</td>
         </tr>
         <tr>
-          <td>(-) Custo das Mercadorias Vendidas (CMV)</td>
-          <td>Custo do pó + insumos dos itens entregues</td>
+          <td>(-) CMV (Custo dos Peptídeos + Insumos Vendidos)</td>
+          <td>Custo do pó liofilizado + água + embalagem + kits dos itens entregues</td>
           <td style="color: #64748B;">- R$ ${totalCMV.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>-${cmvPercent}%</td>
         </tr>
         <tr style="background: #FEF2F2;">
           <td style="color: #DC2626;">(-) Perdas / Quebras / Avarias</td>
-          <td>Frascos descartados ou danificados</td>
+          <td>Frascos quebrados, água avariada, caixas danificadas ou descarte de validade</td>
           <td style="color: #DC2626; font-weight: 700;">- R$ ${totalPerdas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td>-${perdasPercent}%</td>
         </tr>
         <tr style="background: #F0FDF4; font-weight: 900; font-size: 15px;">
           <td style="color: #145C46;">(=) LUCRO LÍQUIDO REAL OPERACIONAL</td>
-          <td>(Vendas - CMV - Perdas)</td>
+          <td>(Faturamento - CMV - Perdas Reais)</td>
           <td style="color: #059669; font-size: 18px;">R$ ${lucroReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td style="color: #059669;">${lucroPercent}%</td>
         </tr>
+        <tr style="background: #FFFBEB; font-weight: 700;">
+          <td style="color: #92400E;">📦 Total Investido em Compras de Estoque & Insumos</td>
+          <td>Peptídeos (R$ ${totalPeptideosComprados.toLocaleString('pt-BR', {minimumFractionDigits: 2})}) + Insumos/Caixas (R$ ${(totalInsumosComprados + totalOutrosComprados).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</td>
+          <td style="color: #92400E;">R$ ${totalComprado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td>—</td>
+        </tr>
         <tr>
-          <td style="color: #475569;">Saldo de Fluxo de Caixa (Vendas - Compras Totais - Perdas)</td>
-          <td>Balanço de caixa imediato (inclui estoque parado)</td>
-          <td style="font-weight: 700;">R$ ${(totalVendido - totalComprado - totalPerdas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td style="color: #475569;">💵 Saldo de Fluxo de Caixa Imediato</td>
+          <td>(Vendas Recebidas - Compras Totais Pagas - Perdas)</td>
+          <td style="font-weight: 800; font-size: 15px; color: ${saldoFluxoCaixa >= 0 ? '#059669' : '#DC2626'};">
+            ${saldoFluxoCaixa >= 0 ? '+' : ''}R$ ${saldoFluxoCaixa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+          </td>
           <td>—</td>
         </tr>
       `;
@@ -2004,49 +2602,101 @@
 
     function renderComprasTable() {
       const tbody = document.getElementById('compras-table-body');
-      if (compras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma compra registrada ainda. Clique em "+ Nova Compra" para lançar.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = compras.map(c => `
-        <tr>
-          <td><strong>${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${c.date}</span></td>
-          <td><strong>${c.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">${c.dosage}</span></td>
-          <td><strong>${c.qty}</strong> un</td>
-          <td>R$ ${c.unitCost.toFixed(2)}</td>
-          <td style="font-weight: 800; color: var(--primary);">R$ ${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td>${c.supplier}</td>
-          <td style="font-size: 12px; color: var(--gray-600);">${c.notes || '-'}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('${c.id}')">Excluir</button>
-          </td>
-        </tr>
-      `).join('');
-    }
 
-    function renderVendasTable() {
-      const tbody = document.getElementById('vendas-table-body');
-      if (vendas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
+      // Calculate summary metrics
+      let totalComprasGeral = 0;
+      let totalPepCost = 0;
+      let totalPepQty = 0;
+      let totalInsumosCost = 0;
+      let totalOutrosCost = 0;
+
+      let countAll = compras.length;
+      let countPeptide = 0;
+      let countWater = 0;
+      let countBox = 0;
+      let countLabel = 0;
+      let countSupplies = 0;
+      let countOther = 0;
+
+      compras.forEach(c => {
+        totalComprasGeral += c.totalCost;
+        const cat = c.category || 'peptide';
+        if (cat === 'peptide') {
+          countPeptide++;
+          totalPepCost += c.totalCost;
+          totalPepQty += c.qty;
+        } else if (cat === 'water') {
+          countWater++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'box') {
+          countBox++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'label') {
+          countLabel++;
+          totalInsumosCost += c.totalCost;
+        } else if (cat === 'supplies') {
+          countSupplies++;
+          totalInsumosCost += c.totalCost;
+        } else {
+          countOther++;
+          totalOutrosCost += c.totalCost;
+        }
+      });
+
+      // Update pill counters
+      if (document.getElementById('count-all')) document.getElementById('count-all').innerText = countAll;
+      if (document.getElementById('count-peptide')) document.getElementById('count-peptide').innerText = countPeptide;
+      if (document.getElementById('count-water')) document.getElementById('count-water').innerText = countWater;
+      if (document.getElementById('count-box')) document.getElementById('count-box').innerText = countBox;
+      if (document.getElementById('count-label')) document.getElementById('count-label').innerText = countLabel;
+      if (document.getElementById('count-supplies')) document.getElementById('count-supplies').innerText = countSupplies;
+      if (document.getElementById('count-other')) document.getElementById('count-other').innerText = countOther;
+
+      // Update top metric cards in Compras tab
+      if (document.getElementById('compras-metric-total')) {
+        document.getElementById('compras-metric-total').innerText = 'R$ ' + totalComprasGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-total-sub').innerText = compras.length + ' compras registradas';
+        document.getElementById('compras-metric-pep').innerText = 'R$ ' + totalPepCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-pep-sub').innerText = totalPepQty + ' frascos de pó liofilizado';
+        document.getElementById('compras-metric-insumos').innerText = 'R$ ' + totalInsumosCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-insumos-sub').innerText = (countWater + countBox + countLabel + countSupplies) + ' itens (água, caixas, rótulos, kits)';
+        document.getElementById('compras-metric-outros').innerText = 'R$ ' + totalOutrosCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('compras-metric-outros-sub').innerText = countOther + ' lançamentos operacionais';
+      }
+
+      // Filter
+      let filtered = compras;
+      if (currentComprasFilter !== 'all') {
+        filtered = compras.filter(c => (c.category || 'peptide') === currentComprasFilter);
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma compra encontrada nesta categoria. Clique em "+ Nova Compra" para lançar.</td></tr>';
         return;
       }
-      tbody.innerHTML = vendas.map(v => `
-        <tr>
-          <td><strong>${v.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${v.date}</span></td>
-          <td><strong>${v.clientName}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${v.channel} · ${v.clientPhone || ''}</span></td>
-          <td><strong>${v.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">${v.dosage}</span></td>
-          <td><strong>${v.qty}</strong></td>
-          <td>R$ ${v.unitPrice.toFixed(2)}</td>
-          <td style="color: var(--gray-400);">R$ ${v.unitCost.toFixed(2)}</td>
-          <td><strong>R$ ${v.totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
-          <td style="color: #059669; font-weight: 800;">+ R$ ${v.profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td><span class="badge" style="background: #DCFCE7; color: #166534;">${v.margin}%</span></td>
-          <td>${v.paymentMethod}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('${v.id}')">Excluir</button>
-          </td>
-        </tr>
-      `).join('');
+
+      tbody.innerHTML = filtered.map(c => {
+        const cat = c.category || 'peptide';
+        const badge = getCategoryBadge(cat);
+        return `
+          <tr>
+            <td><strong>${c.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${c.date}</span></td>
+            <td>
+              <div style="margin-bottom: 4px;">${badge}</div>
+              <strong style="color: var(--dark); font-size: 13px;">${c.name}</strong>
+              <div style="font-size: 12px; color: var(--gray-600);">${c.dosage}</div>
+            </td>
+            <td><strong>${c.qty}</strong> un</td>
+            <td>R$ ${c.unitCost.toFixed(2)}</td>
+            <td style="font-weight: 800; color: var(--primary);">R$ ${c.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>${c.supplier}</td>
+            <td style="font-size: 12px; color: var(--gray-600);">${c.notes || '-'}</td>
+            <td>
+              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('${c.id}')">Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function renderPerdasTable() {
@@ -2055,20 +2705,27 @@
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma perda registrada. Estoque com 100% de aproveitamento!</td></tr>';
         return;
       }
-      tbody.innerHTML = perdas.map(p => `
-        <tr>
-          <td><strong>${p.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${p.date}</span></td>
-          <td><strong>${p.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">${p.dosage}</span></td>
-          <td style="font-weight: 800; color: #DC2626;">${p.qty} frasco(s)</td>
-          <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">${p.reason}</span></td>
-          <td>R$ ${p.unitCost.toFixed(2)}</td>
-          <td style="font-weight: 800; color: #DC2626;">- R$ ${p.lossTotal.toFixed(2)}</td>
-          <td style="font-size: 12px; color: var(--gray-600);">${p.notes || '-'}</td>
-          <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('${p.id}')">Excluir</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = perdas.map(p => {
+        const cat = p.category || 'peptide';
+        const badge = getCategoryBadge(cat);
+        return `
+          <tr>
+            <td><strong>${p.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${p.date}</span></td>
+            <td>
+              <div style="margin-bottom: 4px;">${badge}</div>
+              <strong style="color: var(--dark);">${p.name}</strong><br><span style="font-size: 12px; color: var(--gray-600);">${p.dosage}</span>
+            </td>
+            <td style="font-weight: 800; color: #DC2626;">${p.qty} un</td>
+            <td><span class="badge" style="background: #FEE2E2; color: #991B1B;">${p.reason}</span></td>
+            <td>R$ ${p.unitCost.toFixed(2)}</td>
+            <td style="font-weight: 800; color: #DC2626;">- R$ ${p.lossTotal.toFixed(2)}</td>
+            <td style="font-size: 12px; color: var(--gray-600);">${p.notes || '-'}</td>
+            <td>
+              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('${p.id}')">Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function renderBalancoTable() {
@@ -2119,6 +2776,43 @@
         rowsHtml = '<tr><td colspan="10" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhum composto encontrado com movimentação.</td></tr>';
       }
       tbody.innerHTML = rowsHtml;
+
+      // Populate Balanço de Insumos & Suprimentos
+      const insumosBody = document.getElementById('balanco-insumos-body');
+      if (insumosBody) {
+        const cats = [
+          { key: 'water', label: '💧 Água Bacteriostática', desc: 'Frascos ampolas com álcool benzílico 0.9%' },
+          { key: 'box', label: '📦 Caixas Térmicas', desc: 'Embalagens EPS alta densidade e caixas de envio' },
+          { key: 'label', label: '🏷️ Etiquetas e Rótulos', desc: 'Rótulos vinil fosco e lacres de segurança' },
+          { key: 'supplies', label: '💉 Insumos Gerais', desc: 'Seringas BD 1ml, swabs álcool 70%, bolsas gelo gel' },
+          { key: 'other', label: '📝 Outras Despesas', desc: 'Fretes internacionais DHL, taxas e suprimentos' }
+        ];
+
+        insumosBody.innerHTML = cats.map(c => {
+          const items = compras.filter(item => (item.category || 'peptide') === c.key);
+          const totalQtd = items.reduce((acc, it) => acc + it.qty, 0);
+          const totalInvestido = items.reduce((acc, it) => acc + it.totalCost, 0);
+          const avgCost = totalQtd > 0 ? (totalInvestido / totalQtd) : 0;
+          const perdasCat = perdas.filter(p => (p.category || 'peptide') === c.key);
+          const totalPerdasVal = perdasCat.reduce((acc, p) => acc + p.lossTotal, 0);
+          const totalPerdasQtd = perdasCat.reduce((acc, p) => acc + p.qty, 0);
+          const saldoLiquido = totalInvestido - totalPerdasVal;
+
+          return `
+            <tr>
+              <td><strong>${c.label}</strong></td>
+              <td style="font-size: 12px; color: var(--gray-600);">${c.desc}</td>
+              <td><strong>${totalQtd}</strong> un (${items.length} compras)</td>
+              <td>${totalQtd > 0 ? 'R$ ' + avgCost.toFixed(2) : '—'}</td>
+              <td style="font-weight: 700; color: var(--dark);">R$ ${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td style="color: ${totalPerdasVal > 0 ? '#DC2626' : 'var(--gray-400)'};">
+                ${totalPerdasVal > 0 ? totalPerdasQtd + ' un (- R$ ' + totalPerdasVal.toFixed(2) + ')' : '0 un'}
+              </td>
+              <td style="font-weight: 800; color: var(--primary);">R$ ${saldoLiquido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
     // Backup & Export JSON
