@@ -1438,16 +1438,156 @@ const adminHtml = `<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- Preview Lucro Desta Venda -->
-        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #166534; margin-bottom: 4px;">
-            <span>Valor Total da Venda: <strong id="venda-preview-total">R$ 0,00</strong></span>
-            <span>Custo Total (CMV): <span id="venda-preview-custo">R$ 0,00</span></span>
+        <!-- 1. Custo do Frasco / Peptídeo no Estoque (Calculado das Compras) -->
+        <div style="background: #F8FAFC; border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0; font-weight: 700; font-size: 13px; color: var(--gray-900);">🧪 Custo Unit. do Peptídeo no Estoque (Compras):</label>
+            <span id="venda-compound-stock-badge" class="badge" style="background: #DCFCE7; color: #166534;">Estoque: -- un</span>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; color: #059669;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--gray-600);">R$</span>
+            <input type="number" id="venda-compound-unit-cost" class="form-input" step="0.01" style="max-width: 120px; font-weight: 700;" oninput="recalcVendaTotals()">
+            <span id="venda-compound-cost-origin" style="font-size: 11px; color: var(--gray-500); line-height: 1.3;">Calculado automaticamente pelo valor real das compras</span>
+          </div>
+        </div>
+
+        <!-- 2. Opções de Inclusão de Custos (Checkboxes Interativos + Valores) -->
+        <div style="border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; margin-bottom: 14px; background: #FFFFFF;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #F1F5F9; padding-bottom: 6px;">
+            <label class="form-label" style="font-size: 13px; font-weight: 800; color: #0F172A; margin: 0;">
+              📦 Insumos &amp; Custos Inclusos Nesta Venda:
+            </label>
+            <span style="font-size: 11px; color: #64748B;">Marque o que acompanha o envio</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Caixa Térmica -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-box-check" checked onchange="recalcVendaTotals()">
+                <span>📦 <strong>Caixa Térmica / Isopor</strong></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-box-val" class="form-input" step="0.10" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="6.50" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Etiqueta / Rótulo -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-label-check" checked onchange="recalcVendaTotals()">
+                <span>🏷️ <strong>Etiqueta / Rótulo</strong> <span style="font-size: 11px; color: var(--gray-500);">(un/frasco)</span></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-label-val" class="form-input" step="0.05" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="0.80" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Água Bacteriostática BAC -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-water-check" checked onchange="recalcVendaTotals()">
+                <span>💧 <strong>Água Bacteriostática</strong></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <select id="venda-cost-water-type" class="form-select" style="padding: 2px 4px; font-size: 11px; height: 28px;" onchange="onVendaWaterTypeChange()">
+                  <option value="3ml">BAC 3ml (R$ 15,00)</option>
+                  <option value="10ml">BAC 10ml (R$ 25,00)</option>
+                  <option value="custom">Outro Volume</option>
+                </select>
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-water-val" class="form-input" step="0.50" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="15.00" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Insumos Gerais Seringas + Swabs -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-supplies-check" onchange="recalcVendaTotals()">
+                <span>💉 <strong>Insumos (Seringas BD 1ml 31G + Swabs)</strong></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-supplies-val" class="form-input" step="0.10" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="3.20" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Frete / Envio Pago por Nós -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-shipping-check" onchange="recalcVendaTotals()">
+                <span>🛵 <strong>Frete Pago por Nós (Motoboy / Sedex)</strong></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-shipping-val" class="form-input" step="1.00" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="0.00" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Taxa de Gateway / Cartão -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                <input type="checkbox" id="venda-cost-gateway-check" onchange="recalcVendaTotals()">
+                <span>💳 <strong>Taxa Maquininha / Gateway (Cartão)</strong></span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                <input type="number" id="venda-cost-gateway-val" class="form-input" step="0.50" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="0.00" oninput="recalcVendaTotals()">
+              </div>
+            </div>
+
+            <!-- Outro Custo Adicional -->
+            <div style="background: #F8FAFC; padding: 8px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin: 0; user-select: none;">
+                  <input type="checkbox" id="venda-cost-other-check" onchange="recalcVendaTotals()">
+                  <span>➕ <strong>Outro Custo Adicional</strong></span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span style="font-size: 12px; color: var(--gray-500);">R$</span>
+                  <input type="number" id="venda-cost-other-val" class="form-input" step="1.00" style="width: 75px; padding: 2px 6px; font-size: 12px; height: 28px;" value="0.00" oninput="recalcVendaTotals()">
+                </div>
+              </div>
+              <input type="text" id="venda-cost-other-desc" class="form-input" placeholder="Descrição do custo (ex: Brinde, gelo reutilizável, fita extra)" style="font-size: 11px; padding: 4px 8px; height: 26px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Demonstrativo do Lucro Líquido Real Desta Venda -->
+        <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">
+            📊 Demonstrativo do Lucro Líquido Real
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #15803D; margin-bottom: 2px;">
+            <span>(+) Valor Cobrado do Cliente:</span>
+            <strong id="venda-calc-receita">R$ 0,00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #DC2626; margin-bottom: 2px;">
+            <span>(-) Custo Peptídeo (Estoque/Compras):</span>
+            <span id="venda-calc-peptideo">- R$ 0,00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #DC2626; margin-bottom: 4px;">
+            <span>(-) Insumos &amp; Custos Extras Selecionados:</span>
+            <span id="venda-calc-extras">- R$ 0,00</span>
+          </div>
+          <div id="venda-extras-list" style="font-size: 11px; color: #4B5563; background: #FFFFFF; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; border: 1px dashed #CBD5E1;">
+            Nenhum custo extra selecionado
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #374151; border-top: 1px solid #BBF7D0; padding-top: 6px; margin-bottom: 4px;">
+            <span>Custo Total Real (CMV):</span>
+            <strong id="venda-preview-custo">R$ 0,00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: #059669; border-top: 2px solid #86EFAC; padding-top: 6px;">
             <span>LUCRO LÍQUIDO DESTA VENDA:</span>
-            <span id="venda-preview-lucro">R$ 0,00</span>
+            <span id="venda-preview-lucro" style="font-size: 16px;">R$ 0,00</span>
           </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #047857; margin-top: 3px;">
+            <span>Margem Líquida Real:</span>
+            <strong id="venda-calc-margem">0.0%</strong>
+          </div>
+          <span id="venda-preview-total" style="display:none;"></span>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -2178,33 +2318,173 @@ const adminHtml = `<!DOCTYPE html>
       if (comp) {
         const dose = comp.doses.find(d => d.code === doseCode);
         if (dose) {
-          // Preço sugerido do catálogo a 75%
+          // Preço sugerido do catálogo
           document.getElementById('venda-unit-price').value = dose.suggestedPriceB2C.toFixed(2);
+
+          // 1. Custo Real do Peptídeo calculado pelo estoque e compras
+          const matchingCompras = compras.filter(c => c.code === doseCode && !c.isGift && Number(c.unitCost) > 0);
+          let baseVialCost = 0;
+          let costOriginText = '';
+
+          if (matchingCompras.length > 0) {
+            const totalSpent = matchingCompras.reduce((sum, c) => sum + (Number(c.totalCost) || (Number(c.qty) * Number(c.unitCost))), 0);
+            const totalQty = matchingCompras.reduce((sum, c) => sum + (Number(c.qty) || 0), 0);
+            baseVialCost = totalQty > 0 ? (totalSpent / totalQty) : (matchingCompras[0].unitCost || 0);
+            costOriginText = 'Custo real das compras cadastradas (' + totalQty + ' un compradas)';
+          } else {
+            baseVialCost = dose.powderCostPerVial || 25.00;
+            costOriginText = 'Custo estimado de catálogo (sem compra cadastrada ainda)';
+          }
+
+          document.getElementById('venda-compound-unit-cost').value = baseVialCost.toFixed(2);
+          document.getElementById('venda-compound-cost-origin').innerText = costOriginText;
+
+          // 2. Saldo atual em estoque físico
+          const comprados = compras.filter(c => c.code === doseCode).reduce((a, b) => a + (Number(b.qty) || 0), 0);
+          const vendidos = vendas.filter(v => v.code === doseCode).reduce((a, b) => a + (Number(b.qty) || 0), 0);
+          const perdidos = perdas.filter(p => p.code === doseCode).reduce((a, b) => a + (Number(p.qty) || 0), 0);
+          const saldo = Math.max(0, comprados - vendidos - perdidos);
+
+          const stockBadge = document.getElementById('venda-compound-stock-badge');
+          if (stockBadge) {
+            stockBadge.innerText = 'Estoque: ' + saldo + ' un';
+            if (saldo > 0) {
+              stockBadge.style.background = '#DCFCE7';
+              stockBadge.style.color = '#166534';
+            } else {
+              stockBadge.style.background = '#FEF3C7';
+              stockBadge.style.color = '#92400E';
+            }
+          }
+
+          // 3. Atualizar custos de insumos das compras reais cadastradas
+          const boxCompras = compras.filter(c => c.category === 'box' && Number(c.unitCost) > 0);
+          if (boxCompras.length > 0) {
+            document.getElementById('venda-cost-box-val').value = Number(boxCompras[0].unitCost).toFixed(2);
+          }
+
+          const labelCompras = compras.filter(c => c.category === 'label' && Number(c.unitCost) > 0);
+          if (labelCompras.length > 0) {
+            document.getElementById('venda-cost-label-val').value = Number(labelCompras[0].unitCost).toFixed(2);
+          }
+
+          const waterCompras = compras.filter(c => c.category === 'water' && Number(c.unitCost) > 0);
+          if (waterCompras.length > 0) {
+            const lastWater = waterCompras[0];
+            if (lastWater.dosage && lastWater.dosage.includes('3ml')) {
+              document.getElementById('venda-cost-water-val').value = Number(lastWater.unitCost).toFixed(2);
+            }
+          }
+
+          const suppliesCompras = compras.filter(c => c.category === 'supplies' && Number(c.unitCost) > 0);
+          if (suppliesCompras.length > 0) {
+            document.getElementById('venda-cost-supplies-val').value = Number(suppliesCompras[0].unitCost).toFixed(2);
+          }
+
           recalcVendaTotals();
         }
       }
     }
 
+    function onVendaWaterTypeChange() {
+      const type = document.getElementById('venda-cost-water-type').value;
+      if (type === '3ml') {
+        document.getElementById('venda-cost-water-val').value = '15.00';
+      } else if (type === '10ml') {
+        document.getElementById('venda-cost-water-val').value = '25.00';
+      }
+      recalcVendaTotals();
+    }
+
     function recalcVendaTotals() {
-      const compId = document.getElementById('venda-compound').value;
-      const doseCode = document.getElementById('venda-dose').value;
       const qty = parseFloat(document.getElementById('venda-qty').value) || 0;
       const unitPrice = parseFloat(document.getElementById('venda-unit-price').value) || 0;
-
-      const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
-      let unitCost = 0;
-      if (comp) {
-        const dose = comp.doses.find(d => d.code === doseCode);
-        if (dose) unitCost = dose.totalCostB2C;
-      }
+      const vialCost = parseFloat(document.getElementById('venda-compound-unit-cost').value) || 0;
 
       const totalSale = qty * unitPrice;
-      const totalCost = qty * unitCost;
-      const profit = totalSale - totalCost;
+      const totalPeptideCost = qty * vialCost;
 
+      let extrasCost = 0;
+      const extrasList = [];
+
+      // 1. Caixa Térmica / Isopor (por pedido)
+      const boxCheck = document.getElementById('venda-cost-box-check');
+      if (boxCheck && boxCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-box-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Caixa (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 2. Etiqueta / Rótulo (por frasco vendido)
+      const labelCheck = document.getElementById('venda-cost-label-check');
+      if (labelCheck && labelCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-label-val').value) || 0;
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push('Etiqueta (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 3. Água Bacteriostática (por frasco vendido)
+      const waterCheck = document.getElementById('venda-cost-water-check');
+      if (waterCheck && waterCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-water-val').value) || 0;
+        const waterType = document.getElementById('venda-cost-water-type').value;
+        const typeLabel = waterType === '3ml' ? 'Água BAC 3ml' : (waterType === '10ml' ? 'Água BAC 10ml' : 'Água BAC');
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push(typeLabel + ' (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 4. Kit Insumos Seringas + Swabs (por frasco vendido)
+      const suppliesCheck = document.getElementById('venda-cost-supplies-check');
+      if (suppliesCheck && suppliesCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-supplies-val').value) || 0;
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push('Seringas/Swabs (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 5. Frete Pago pela Loja
+      const shippingCheck = document.getElementById('venda-cost-shipping-check');
+      if (shippingCheck && shippingCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-shipping-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Frete (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 6. Taxa Cartão / Gateway
+      const gatewayCheck = document.getElementById('venda-cost-gateway-check');
+      if (gatewayCheck && gatewayCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-gateway-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Taxa Cartão (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 7. Outro Custo Adicional
+      const otherCheck = document.getElementById('venda-cost-other-check');
+      if (otherCheck && otherCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-other-val').value) || 0;
+        const desc = document.getElementById('venda-cost-other-desc').value.trim() || 'Outro Custo';
+        extrasCost += val;
+        extrasList.push(desc + ' (R$ ' + val.toFixed(2) + ')');
+      }
+
+      const totalCost = totalPeptideCost + extrasCost;
+      const profit = totalSale - totalCost;
+      const margin = totalSale > 0 ? ((profit / totalSale) * 100) : 0;
+
+      // Update Top & Breakdown UI
       document.getElementById('venda-preview-total').innerText = 'R$ ' + totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2});
       document.getElementById('venda-preview-custo').innerText = 'R$ ' + totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
       document.getElementById('venda-preview-lucro').innerText = 'R$ ' + profit.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+      if (document.getElementById('venda-calc-receita')) {
+        document.getElementById('venda-calc-receita').innerText = 'R$ ' + totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('venda-calc-peptideo').innerText = '- R$ ' + totalPeptideCost.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ' (' + qty + ' un × R$ ' + vialCost.toFixed(2) + ')';
+        document.getElementById('venda-calc-extras').innerText = '- R$ ' + extrasCost.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('venda-extras-list').innerText = extrasList.length > 0 ? extrasList.join(' • ') : 'Nenhum insumo extra selecionado';
+        document.getElementById('venda-calc-margem').innerText = margin.toFixed(1) + '%';
+      }
     }
 
     function onPerdaCompoundChange() {
@@ -2350,12 +2630,13 @@ const adminHtml = `<!DOCTYPE html>
 
     // CRUD: Save Venda
     function saveVenda() {
-      const clientName = document.getElementById('venda-client').value.trim() || 'Cliente';
-      const clientPhone = document.getElementById('venda-phone').value.trim() || '';
+      const clientName = document.getElementById('venda-client').value.trim() || 'Cliente Particular';
+      const clientPhone = document.getElementById('venda-phone').value.trim();
       const compId = document.getElementById('venda-compound').value;
       const doseCode = document.getElementById('venda-dose').value;
       const qty = parseInt(document.getElementById('venda-qty').value) || 0;
       const unitPrice = parseFloat(document.getElementById('venda-unit-price').value) || 0;
+      const vialCost = parseFloat(document.getElementById('venda-compound-unit-cost').value) || 0;
       const paymentMethod = document.getElementById('venda-pagto').value;
       const channel = document.getElementById('venda-canal').value;
       const date = document.getElementById('venda-date').value || new Date().toISOString().split('T')[0];
@@ -2367,12 +2648,79 @@ const adminHtml = `<!DOCTYPE html>
 
       const comp = INITIAL_COMPOUNDS.find(c => c.id === compId);
       const dose = comp ? comp.doses.find(d => d.code === doseCode) : null;
-      const unitCost = dose ? dose.totalCostB2C : 0;
 
       const totalSale = qty * unitPrice;
-      const totalCost = qty * unitCost;
+      const totalPeptideCost = qty * vialCost;
+
+      let extrasCost = 0;
+      const extrasList = [];
+
+      // 1. Caixa Térmica / Isopor
+      const boxCheck = document.getElementById('venda-cost-box-check');
+      if (boxCheck && boxCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-box-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Caixa (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 2. Etiqueta / Rótulo
+      const labelCheck = document.getElementById('venda-cost-label-check');
+      if (labelCheck && labelCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-label-val').value) || 0;
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push('Etiqueta (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 3. Água Bacteriostática
+      const waterCheck = document.getElementById('venda-cost-water-check');
+      if (waterCheck && waterCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-water-val').value) || 0;
+        const waterType = document.getElementById('venda-cost-water-type').value;
+        const typeLabel = waterType === '3ml' ? 'Água BAC 3ml' : (waterType === '10ml' ? 'Água BAC 10ml' : 'Água BAC');
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push(typeLabel + ' (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 4. Kit Insumos Seringas + Swabs
+      const suppliesCheck = document.getElementById('venda-cost-supplies-check');
+      if (suppliesCheck && suppliesCheck.checked) {
+        const unitVal = parseFloat(document.getElementById('venda-cost-supplies-val').value) || 0;
+        const totalVal = unitVal * qty;
+        extrasCost += totalVal;
+        extrasList.push('Seringas/Swabs (' + qty + 'x R$ ' + unitVal.toFixed(2) + ')');
+      }
+
+      // 5. Frete
+      const shippingCheck = document.getElementById('venda-cost-shipping-check');
+      if (shippingCheck && shippingCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-shipping-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Frete (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 6. Taxa Gateway / Cartão
+      const gatewayCheck = document.getElementById('venda-cost-gateway-check');
+      if (gatewayCheck && gatewayCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-gateway-val').value) || 0;
+        extrasCost += val;
+        extrasList.push('Taxa Cartão (R$ ' + val.toFixed(2) + ')');
+      }
+
+      // 7. Outro Custo
+      const otherCheck = document.getElementById('venda-cost-other-check');
+      if (otherCheck && otherCheck.checked) {
+        const val = parseFloat(document.getElementById('venda-cost-other-val').value) || 0;
+        const desc = document.getElementById('venda-cost-other-desc').value.trim() || 'Outro Custo';
+        extrasCost += val;
+        extrasList.push(desc + ' (R$ ' + val.toFixed(2) + ')');
+      }
+
+      const totalCost = totalPeptideCost + extrasCost;
       const profit = totalSale - totalCost;
       const margin = totalSale > 0 ? ((profit / totalSale) * 100) : 0;
+      const unitCost = Number((totalCost / (qty || 1)).toFixed(2));
 
       const newVenda = {
         id: "VND-" + String(vendas.length + 1).padStart(3, '0'),
@@ -2392,7 +2740,13 @@ const adminHtml = `<!DOCTYPE html>
         margin: Number(margin.toFixed(1)),
         paymentMethod: paymentMethod,
         channel: channel,
-        status: "Pago"
+        status: "Pago",
+        costsDetail: {
+          vialCost: vialCost,
+          totalPeptideCost: totalPeptideCost,
+          extrasCost: extrasCost,
+          items: extrasList
+        }
       };
 
       vendas.unshift(newVenda);
@@ -2403,6 +2757,7 @@ const adminHtml = `<!DOCTYPE html>
       renderDRE();
       renderVendasTable();
       renderBalancoTable();
+      renderStockTable();
     }
 
     function clearAllVendas() {
@@ -2752,14 +3107,26 @@ const adminHtml = `<!DOCTYPE html>
         tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
         return;
       }
-      tbody.innerHTML = vendas.map(v => \`
+      tbody.innerHTML = vendas.map(v => {
+        const hasExtras = v.costsDetail && v.costsDetail.items && v.costsDetail.items.length > 0;
+        const detailsTooltip = hasExtras
+          ? ('Pó: R$ ' + (v.costsDetail.vialCost || 0).toFixed(2) + ' + Insumos: ' + v.costsDetail.items.join(', '))
+          : 'Custo direto';
+        const extrasBadge = hasExtras
+          ? '<br><span style="font-size: 10px; color: #0284C7; background: #E0F2FE; padding: 1px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; cursor: help;" title="' + detailsTooltip + '">📦 +' + v.costsDetail.items.length + ' insumos</span>'
+          : '';
+
+        return \`
         <tr>
           <td><strong>\${v.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.date}</span></td>
           <td><strong>\${v.clientName}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.channel} · \${v.clientPhone || ''}</span></td>
           <td><strong>\${v.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${v.dosage}</span></td>
           <td><strong>\${v.qty}</strong></td>
           <td>R$ \${v.unitPrice.toFixed(2)}</td>
-          <td style="color: var(--gray-400);">R$ \${v.unitCost.toFixed(2)}</td>
+          <td>
+            <span style="font-weight: 600; color: #475569;" title="\${detailsTooltip}">R$ \${v.unitCost.toFixed(2)}</span>
+            \${extrasBadge}
+          </td>
           <td><strong>R$ \${v.totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
           <td style="color: #059669; font-weight: 800;">+ R$ \${v.profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td><span class="badge" style="background: #DCFCE7; color: #166534;">\${v.margin}%</span></td>
@@ -2768,9 +3135,9 @@ const adminHtml = `<!DOCTYPE html>
             <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('\${v.id}')">Excluir</button>
           </td>
         </tr>
-      \`).join('');
+      \`;
+      }).join('');
     }
-
 
     function renderPerdasTable() {
       const tbody = document.getElementById('perdas-table-body');
