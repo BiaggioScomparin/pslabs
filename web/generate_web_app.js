@@ -1380,7 +1380,7 @@ const htmlContent = `<!DOCTYPE html>
                 <option value="1">1.0 ml (Mais concentrado)</option>
                 <option value="2" selected>2.0 ml (Recomendado)</option>
                 <option value="2.5">2.5 ml</option>
-                <option value="3">3.0 ml (Mais diluído)</option>
+                <option value="3">3.0 ml (Água BAC 3ml)</option>
                 <option value="5">5.0 ml</option>
               </select>
             </div>

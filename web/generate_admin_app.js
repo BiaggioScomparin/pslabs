@@ -1602,6 +1602,7 @@ const adminHtml = `<!DOCTYPE html>
         unitName: "frascos",
         defaultQty: 20,
         items: [
+          { name: "Água Bacteriostática 3ml (Álcool Benzílico 0.9%)", defaultCost: 15.00, spec: "Frasco Ampola 3ml" },
           { name: "Água Bacteriostática 10ml (Álcool Benzílico 0.9%)", defaultCost: 25.00, spec: "Frasco Ampola 10ml" },
           { name: "Água Bacteriostática 20ml (Álcool Benzílico 0.9%)", defaultCost: 35.00, spec: "Frasco Ampola 20ml" },
           { name: "Água Bacteriostática 30ml (Álcool Benzílico 0.9%)", defaultCost: 45.00, spec: "Frasco 30ml" },
