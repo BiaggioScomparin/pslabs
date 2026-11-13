@@ -945,7 +945,10 @@ const adminHtml = `<!DOCTYPE html>
                 <div class="panel-title">💰 Registro e Acompanhamento de Vendas (Saídas)</div>
                 <div style="font-size: 12px; color: var(--gray-600);">Controle de todas as vendas com cálculo automático do lucro real de cada transação.</div>
               </div>
-              <button class="btn-sm btn-success" onclick="openModal('modal-venda')">+ Lançar Nova Venda</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-sm btn-outline" style="color: #DC2626; border-color: #FECACA;" onclick="clearAllVendas()">🗑️ Zerar Vendas</button>
+                <button class="btn-sm btn-success" onclick="openModal('modal-venda')">+ Lançar Nova Venda</button>
+              </div>
             </div>
 
             <div class="table-wrap">
@@ -1668,318 +1671,120 @@ const adminHtml = `<!DOCTYPE html>
     let vendas = JSON.parse(localStorage.getItem('psl_vendas') || 'null');
     let perdas = JSON.parse(localStorage.getItem('psl_perdas') || 'null');
 
-    // Default Seed Data if Empty
-    if (!compras || compras.length === 0) {
-      compras = [
-        {
-          id: "CMP-001",
-          date: "2026-11-01",
-          category: "peptide",
-          compoundId: "retatrutide",
-          code: "RT60",
-          name: "Retatrutide",
-          dosage: "60mg",
-          qty: 20,
-          unitCost: 145.10,
-          totalCost: 2902.00,
-          supplier: "SinoPept Direct",
-          notes: "Lote HPLC >99.4%"
-        },
-        {
-          id: "CMP-002",
-          date: "2026-11-02",
-          category: "water",
-          compoundId: "water",
-          code: "AGUA-10ML",
-          name: "Água Bacteriostática",
-          dosage: "10ml (Álcool Benzílico 0.9%)",
-          qty: 50,
-          unitCost: 25.00,
-          totalCost: 1250.00,
-          supplier: "PharmaGrade Soluções",
-          notes: "Frascos ampolas lacrados estéreis"
-        },
-        {
-          id: "CMP-003",
-          date: "2026-11-02",
-          category: "box",
-          compoundId: "box",
-          code: "CAIXA-TER",
-          name: "Caixa Térmica Isopor",
-          dosage: "Padrão 2-4 Frascos c/ Tampa",
-          qty: 100,
-          unitCost: 6.50,
-          totalCost: 650.00,
-          supplier: "Térmicas Express SP",
-          notes: "Isopor EPS alta densidade anti-impacto"
-        },
-        {
-          id: "CMP-004",
-          date: "2026-11-03",
-          category: "label",
-          compoundId: "label",
-          code: "ROT-VINIL",
-          name: "Etiquetas & Rótulos",
-          dosage: "Rótulo Frasco 58x26mm Vinil Fosco",
-          qty: 500,
-          unitCost: 0.80,
-          totalCost: 400.00,
-          supplier: "LabelPrint Tech",
-          notes: "Adesivo impermeável fosco PSL Labs"
-        },
-        {
-          id: "CMP-005",
-          date: "2026-11-03",
-          category: "supplies",
-          compoundId: "supplies",
-          code: "INS-SER",
-          name: "Insumos Gerais",
-          dosage: "Seringas BD 1ml 31G + Swabs Álcool",
-          qty: 200,
-          unitCost: 1.60,
-          totalCost: 320.00,
-          supplier: "MedCirúrgica Distribuidora",
-          notes: "Agulha ultrafina 31G confortável"
-        },
-        {
-          id: "CMP-006",
-          date: "2026-11-03",
-          category: "peptide",
-          compoundId: "tirzepatide",
-          code: "TR50",
-          name: "Tirzepatide",
-          dosage: "50mg",
-          qty: 15,
-          unitCost: 108.60,
-          totalCost: 1629.00,
-          supplier: "Direct Labs Pharma",
-          notes: "Duplo agonista GLP-1/GIP"
-        },
-        {
-          id: "CMP-007",
-          date: "2026-11-04",
-          category: "peptide",
-          compoundId: "ghk-cu",
-          code: "CU50",
-          name: "GHK-Cu",
-          dosage: "50mg",
-          qty: 20,
-          unitCost: 25.40,
-          totalCost: 508.00,
-          supplier: "PureCopper Labs",
-          notes: "Cristais azuis alta pureza"
-        },
-        {
-          id: "CMP-008",
-          date: "2026-11-04",
-          category: "peptide",
-          compoundId: "bpc157",
-          code: "BPC5",
-          name: "BPC-157",
-          dosage: "5mg",
-          qty: 20,
-          unitCost: 37.70,
-          totalCost: 754.00,
-          supplier: "SinoPept Direct",
-          notes: "Grau laboratorial regenerativo"
-        },
-        {
-          id: "CMP-009",
-          date: "2026-11-05",
-          category: "other",
-          compoundId: "other",
-          code: "OUT-FRETE",
-          name: "Outras Despesas",
-          dosage: "Frete Aéreo Internacional Importação",
-          qty: 1,
-          unitCost: 380.00,
-          totalCost: 380.00,
-          supplier: "DHL Express Brasil",
-          notes: "Desembaraço prioritário lote laboratorial"
-        },
-        {
-          id: "CMP-010",
-          date: "2026-11-06",
-          category: "peptide",
-          isGift: true,
-          compoundId: "ghk-cu",
-          code: "CU50",
-          name: "GHK-Cu",
-          dosage: "50mg (Bonificação)",
-          qty: 5,
-          unitCost: 0.00,
-          totalCost: 0.00,
-          supplier: "SinoPept / Fábrica Chinesa",
-          notes: "🎁 Brinde enviado pela fabricante chinesa junto com o lote (Custo R$ 0,00)"
-        }
-      ];
+    // Default Seed Data matching user's real business inventory
+    const defaultCompras = [
+      {
+        id: "CMP-001",
+        date: "2026-11-10",
+        category: "peptide",
+        compoundId: "ghk-cu",
+        code: "CU50",
+        name: "GHK-Cu",
+        dosage: "50mg",
+        qty: 40,
+        unitCost: 25.40,
+        totalCost: 1016.00,
+        supplier: "Fábrica Chinesa / SinoPept",
+        notes: "Lote de 40 frascos registrado"
+      }
+    ];
+    const defaultVendas = []; // ZERO vendas iniciais
+    const defaultPerdas = [
+      {
+        id: "PRD-001",
+        date: "2026-11-11",
+        category: "peptide",
+        compoundId: "ghk-cu",
+        code: "CU50",
+        name: "GHK-Cu",
+        dosage: "50mg",
+        qty: 10,
+        unitCost: 25.40,
+        lossTotal: 254.00,
+        reason: "Fornecedor não enviou",
+        notes: "Faltaram 10 frascos na remessa do fornecedor"
+      },
+      {
+        id: "PRD-002",
+        date: "2026-11-12",
+        category: "peptide",
+        compoundId: "ghk-cu",
+        code: "CU50",
+        name: "GHK-Cu",
+        dosage: "50mg",
+        qty: 1,
+        unitCost: 25.40,
+        lossTotal: 25.40,
+        reason: "Uso próprio",
+        notes: "Retirado 1 frasco para protocolo pessoal"
+      }
+    ];
+
+    if (!compras) {
+      compras = defaultCompras;
       localStorage.setItem('psl_compras', JSON.stringify(compras));
-    } else {
-      // Auto-migrate: ensure every record has category defined
-      let migrated = false;
-      compras.forEach(c => {
-        if (!c.category) {
-          c.category = 'peptide';
-          migrated = true;
-        }
-      });
-      if (migrated) localStorage.setItem('psl_compras', JSON.stringify(compras));
+    }
+    if (!vendas) {
+      vendas = defaultVendas;
+      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+    }
+    if (!perdas) {
+      perdas = defaultPerdas;
+      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
     }
 
-    if (!vendas || vendas.length === 0) {
-      vendas = [
-        {
-          id: "VND-001",
-          date: "2026-11-05",
-          clientName: "Rodrigo Silveira",
-          clientPhone: "11988776655",
-          compoundId: "retatrutide",
-          code: "RT60",
-          name: "Retatrutide",
-          dosage: "60mg",
-          qty: 2,
-          unitPrice: 450.00,
-          unitCost: 186.10,
-          totalSale: 900.00,
-          totalCost: 372.20,
-          profit: 527.80,
-          margin: 58.6,
-          paymentMethod: "Pix",
-          channel: "WhatsApp",
-          status: "Pago"
-        },
-        {
-          id: "VND-002",
-          date: "2026-11-06",
-          clientName: "Dra. Vanessa Lima",
-          clientPhone: "11977665544",
-          compoundId: "ghk-cu",
-          code: "CU50",
-          name: "GHK-Cu",
-          dosage: "50mg",
-          qty: 3,
-          unitPrice: 250.00,
-          unitCost: 66.40,
-          totalSale: 750.00,
-          totalCost: 199.20,
-          profit: 550.80,
-          margin: 73.4,
-          paymentMethod: "Pix",
-          channel: "WhatsApp",
-          status: "Pago"
-        },
-        {
-          id: "VND-003",
-          date: "2026-11-08",
-          clientName: "Carlos Eduardo Santos",
-          clientPhone: "11999887711",
-          compoundId: "tirzepatide",
-          code: "TR50",
-          name: "Tirzepatide",
-          dosage: "50mg",
-          qty: 2,
-          unitPrice: 450.00,
-          unitCost: 149.60,
-          totalSale: 900.00,
-          totalCost: 299.20,
-          profit: 600.80,
-          margin: 66.8,
-          paymentMethod: "Pix",
-          channel: "Loja Online",
-          status: "Pago"
-        },
-        {
-          id: "VND-004",
-          date: "2026-11-09",
-          clientName: "Lucas Zanin",
-          clientPhone: "11988223344",
-          compoundId: "bpc157",
-          code: "BPC5",
-          name: "BPC-157",
-          dosage: "5mg",
-          qty: 2,
-          unitPrice: 319.00,
-          unitCost: 78.70,
-          totalSale: 638.00,
-          totalCost: 157.40,
-          profit: 480.60,
-          margin: 75.3,
-          paymentMethod: "Cartão de Crédito",
-          channel: "Loja Online",
-          status: "Pago"
-        }
-      ];
+    // Auto-purge old demo mock sales (VND-001..VND-004)
+    const demoVendasIds = ['VND-001', 'VND-002', 'VND-003', 'VND-004'];
+    if (vendas && vendas.some(v => demoVendasIds.includes(v.id))) {
+      vendas = vendas.filter(v => !demoVendasIds.includes(v.id));
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
     }
 
-    if (!perdas || perdas.length === 0) {
-      perdas = [
-        {
-          id: "PRD-001",
-          date: "2026-11-08",
-          category: "peptide",
-          compoundId: "retatrutide",
-          code: "RT60",
-          name: "Retatrutide",
-          dosage: "60mg",
-          qty: 1,
-          unitCost: 145.10,
-          lossTotal: 145.10,
-          reason: "Frasco quebrado no manuseio/transporte",
-          notes: "Caiu durante preparação da embalagem de envio"
-        },
-        {
-          id: "PRD-002",
-          date: "2026-11-09",
-          category: "water",
-          compoundId: "water",
-          code: "AGUA-10ML",
-          name: "Água Bacteriostática",
-          dosage: "10ml",
-          qty: 2,
-          unitCost: 25.00,
-          lossTotal: 50.00,
-          reason: "Frasco quebrado no manuseio/transporte",
-          notes: "Ampola trincada no recebimento da remessa"
-        }
-      ];
-      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
-    } else {
-      let migratedP = false;
-      perdas.forEach(p => {
-        if (!p.category) {
-          p.category = 'peptide';
-          migratedP = true;
-        }
-      });
-      if (migratedP) localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+    // Auto-purge old mock compras if they contain the old demo non-ghk-cu items
+    const demoComprasIds = ['CMP-001', 'CMP-002', 'CMP-003', 'CMP-004', 'CMP-005', 'CMP-006', 'CMP-007', 'CMP-008', 'CMP-009', 'CMP-010'];
+    if (compras && compras.some(c => demoComprasIds.includes(c.id) && c.compoundId !== 'ghk-cu')) {
+      compras = compras.filter(c => !(demoComprasIds.includes(c.id) && c.compoundId !== 'ghk-cu'));
+      if (compras.length === 0) compras = defaultCompras;
+      localStorage.setItem('psl_compras', JSON.stringify(compras));
     }
+
+    // Auto-purge old mock perdas (Retatrutide/Água quebradas do demo)
+    const demoPerdasIds = ['PRD-001', 'PRD-002'];
+    if (perdas && perdas.some(p => demoPerdasIds.includes(p.id) && (p.compoundId === 'retatrutide' || p.compoundId === 'water'))) {
+      perdas = perdas.filter(p => !(demoPerdasIds.includes(p.id) && (p.compoundId === 'retatrutide' || p.compoundId === 'water')));
+      if (perdas.length === 0) perdas = defaultPerdas;
+      localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+    }
+
+    // Auto-migrate: ensure every record has category defined
+    let migrated = false;
+    compras.forEach(c => {
+      if (!c.category) {
+        c.category = 'peptide';
+        migrated = true;
+      }
+    });
+    if (migrated) localStorage.setItem('psl_compras', JSON.stringify(compras));
+
+    let migratedP = false;
+    perdas.forEach(p => {
+      if (!p.category) {
+        p.category = 'peptide';
+        migratedP = true;
+      }
+    });
+    if (migratedP) localStorage.setItem('psl_perdas', JSON.stringify(perdas));
 
     // Default orders demo if empty
     if (!orders) {
-      orders = [
-        {
-          id: "PED-1082",
-          date: "Hoje, 14:20",
-          client: "Carlos Eduardo",
-          phone: "5511999887711",
-          items: "Tirzepatide 50mg (1 un)",
-          delivery: "Uber Flash SP (2h)",
-          total: 450.00,
-          status: "Aguardando Motoboy"
-        },
-        {
-          id: "PED-1081",
-          date: "Ontem, 18:45",
-          client: "Dra. Patricia Lima",
-          phone: "5511988776655",
-          items: "GHK-Cu 50mg (2 un)",
-          delivery: "Sedex Térmico BR",
-          total: 500.00,
-          status: "Enviado / Rastreio"
-        }
-      ];
+      orders = [];
       localStorage.setItem('psl_orders', JSON.stringify(orders));
+    } else {
+      const demoOrdersIds = ['PED-1081', 'PED-1082'];
+      if (orders.some(o => demoOrdersIds.includes(o.id))) {
+        orders = orders.filter(o => !demoOrdersIds.includes(o.id));
+        localStorage.setItem('psl_orders', JSON.stringify(orders));
+      }
     }
 
     // Auth verification
@@ -2599,6 +2404,14 @@ const adminHtml = `<!DOCTYPE html>
       renderBalancoTable();
     }
 
+    function clearAllVendas() {
+      if (!confirm("Deseja realmente ZERAR todo o histórico de vendas? Esta ação removerá todas as vendas cadastradas e recalculará o estoque físico.")) return;
+      vendas = [];
+      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+      initializeApp();
+      showToast("Histórico de vendas zerado com sucesso!");
+    }
+
     function deleteVenda(id) {
       if (!confirm("Tem certeza que deseja excluir esta venda?")) return;
       vendas = vendas.filter(v => v.id !== id);
@@ -3095,10 +2908,11 @@ const adminHtml = `<!DOCTYPE html>
     }
 
     function resetToDemoData() {
-      if (!confirm("Deseja resetar para os dados iniciais de demonstração?")) return;
+      if (!confirm("Deseja resetar para os dados iniciais de estoque?")) return;
       localStorage.removeItem('psl_compras');
       localStorage.removeItem('psl_vendas');
       localStorage.removeItem('psl_perdas');
+      localStorage.removeItem('psl_orders');
       window.location.reload();
     }
 

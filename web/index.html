@@ -1374,38 +1374,48 @@ let selectedDoses = {}; // { compoundId: doseIndex }
 let cart = {}; // { productCode: qty }
 let sellerWhatsapp = localStorage.getItem('psl_seller_wa') || '5511999999999';
 
-// Default Seed Data if user has not registered purchases in Admin yet
+// Default Seed Data matching user's real business inventory
 const defaultCompras = [
-  { id: "CMP-001", date: "2026-11-01", category: "peptide", compoundId: "retatrutide", code: "RT60", name: "Retatrutide", dosage: "60mg", qty: 20 },
-  { id: "CMP-002", date: "2026-11-02", category: "water", compoundId: "water", code: "AGUA-10ML", name: "Água Bacteriostática", dosage: "10ml", qty: 50 },
-  { id: "CMP-003", date: "2026-11-02", category: "box", compoundId: "box", code: "CAIXA-TER", name: "Caixa Térmica Isopor", dosage: "Padrão 2-4 Frascos", qty: 100 },
-  { id: "CMP-004", date: "2026-11-03", category: "label", compoundId: "label", code: "ROT-VINIL", name: "Etiquetas & Rótulos", dosage: "Rótulo Frasco Vinil", qty: 500 },
-  { id: "CMP-005", date: "2026-11-03", category: "supplies", compoundId: "supplies", code: "INS-SER", name: "Insumos Gerais", dosage: "Seringas BD 1ml 31G + Swabs", qty: 200 },
-  { id: "CMP-006", date: "2026-11-03", category: "peptide", compoundId: "tirzepatide", code: "TR50", name: "Tirzepatide", dosage: "50mg", qty: 15 },
-  { id: "CMP-007", date: "2026-11-04", category: "peptide", compoundId: "ghk-cu", code: "CU50", name: "GHK-Cu", dosage: "50mg", qty: 20 },
-  { id: "CMP-008", date: "2026-11-04", category: "peptide", compoundId: "bpc157", code: "BPC5", name: "BPC-157", dosage: "5mg", qty: 20 },
-  { id: "CMP-009", date: "2026-11-05", category: "other", compoundId: "other", code: "OUT-FRETE", name: "Outras Despesas", dosage: "Frete Aéreo Internacional", qty: 1 },
-  { id: "CMP-010", date: "2026-11-06", category: "peptide", isGift: true, compoundId: "ghk-cu", code: "CU50", name: "GHK-Cu", dosage: "50mg (Bonificação)", qty: 5 }
+  { id: "CMP-001", date: "2026-11-10", category: "peptide", compoundId: "ghk-cu", code: "CU50", name: "GHK-Cu", dosage: "50mg", qty: 40, unitCost: 25.40, totalCost: 1016.00, supplier: "Fábrica Chinesa / SinoPept", notes: "Lote de 40 frascos registrado" }
 ];
-const defaultVendas = [
-  { id: "VND-001", date: "2026-11-05", compoundId: "retatrutide", code: "RT60", qty: 2 },
-  { id: "VND-002", date: "2026-11-06", compoundId: "ghk-cu", code: "CU50", qty: 3 },
-  { id: "VND-003", date: "2026-11-08", compoundId: "tirzepatide", code: "TR50", qty: 2 },
-  { id: "VND-004", date: "2026-11-09", compoundId: "bpc157", code: "BPC5", qty: 2 }
-];
+const defaultVendas = []; // ZERO vendas iniciais
 const defaultPerdas = [
-  { id: "PRD-001", date: "2026-11-08", category: "peptide", compoundId: "retatrutide", code: "RT60", qty: 1 }
+  { id: "PRD-001", date: "2026-11-11", category: "peptide", compoundId: "ghk-cu", code: "CU50", name: "GHK-Cu", dosage: "50mg", qty: 10, unitCost: 25.40, lossTotal: 254.00, reason: "Fornecedor não enviou", notes: "Faltaram 10 frascos na remessa do fornecedor" },
+  { id: "PRD-002", date: "2026-11-12", category: "peptide", compoundId: "ghk-cu", code: "CU50", name: "GHK-Cu", dosage: "50mg", qty: 1, unitCost: 25.40, lossTotal: 25.40, reason: "Uso próprio", notes: "Retirado 1 frasco para protocolo pessoal" }
 ];
 
 // Load live physical data from localStorage
-const rawCompras = localStorage.getItem('psl_compras');
-const pslCompras = rawCompras ? JSON.parse(rawCompras) : defaultCompras;
-const rawVendas = localStorage.getItem('psl_vendas');
-const pslVendas = rawVendas ? JSON.parse(rawVendas) : defaultVendas;
-const rawPerdas = localStorage.getItem('psl_perdas');
-const pslPerdas = rawPerdas ? JSON.parse(rawPerdas) : defaultPerdas;
+let rawCompras = localStorage.getItem('psl_compras');
+let pslCompras = rawCompras ? JSON.parse(rawCompras) : defaultCompras;
+let rawVendas = localStorage.getItem('psl_vendas');
+let pslVendas = rawVendas ? JSON.parse(rawVendas) : defaultVendas;
+let rawPerdas = localStorage.getItem('psl_perdas');
+let pslPerdas = rawPerdas ? JSON.parse(rawPerdas) : defaultPerdas;
 
-// Persist initial demo data if empty
+// Auto-purge old demo mock sales (VND-001..VND-004)
+const demoVendasIds = ['VND-001', 'VND-002', 'VND-003', 'VND-004'];
+if (pslVendas && pslVendas.some(v => demoVendasIds.includes(v.id))) {
+  pslVendas = pslVendas.filter(v => !demoVendasIds.includes(v.id));
+  localStorage.setItem('psl_vendas', JSON.stringify(pslVendas));
+}
+
+// Auto-purge old mock compras so ONLY real user purchases remain
+const demoComprasIds = ['CMP-001', 'CMP-002', 'CMP-003', 'CMP-004', 'CMP-005', 'CMP-006', 'CMP-007', 'CMP-008', 'CMP-009', 'CMP-010'];
+if (pslCompras && pslCompras.some(c => demoComprasIds.includes(c.id) && c.compoundId !== 'ghk-cu')) {
+  pslCompras = pslCompras.filter(c => !(demoComprasIds.includes(c.id) && c.compoundId !== 'ghk-cu'));
+  if (pslCompras.length === 0) pslCompras = defaultCompras;
+  localStorage.setItem('psl_compras', JSON.stringify(pslCompras));
+}
+
+// Auto-purge old mock perdas (Retatrutide/Água quebradas do demo)
+const demoPerdasIds = ['PRD-001', 'PRD-002'];
+if (pslPerdas && pslPerdas.some(p => demoPerdasIds.includes(p.id) && (p.compoundId === 'retatrutide' || p.compoundId === 'water'))) {
+  pslPerdas = pslPerdas.filter(p => !(demoPerdasIds.includes(p.id) && (p.compoundId === 'retatrutide' || p.compoundId === 'water')));
+  if (pslPerdas.length === 0) pslPerdas = defaultPerdas;
+  localStorage.setItem('psl_perdas', JSON.stringify(pslPerdas));
+}
+
+// Persist initial data if empty
 if (!rawCompras) localStorage.setItem('psl_compras', JSON.stringify(pslCompras));
 if (!rawVendas) localStorage.setItem('psl_vendas', JSON.stringify(pslVendas));
 if (!rawPerdas) localStorage.setItem('psl_perdas', JSON.stringify(pslPerdas));
