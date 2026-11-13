@@ -1078,11 +1078,30 @@ const adminHtml = `<!DOCTYPE html>
         <!-- TAB 6: CONTROLE DE ESTOQUE PRONTA ENTREGA (SP) -->
         <!-- ========================================================= -->
         <div id="tab-estoque" class="view-tab">
+          <!-- Estoque KPI Cards -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 16px;">
+            <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 18px; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--gray-600);">⚡ Compostos Pronta Entrega</div>
+              <div style="font-size: 24px; font-weight: 900; color: #059669; margin: 4px 0;" id="kpi-stock-instock-count">0</div>
+              <div style="font-size: 11px; color: var(--gray-400);">Com estoque físico disponível em SP</div>
+            </div>
+            <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 18px; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--gray-600);">⏳ Compostos Sob Encomenda</div>
+              <div style="font-size: 24px; font-weight: 900; color: #D97706; margin: 4px 0;" id="kpi-stock-preorder-count">0</div>
+              <div style="font-size: 11px; color: var(--gray-400);">Sem compra ou estoque zerado (3-5 dias)</div>
+            </div>
+            <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 18px; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--gray-600);">📦 Frascos Físicos em SP</div>
+              <div style="font-size: 24px; font-weight: 900; color: var(--primary); margin: 4px 0;" id="kpi-stock-total-vials">0</div>
+              <div style="font-size: 11px; color: var(--gray-400);">Saldo total de unidades para envio imediato</div>
+            </div>
+          </div>
+
           <div class="panel">
             <div class="panel-header">
               <div>
                 <div class="panel-title">📦 Controle de Estoque Pronta-Entrega (SP)</div>
-                <div style="font-size: 12px; color: var(--gray-600);">Altere o status para atualizar instantaneamente o catálogo do cliente no site.</div>
+                <div style="font-size: 12px; color: var(--gray-600);">Sincronizado automaticamente com Compras x Vendas x Perdas. Somente o que tem estoque físico é Pronta Entrega.</div>
               </div>
               <input type="text" id="stock-search" placeholder="Filtrar composto..." oninput="filterStockTable()" style="padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px;">
             </div>
@@ -2913,6 +2932,32 @@ const adminHtml = `<!DOCTYPE html>
       }).join('');
     }
 
+    function renderVendasTable() {
+      const tbody = document.getElementById('vendas-table-body');
+      if (vendas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = vendas.map(v => \`
+        <tr>
+          <td><strong>\${v.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.date}</span></td>
+          <td><strong>\${v.clientName}</strong><br><span style="font-size: 11px; color: var(--gray-400);">\${v.channel} · \${v.clientPhone || ''}</span></td>
+          <td><strong>\${v.name}</strong><br><span class="badge" style="background: #E0E7FF; color: #3730A3;">\${v.dosage}</span></td>
+          <td><strong>\${v.qty}</strong></td>
+          <td>R$ \${v.unitPrice.toFixed(2)}</td>
+          <td style="color: var(--gray-400);">R$ \${v.unitCost.toFixed(2)}</td>
+          <td><strong>R$ \${v.totalSale.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+          <td style="color: #059669; font-weight: 800;">+ R$ \${v.profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td><span class="badge" style="background: #DCFCE7; color: #166534;">\${v.margin}%</span></td>
+          <td>\${v.paymentMethod}</td>
+          <td>
+            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('\${v.id}')">Excluir</button>
+          </td>
+        </tr>
+      \`).join('');
+    }
+
+
     function renderPerdasTable() {
       const tbody = document.getElementById('perdas-table-body');
       if (perdas.length === 0) {
@@ -3057,36 +3102,85 @@ const adminHtml = `<!DOCTYPE html>
       window.location.reload();
     }
 
-    // Stock Management Tab
+    // Stock Management Tab - Synchronized with Compras, Vendas and Perdas
     function renderStockTable() {
       const tbody = document.getElementById('stock-tbody');
       tbody.innerHTML = '';
 
+      let totalInStockCompounds = 0;
+      let totalPreOrderCompounds = 0;
+      let totalPhysicalVials = 0;
+
       INITIAL_COMPOUNDS.forEach(comp => {
         const tr = document.createElement('tr');
-        const st = (stockData && stockData[comp.id]) ? stockData[comp.id] : 'in_stock';
-        
+
+        // Calculate real physical balance per dose for this compound
+        let compPhysicalStock = 0;
+        const doseDetails = comp.doses.map(dose => {
+          const comprados = compras.filter(c => c.code === dose.code).reduce((a, b) => a + (Number(b.qty) || 0), 0);
+          const vendidos = vendas.filter(v => v.code === dose.code).reduce((a, b) => a + (Number(b.qty) || 0), 0);
+          const perdidos = perdas.filter(p => p.code === dose.code).reduce((a, b) => a + (Number(b.qty) || 0), 0);
+          const saldo = Math.max(0, comprados - vendidos - perdidos);
+          compPhysicalStock += saldo;
+          return { code: dose.code, label: dose.label, comprados, vendidos, perdidos, saldo };
+        });
+
+        totalPhysicalVials += compPhysicalStock;
+
+        // Determine status: manual override or automated based on physical stock
+        const override = (stockData && stockData[comp.id]) ? (typeof stockData[comp.id] === 'string' ? stockData[comp.id] : stockData[comp.id].status) : null;
+        let effectiveStatus = '';
+        if (override && override !== 'auto') {
+          effectiveStatus = override;
+        } else {
+          effectiveStatus = compPhysicalStock > 0 ? 'in_stock' : 'pre_order';
+        }
+
+        if (effectiveStatus === 'in_stock') totalInStockCompounds++;
+        else totalPreOrderCompounds++;
+
         let badgeHtml = '';
-        if (st === 'in_stock') badgeHtml = '<span class="badge badge-in-stock">Pronta Entrega SP</span>';
-        else if (st === 'pre_order') badgeHtml = '<span class="badge badge-pre-order">Sob Encomenda (3-5d)</span>';
-        else badgeHtml = '<span class="badge badge-out-of-stock">Esgotado</span>';
+        if (effectiveStatus === 'in_stock') {
+          badgeHtml = '<span class="badge badge-in-stock">⚡ Pronta Entrega SP (' + compPhysicalStock + ' un)</span>';
+        } else if (effectiveStatus === 'pre_order') {
+          badgeHtml = '<span class="badge badge-pre-order">⏳ Sob Encomenda (3-5d)</span>';
+        } else {
+          badgeHtml = '<span class="badge badge-out-of-stock">❌ Esgotado</span>';
+        }
+
+        // Doses pill summary
+        const dosePillsHtml = doseDetails.map(d => {
+          const bg = d.saldo > 0 ? '#D1FAE5' : 'var(--gray-100)';
+          const color = d.saldo > 0 ? '#065F46' : 'var(--gray-600)';
+          const weight = d.saldo > 0 ? '800' : '600';
+          return '<span class="badge" style="background: ' + bg + '; color: ' + color + '; font-weight: ' + weight + '; margin-right: 4px; margin-bottom: 2px;" title="Comprados: ' + d.comprados + ' | Vendidos: ' + d.vendidos + ' | Perdas: ' + d.perdidos + '">' + d.label + ': ' + d.saldo + ' un</span>';
+        }).join(' ');
 
         tr.innerHTML = \`
           <td><strong>\${comp.name}</strong></td>
           <td><span style="font-size: 11px; color: var(--gray-400);">\${comp.line}</span></td>
-          <td>\${comp.doses.map(d => '<span class="badge" style="background: var(--gray-100); color: var(--gray-700); margin-right: 4px;">' + d.label + '</span>').join('')}</td>
+          <td>\${dosePillsHtml}</td>
           <td id="stock-badge-\${comp.id}">\${badgeHtml}</td>
-          <td><strong>\${comp.doses[0].stockQty} frascos</strong></td>
+          <td><strong style="color: \${compPhysicalStock > 0 ? '#059669' : 'var(--gray-400)'};">\${compPhysicalStock} frascos</strong></td>
           <td>
             <select class="form-select" style="padding: 4px 8px; font-size: 11px;" onchange="updateCompoundStock('\${comp.id}', this.value)">
-              <option value="in_stock" \${st === 'in_stock' ? 'selected' : ''}>Pronta Entrega</option>
-              <option value="pre_order" \${st === 'pre_order' ? 'selected' : ''}>Sob Encomenda</option>
-              <option value="out_of_stock" \${st === 'out_of_stock' ? 'selected' : ''}>Esgotado</option>
+              <option value="auto" \${(!override || override === 'auto') ? 'selected' : ''}>🤖 Automático (\${compPhysicalStock > 0 ? 'Pronta Entrega' : 'Sob Encomenda'})</option>
+              <option value="in_stock" \${override === 'in_stock' ? 'selected' : ''}>⚡ Forçar Pronta Entrega</option>
+              <option value="pre_order" \${override === 'pre_order' ? 'selected' : ''}>⏳ Forçar Sob Encomenda</option>
+              <option value="out_of_stock" \${override === 'out_of_stock' ? 'selected' : ''}>❌ Forçar Esgotado</option>
             </select>
           </td>
         \`;
         tbody.appendChild(tr);
       });
+
+      // Update Stock Tab KPI Banner
+      const kpiInStock = document.getElementById('kpi-stock-instock-count');
+      const kpiPreOrder = document.getElementById('kpi-stock-preorder-count');
+      const kpiTotalVials = document.getElementById('kpi-stock-total-vials');
+      if (kpiInStock) kpiInStock.innerText = totalInStockCompounds;
+      if (kpiPreOrder) kpiPreOrder.innerText = totalPreOrderCompounds;
+      if (kpiTotalVials) kpiTotalVials.innerText = totalPhysicalVials;
     }
 
     function updateCompoundStock(compId, status) {
