@@ -1434,54 +1434,57 @@ function getDosePhysicalStock(code) {
 }
 
 // Initialize Compounds with Dynamic Stock Status
-PSL_COMPOUNDS.forEach(comp => {
-  let compoundTotalPhysicalStock = 0;
-  let firstStockDoseIdx = -1;
+function updateAllCompoundsStock() {
+  PSL_COMPOUNDS.forEach(comp => {
+    let compoundTotalPhysicalStock = 0;
+    let firstStockDoseIdx = -1;
 
-  comp.doses.forEach((dose, idx) => {
-    // Custom price overrides
-    if (customPrices[dose.code + '_b2c']) {
-      dose.suggestedPriceB2C = customPrices[dose.code + '_b2c'];
+    comp.doses.forEach((dose, idx) => {
+      // Custom price overrides
+      if (customPrices[dose.code + '_b2c']) {
+        dose.suggestedPriceB2C = customPrices[dose.code + '_b2c'];
+      }
+      if (customPrices[dose.code + '_b2b']) {
+        dose.b2bBoxPrice = customPrices[dose.code + '_b2b'];
+      }
+
+      // Physical inventory calculation: Compras - Vendas - Perdas
+      dose.stockQty = getDosePhysicalStock(dose.code);
+      dose.stockStatus = dose.stockQty > 0 ? 'in_stock' : 'pre_order';
+      compoundTotalPhysicalStock += dose.stockQty;
+
+      if (dose.stockQty > 0 && firstStockDoseIdx === -1) {
+        firstStockDoseIdx = idx;
+      }
+    });
+
+    // Compound-level stock status
+    const manualStock = stockData[comp.id];
+    const manualStatus = typeof manualStock === 'string' ? manualStock : (manualStock ? manualStock.status : null);
+
+    if (manualStatus === 'out_of_stock') {
+      comp.stockStatus = 'out_of_stock';
+    } else if (manualStatus === 'pre_order') {
+      comp.stockStatus = 'pre_order';
+    } else if (manualStatus === 'in_stock') {
+      comp.stockStatus = 'in_stock';
+    } else {
+      // STRICT RULE: ONLY compounds with recorded purchases and remaining stock > 0 are in_stock (Pronta Entrega SP); ALL others are pre_order (Sob Encomenda)!
+      comp.stockStatus = compoundTotalPhysicalStock > 0 ? 'in_stock' : 'pre_order';
     }
-    if (customPrices[dose.code + '_b2b']) {
-      dose.b2bBoxPrice = customPrices[dose.code + '_b2b'];
-    }
 
-    // Physical inventory calculation: Compras - Vendas - Perdas
-    dose.stockQty = getDosePhysicalStock(dose.code);
-    dose.stockStatus = dose.stockQty > 0 ? 'in_stock' : 'pre_order';
-    compoundTotalPhysicalStock += dose.stockQty;
+    comp.totalPhysicalStock = compoundTotalPhysicalStock;
 
-    if (dose.stockQty > 0 && firstStockDoseIdx === -1) {
-      firstStockDoseIdx = idx;
+    // Auto-select the dose that has positive physical stock if available
+    if (firstStockDoseIdx !== -1) {
+      comp.defaultDoseIndex = firstStockDoseIdx;
+      selectedDoses[comp.id] = firstStockDoseIdx;
+    } else {
+      selectedDoses[comp.id] = comp.defaultDoseIndex || 0;
     }
   });
-
-  // Compound-level stock status
-  const manualStock = stockData[comp.id];
-  const manualStatus = typeof manualStock === 'string' ? manualStock : (manualStock ? manualStock.status : null);
-
-  if (manualStatus === 'out_of_stock') {
-    comp.stockStatus = 'out_of_stock';
-  } else if (manualStatus === 'pre_order') {
-    comp.stockStatus = 'pre_order';
-  } else if (manualStatus === 'in_stock') {
-    comp.stockStatus = 'in_stock';
-  } else {
-    // STRICT RULE: ONLY compounds with recorded purchases and remaining stock > 0 are in_stock (Pronta Entrega SP); ALL others are pre_order (Sob Encomenda)!
-    comp.stockStatus = compoundTotalPhysicalStock > 0 ? 'in_stock' : 'pre_order';
-  }
-
-  comp.totalPhysicalStock = compoundTotalPhysicalStock;
-
-  // Auto-select the dose that has positive physical stock if available
-  if (firstStockDoseIdx !== -1) {
-    comp.defaultDoseIndex = firstStockDoseIdx;
-    selectedDoses[comp.id] = firstStockDoseIdx;
-  } else {
-    selectedDoses[comp.id] = comp.defaultDoseIndex || 0;
-  }
-});
+}
+updateAllCompoundsStock();
 
 function promptWhatsappNumber() {
   const num = prompt("Digite o número do WhatsApp com DDD (apenas números, ex: 5511999999999):", sellerWhatsapp);
@@ -2024,6 +2027,42 @@ function updateSyringeSvg(units, maxUnits) {
 // Initialize
 renderCompounds();
 calculateDose();
+
+// Live Synchronization with VPS Database
+async function syncFromDatabase() {
+  try {
+    const res = await fetch('/api/psl');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.ok) {
+      if (Array.isArray(data.compras)) {
+        pslCompras = data.compras;
+        localStorage.setItem('psl_compras', JSON.stringify(pslCompras));
+      }
+      if (Array.isArray(data.vendas)) {
+        pslVendas = data.vendas;
+        localStorage.setItem('psl_vendas', JSON.stringify(pslVendas));
+      }
+      if (Array.isArray(data.perdas)) {
+        pslPerdas = data.perdas;
+        localStorage.setItem('psl_perdas', JSON.stringify(pslPerdas));
+      }
+      if (data.stockOverrides) {
+        Object.assign(stockData, data.stockOverrides);
+        localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+      }
+      if (data.settings && data.settings.wa) {
+        sellerWhatsapp = data.settings.wa;
+        localStorage.setItem('psl_seller_wa', sellerWhatsapp);
+      }
+      updateAllCompoundsStock();
+      filterCompounds();
+    }
+  } catch (e) {
+    // Silently fallback to cached local data
+  }
+}
+syncFromDatabase();
 
   </script>
 </body>

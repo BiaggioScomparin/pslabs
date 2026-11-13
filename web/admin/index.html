@@ -623,7 +623,8 @@
       <!-- Topbar -->
       <div class="admin-topbar">
         <div class="topbar-title" id="page-title">📈 Painel de Lucro Real &amp; DRE</div>
-        <div style="display: flex; gap: 8px;">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <span id="db-sync-badge" title="Sincronização em tempo real com PostgreSQL na VPS. Clique para atualizar." style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 100px; background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; cursor: pointer; transition: all 0.2s;" onclick="syncFromDatabase(true)">🟢 VPS Conectado</span>
           <button class="btn-sm btn-primary" onclick="openModal('modal-compra')">+ Nova Compra</button>
           <button class="btn-sm btn-success" onclick="openModal('modal-venda')">+ Nova Venda</button>
           <button class="btn-sm btn-danger" onclick="openModal('modal-perda')">+ Registrar Perda</button>
@@ -1808,6 +1809,90 @@
       }
     }
 
+    // Live PostgreSQL VPS Synchronization
+    let isDbSyncing = false;
+    let isDbConnected = false;
+
+    async function syncFromDatabase(showNotification = false) {
+      if (isDbSyncing) return;
+      isDbSyncing = true;
+      const badge = document.getElementById('db-sync-badge');
+      if (badge) {
+        badge.innerHTML = '🟡 Sincronizando...';
+        badge.style.background = '#FEF3C7';
+        badge.style.color = '#D97706';
+        badge.style.borderColor = '#FDE68A';
+      }
+
+      try {
+        const res = await fetch('/api/psl');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data && data.ok) {
+          isDbConnected = true;
+          if (Array.isArray(data.compras)) {
+            compras = data.compras;
+            localStorage.setItem('psl_compras', JSON.stringify(compras));
+          }
+          if (Array.isArray(data.vendas)) {
+            vendas = data.vendas;
+            localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+          }
+          if (Array.isArray(data.perdas)) {
+            perdas = data.perdas;
+            localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+          }
+          if (data.stockOverrides) {
+            stockData = Object.assign(stockData || {}, data.stockOverrides);
+            localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+          }
+          if (data.settings) {
+            if (data.settings.wa) localStorage.setItem('psl_seller_wa', data.settings.wa);
+            if (data.settings.pix) localStorage.setItem('psl_pix_key', data.settings.pix);
+          }
+
+          if (badge) {
+            badge.innerHTML = '🟢 VPS Conectado';
+            badge.style.background = '#ECFDF5';
+            badge.style.color = '#059669';
+            badge.style.borderColor = '#A7F3D0';
+          }
+          renderDRE();
+          renderComprasTable();
+          renderVendasTable();
+          renderPerdasTable();
+          renderBalancoTable();
+          renderStockTable();
+          if (showNotification) showToast("Dados sincronizados com o banco VPS!");
+        }
+      } catch (err) {
+        console.warn("Sync offline / fallback:", err);
+        if (badge) {
+          badge.innerHTML = '⚪ Modo Local (Offline)';
+          badge.style.background = '#F1F5F9';
+          badge.style.color = '#64748B';
+          badge.style.borderColor = '#CBD5E1';
+        }
+      } finally {
+        isDbSyncing = false;
+      }
+    }
+
+    async function apiSync(action, payload) {
+      try {
+        const res = await fetch('/api/psl', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: action, payload: payload })
+        });
+        if (!res.ok) {
+          console.warn('apiSync warning:', action, res.status);
+        }
+      } catch (err) {
+        console.warn('apiSync offline:', action, err);
+      }
+    }
+
     // Auth verification
     function checkAuthOnLoad() {
       const isAuth = sessionStorage.getItem('psl_admin_auth');
@@ -2490,6 +2575,7 @@
 
       compras.unshift(newCompra);
       localStorage.setItem('psl_compras', JSON.stringify(compras));
+      apiSync('save_compra', newCompra);
 
       closeModal('modal-compra');
       showToast(finalIsGift ? ("🎁 Brinde registrado com sucesso: " + name + " (" + qty + " un a R$ 0)") : ("Compra registrada: " + name + " (" + qty + " un)"));
@@ -2502,6 +2588,7 @@
       if (!confirm("Tem certeza que deseja excluir esta compra?")) return;
       compras = compras.filter(c => c.id !== id);
       localStorage.setItem('psl_compras', JSON.stringify(compras));
+      apiSync('delete_compra', { id });
       showToast("Compra excluída!");
       renderDRE();
       renderComprasTable();
@@ -2631,6 +2718,7 @@
 
       vendas.unshift(newVenda);
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+      apiSync('save_venda', newVenda);
 
       closeModal('modal-venda');
       showToast("Venda de R$ " + totalSale.toFixed(2) + " registrada!");
@@ -2644,6 +2732,7 @@
       if (!confirm("Deseja realmente ZERAR todo o histórico de vendas? Esta ação removerá todas as vendas cadastradas e recalculará o estoque físico.")) return;
       vendas = [];
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+      apiSync('clear_vendas', {});
       initializeApp();
       showToast("Histórico de vendas zerado com sucesso!");
     }
@@ -2652,6 +2741,7 @@
       if (!confirm("Tem certeza que deseja excluir esta venda?")) return;
       vendas = vendas.filter(v => v.id !== id);
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+      apiSync('delete_venda', { id });
       showToast("Venda excluída!");
       renderDRE();
       renderVendasTable();
@@ -2720,6 +2810,7 @@
 
       perdas.unshift(newPerda);
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+      apiSync('save_perda', newPerda);
 
       closeModal('modal-perda');
       showToast("Perda de R$ " + lossTotal.toFixed(2) + " registrada no DRE.");
@@ -2732,6 +2823,7 @@
       if (!confirm("Tem certeza que deseja excluir este registro de perda?")) return;
       perdas = perdas.filter(p => p.id !== id);
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
+      apiSync('delete_perda', { id });
       showToast("Registro de perda excluído!");
       renderDRE();
       renderPerdasTable();
@@ -3249,6 +3341,7 @@
       if (!stockData) stockData = {};
       stockData[compId] = status;
       localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
+      apiSync('update_stock', { compoundId: compId, status: status });
       renderStockTable();
       showToast("Estoque atualizado no catálogo!");
     }
@@ -3346,8 +3439,15 @@
       const pix = document.getElementById('cfg-pix').value.trim();
       const newPin = document.getElementById('cfg-new-pin').value.trim();
 
-      if (wa) localStorage.setItem('psl_seller_wa', wa.replace(/D/g, ''));
-      if (pix) localStorage.setItem('psl_pix_key', pix);
+      if (wa) {
+        const cleanWa = wa.replace(/D/g, '');
+        localStorage.setItem('psl_seller_wa', cleanWa);
+        apiSync('save_setting', { key: 'wa', value: cleanWa });
+      }
+      if (pix) {
+        localStorage.setItem('psl_pix_key', pix);
+        apiSync('save_setting', { key: 'pix', value: pix });
+      }
       if (newPin) {
         if (newPin.length < 4) {
           alert("O PIN deve ter no mínimo 4 dígitos.");
@@ -3373,6 +3473,8 @@
       const pix = localStorage.getItem('psl_pix_key') || 'financeiro@psllabs.com.br';
       if (document.getElementById('cfg-wa')) document.getElementById('cfg-wa').value = wa;
       if (document.getElementById('cfg-pix')) document.getElementById('cfg-pix').value = pix;
+
+      syncFromDatabase();
     }
 
     // Auto-start auth check
