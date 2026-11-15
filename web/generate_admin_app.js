@@ -675,9 +675,9 @@ const adminHtml = `<!DOCTYPE html>
       <p style="font-size: 13.5px; color: var(--gray-600); margin-bottom: 16px;">
         Digite o PIN de segurança para gerenciar compras, vendas, perdas e financeiro:
       </p>
-      <input type="password" id="admin-pin-input" class="auth-input" placeholder="••••" maxlength="10">
+      <input type="password" id="admin-pin-input" class="auth-input" placeholder="Senha administrativa" autocomplete="current-password">
       <button class="btn-auth" onclick="verifyPin()">Entrar no Painel</button>
-      <div style="font-size: 11px; color: var(--gray-400); margin-top: 14px;">PIN Padrão: <strong>psl2026</strong></div>
+      <div style="font-size: 11px; color: var(--gray-400); margin-top: 14px;">Acesso protegido por autenticação no servidor</div>
     </div>
   </div>
 
@@ -1266,8 +1266,8 @@ const adminHtml = `<!DOCTYPE html>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Alterar Senha / PIN de Acesso ao Painel</label>
-              <input type="password" id="cfg-new-pin" class="form-input" placeholder="Novo PIN">
+              <label class="form-label">Senha do administrador (gerenciada no ambiente de hospedagem)</label>
+              <input type="password" id="cfg-new-pin" class="form-input" placeholder="Configure ADMIN_PASSWORD na hospedagem" disabled>
             </div>
 
             <button class="btn-sm btn-primary" onclick="saveAdminSettings()" style="height: 42px; font-size: 14px; width: 100%;">
@@ -1734,7 +1734,7 @@ const adminHtml = `<!DOCTYPE html>
   <!-- JavaScript Application Engine -->
   <script>
     const INITIAL_COMPOUNDS = ${JSON.stringify(compoundList)};
-    const DEFAULT_PIN = "psl2026";
+    // Authentication is validated on the server; no PIN is stored in browser code.
 
     // Insumos & Suprimentos Presets
     const SUPPLY_PRESETS = {
@@ -2013,30 +2013,36 @@ const adminHtml = `<!DOCTYPE html>
       }
     }
 
-    // Auth verification
-    function checkAuthOnLoad() {
-      const isAuth = sessionStorage.getItem('psl_admin_auth');
-      if (isAuth === 'true') {
+    // Auth verified by signed HttpOnly cookie, never by browser storage.
+    async function checkAuthOnLoad() {
+      try {
+        const response = await fetch('/api/psl?session=1', { credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) throw new Error('Unauthorized');
         document.getElementById('auth-overlay').style.display = 'none';
         document.getElementById('admin-app').style.display = 'flex';
         initializeApp();
-      } else {
+      } catch {
         document.getElementById('auth-overlay').style.display = 'flex';
         document.getElementById('admin-app').style.display = 'none';
-        document.getElementById('admin-pin-input').focus();
       }
     }
 
-    function verifyPin() {
-      const savedPin = localStorage.getItem('psl_admin_pin') || DEFAULT_PIN;
-      const inputPin = document.getElementById('admin-pin-input').value.trim();
-      if (inputPin === savedPin) {
-        sessionStorage.setItem('psl_admin_auth', 'true');
+    async function verifyPin() {
+      const field = document.getElementById('admin-pin-input');
+      const password = field.value;
+      field.value = '';
+      try {
+        const response = await fetch('/api/psl', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'login', password })
+        });
+        if (!response.ok) throw new Error('Invalid credentials');
         document.getElementById('auth-overlay').style.display = 'none';
         document.getElementById('admin-app').style.display = 'flex';
         initializeApp();
-      } else {
-        alert("PIN Incorreto! O PIN padrão inicial é: " + DEFAULT_PIN);
+      } catch {
+        alert('Acesso negado. Confira suas credenciais.');
       }
     }
 
@@ -2044,9 +2050,12 @@ const adminHtml = `<!DOCTYPE html>
       if (e.key === 'Enter') verifyPin();
     });
 
-    function logout() {
-      sessionStorage.removeItem('psl_admin_auth');
-      window.location.reload();
+    async function logout() {
+      try {
+        await fetch('/api/psl', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout' }) });
+      } finally {
+        window.location.reload();
+      }
     }
 
     function showTab(tabId) {
@@ -3567,14 +3576,6 @@ const adminHtml = `<!DOCTYPE html>
       if (pix) {
         localStorage.setItem('psl_pix_key', pix);
         apiSync('save_setting', { key: 'pix', value: pix });
-      }
-      if (newPin) {
-        if (newPin.length < 4) {
-          alert("O PIN deve ter no mínimo 4 dígitos.");
-          return;
-        }
-        localStorage.setItem('psl_admin_pin', newPin);
-        alert("Novo PIN salvo com sucesso!");
       }
       showToast("Configurações salvas!");
     }
