@@ -1,12 +1,14 @@
 const { Pool } = require('pg');
+const crypto = require('node:crypto');
 
 let pool;
 function getPool() {
   if (!pool) {
-    const connectionString = process.env.DATABASE_URL || "postgresql://postgres.your-tenant-id:dcad519bf34b193c9e81461b097fecf4@184.107.176.201:6543/postgres";
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) throw new Error('DATABASE_URL is not configured');
     pool = new Pool({
       connectionString,
-      ssl: false,
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : false,
       max: 5,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000
@@ -15,16 +17,86 @@ function getPool() {
   return pool;
 }
 
-module.exports = async (req, res) => {
-  // CORS Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+const COOKIE_NAME = 'psl_admin_session';
+const SESSION_SECONDS = 8 * 60 * 60;
+const configured = () => Boolean(process.env.ADMIN_PASSWORD && process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 32);
+const hash = value => crypto.createHash('sha256').update(String(value)).digest();
+function equal(a, b) {
+  return crypto.timingSafeEqual(hash(a), hash(b));
+}
+function sign(payload) {
+  return crypto.createHmac('sha256', process.env.SESSION_SECRET).update(payload).digest('base64url');
+}
+function makeSession() {
+  const payload = Buffer.from(JSON.stringify({ exp: Date.now() + SESSION_SECONDS * 1000 })).toString('base64url');
+  return payload + '.' + sign(payload);
+}
+function validSession(req) {
+  const raw = String(req.headers.cookie || '').split(';').map(part => part.trim()).find(part => part.startsWith(COOKIE_NAME + '='));
+  if (!raw || !configured()) return false;
+  const token = raw.slice(COOKIE_NAME.length + 1);
+  const [payload, signature, extra] = token.split('.');
+  if (!payload || !signature || extra || !equal(sign(payload), signature)) return false;
+  try { return Number(JSON.parse(Buffer.from(payload, 'base64url').toString()).exp) > Date.now(); }
+  catch { return false; }
+}
+function cookie(value, maxAge) {
+  return COOKIE_NAME + '=' + value + '; Path=/api/psl; HttpOnly; Secure; SameSite=Strict; Max-Age=' + maxAge;
+}
+function safeOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    return new URL(origin).origin === proto + '://' + host;
+  } catch { return false; }
+}
+
+module.exports = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Vary', 'Cookie');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (req.method === 'OPTIONS') return res.status(405).end();
+  if (!configured()) return res.status(503).json({ error: 'Admin authentication is not configured' });
+  if (req.method === 'POST' && !safeOrigin(req)) return res.status(403).json({ error: 'Forbidden origin' });
+
+  if (req.method === 'POST' && req.body && req.body.action === 'login') {
+    const password = String(req.body.password || '');
+    if (!password || password.length > 256 || !equal(password, process.env.ADMIN_PASSWORD)) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    res.setHeader('Set-Cookie', cookie(makeSession(), SESSION_SECONDS));
+    return res.status(200).json({ ok: true });
+  }
+  if (req.method === 'POST' && req.body && req.body.action === 'logout') {
+    res.setHeader('Set-Cookie', cookie('', 0));
+    return res.status(200).json({ ok: true });
+  }
+  if (req.method === 'GET' && req.query && req.query.session === '1') {
+    return res.status(validSession(req) ? 200 : 401).json({ authenticated: validSession(req) });
   }
 
+  // The storefront only receives non-sensitive availability and contact data.
+  if (req.method === 'GET' && req.query && req.query.public === '1') {
+    try {
+      const p = getPool();
+      const [stock, contact] = await Promise.all([
+        p.query('SELECT compound_id, status FROM psl_stock_overrides'),
+        p.query("SELECT value FROM psl_settings WHERE key = 'wa' LIMIT 1")
+      ]);
+      const stockOverrides = Object.fromEntries(stock.rows.map(row => [row.compound_id, row.status]));
+      let wa = null;
+      try { wa = JSON.parse(contact.rows[0]?.value || 'null'); } catch {}
+      return res.status(200).json({ ok: true, stockOverrides, settings: { wa } });
+    } catch (err) {
+      console.error('Public API error', err);
+      return res.status(503).json({ error: 'Service unavailable' });
+    }
+  }
+
+  if (!validSession(req)) return res.status(401).json({ error: 'Authentication required' });
   const p = getPool();
 
   try {
@@ -242,6 +314,6 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
     console.error("API error:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
