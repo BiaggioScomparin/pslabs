@@ -1876,13 +1876,6 @@ const adminHtml = `<!DOCTYPE html>
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
     }
 
-    // Auto-purge old demo mock sales (VND-001..VND-004)
-    const demoVendasIds = ['VND-001', 'VND-002', 'VND-003', 'VND-004'];
-    if (vendas && vendas.some(v => demoVendasIds.includes(v.id))) {
-      vendas = vendas.filter(v => !demoVendasIds.includes(v.id));
-      localStorage.setItem('psl_vendas', JSON.stringify(vendas));
-    }
-
     // Auto-purge old mock compras if they contain the old demo non-ghk-cu items
     const demoComprasIds = ['CMP-001', 'CMP-002', 'CMP-003', 'CMP-004', 'CMP-005', 'CMP-006', 'CMP-007', 'CMP-008', 'CMP-009', 'CMP-010'];
     if (compras && compras.some(c => demoComprasIds.includes(c.id) && c.compoundId !== 'ghk-cu')) {
@@ -2008,6 +2001,14 @@ const adminHtml = `<!DOCTYPE html>
         });
         if (!res.ok) {
           console.warn('apiSync warning:', action, res.status);
+        } else {
+          const badge = document.getElementById('db-sync-badge');
+          if (badge) {
+            badge.innerHTML = '🟢 VPS Conectado';
+            badge.style.background = '#ECFDF5';
+            badge.style.color = '#059669';
+            badge.style.borderColor = '#A7F3D0';
+          }
         }
       } catch (err) {
         console.warn('apiSync offline:', action, err);
@@ -2809,6 +2810,24 @@ const adminHtml = `<!DOCTYPE html>
       renderBalancoTable();
     }
 
+    // Smart Venda ID Generation (calculates highest numeric ID in vendas)
+    function getNextVendaId() {
+      if (!vendas || vendas.length === 0) return 'VND-001';
+      let maxNum = 0;
+      vendas.forEach(v => {
+        if (v && v.id) {
+          const match = String(v.id).match(/[0-9]+/);
+          if (match) {
+            const num = parseInt(match[0], 10);
+            if (!isNaN(num) && num > maxNum) {
+              maxNum = num;
+            }
+          }
+        }
+      });
+      return 'VND-' + String(maxNum + 1).padStart(3, '0');
+    }
+
     // CRUD: Save Venda
     function saveVenda() {
       const clientName = document.getElementById('venda-client').value.trim() || 'Cliente Particular';
@@ -2903,7 +2922,7 @@ const adminHtml = `<!DOCTYPE html>
       const margin = totalSale > 0 ? ((profit / totalSale) * 100) : 0;
       const unitCost = Number((totalCost / (qty || 1)).toFixed(2));
 
-      const vendaId = editingVendaId || ("VND-" + String(vendas.length + 1).padStart(3, '0'));
+      const vendaId = editingVendaId || getNextVendaId();
 
       const newVenda = {
         id: vendaId,
@@ -2942,6 +2961,13 @@ const adminHtml = `<!DOCTYPE html>
 
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
       apiSync('save_venda', newVenda);
+      const badge = document.getElementById('db-sync-badge');
+      if (badge) {
+        badge.innerHTML = '🟢 VPS Conectado';
+        badge.style.background = '#ECFDF5';
+        badge.style.color = '#059669';
+        badge.style.borderColor = '#A7F3D0';
+      }
       editingVendaId = null;
 
       closeModal('modal-venda');
@@ -3765,7 +3791,7 @@ const adminHtml = `<!DOCTYPE html>
       const newPin = document.getElementById('cfg-new-pin').value.trim();
 
       if (wa) {
-        const cleanWa = wa.replace(/\D/g, '');
+        const cleanWa = wa.replace(/[^0-9]/g, '');
         localStorage.setItem('psl_seller_wa', cleanWa);
         apiSync('save_setting', { key: 'wa', value: cleanWa });
       }
@@ -3804,6 +3830,27 @@ const adminHtml = `<!DOCTYPE html>
 
     // Auto-start auth check
     checkAuthOnLoad();
+
+    // Multi-browser & Multi-tab Real-Time Synchronization
+    setInterval(() => syncFromDatabase(false), 8000);
+    window.addEventListener('focus', () => syncFromDatabase(false));
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncFromDatabase(false); });
+    window.addEventListener('storage', (e) => {
+      if (['psl_vendas', 'psl_compras', 'psl_perdas'].includes(e.key)) {
+        try {
+          if (e.key === 'psl_vendas') vendas = JSON.parse(localStorage.getItem('psl_vendas') || '[]');
+          if (e.key === 'psl_compras') compras = JSON.parse(localStorage.getItem('psl_compras') || '[]');
+          if (e.key === 'psl_perdas') perdas = JSON.parse(localStorage.getItem('psl_perdas') || '[]');
+          renderDRE();
+          renderComprasTable();
+          renderVendasTable();
+          renderPerdasTable();
+          renderBalancoTable();
+          renderStockTable();
+        } catch (ex) {}
+        syncFromDatabase(false);
+      }
+    });
   </script>
 </body>
 </html>`;
