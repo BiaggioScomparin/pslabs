@@ -1166,7 +1166,7 @@
   <div class="modal-backdrop" id="modal-compra">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">🛒 Registrar Nova Compra (Peptídeos & Insumos)</div>
+        <div class="modal-title" id="modal-compra-title">🛒 Registrar Nova Compra (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">✕</button>
       </div>
       <div class="modal-body">
@@ -1268,7 +1268,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn-sm btn-outline" onclick="closeModal('modal-compra')">Cancelar</button>
-        <button class="btn-sm btn-primary" onclick="saveCompra()">Salvar Compra</button>
+        <button class="btn-sm btn-primary" id="btn-save-compra" onclick="saveCompra()">Salvar Compra</button>
       </div>
     </div>
   </div>
@@ -1279,7 +1279,7 @@
   <div class="modal-backdrop" id="modal-venda">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">💰 Lançar Nova Venda Manual</div>
+        <div class="modal-title" id="modal-venda-title">💰 Lançar Nova Venda Manual</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-venda')">✕</button>
       </div>
       <div class="modal-body">
@@ -1499,7 +1499,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn-sm btn-outline" onclick="closeModal('modal-venda')">Cancelar</button>
-        <button class="btn-sm btn-success" onclick="saveVenda()">Confirmar Venda</button>
+        <button class="btn-sm btn-success" id="btn-save-venda" onclick="saveVenda()">Confirmar Venda</button>
       </div>
     </div>
   </div>
@@ -1510,7 +1510,7 @@
   <div class="modal-backdrop" id="modal-perda">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)</div>
+        <div class="modal-title" id="modal-perda-title">⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)</div>
         <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">✕</button>
       </div>
       <div class="modal-body">
@@ -1604,7 +1604,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn-sm btn-outline" onclick="closeModal('modal-perda')">Cancelar</button>
-        <button class="btn-sm btn-danger" onclick="savePerda()">Registrar Prejuízo</button>
+        <button class="btn-sm btn-danger" id="btn-save-perda" onclick="savePerda()">Registrar Prejuízo</button>
       </div>
     </div>
   </div>
@@ -1974,12 +1974,22 @@
       if (tabId === 'balanco') renderBalancoTable();
     }
 
-    // Modal Helpers
+    // Modal Helpers & Edit State
+    let editingVendaId = null;
+    let editingCompraId = null;
+    let editingPerdaId = null;
+
     function openModal(modalId) {
       document.getElementById(modalId).classList.add('active');
       const today = new Date().toISOString().split('T')[0];
 
       if (modalId === 'modal-compra') {
+        editingCompraId = null;
+        const title = document.getElementById('modal-compra-title');
+        if (title) title.innerText = '🛒 Registrar Nova Compra (Peptídeos & Insumos)';
+        const btn = document.getElementById('btn-save-compra');
+        if (btn) btn.innerText = 'Salvar Compra';
+
         document.getElementById('compra-date').value = today;
         populateCompoundSelect('compra-compound', 'compra-dose');
         document.getElementById('compra-category').value = 'peptide';
@@ -1987,10 +1997,25 @@
         if (giftCheck) giftCheck.checked = false;
         onCompraCategoryChange();
       } else if (modalId === 'modal-venda') {
+        editingVendaId = null;
+        const title = document.getElementById('modal-venda-title');
+        if (title) title.innerText = '💰 Lançar Nova Venda Manual';
+        const btn = document.getElementById('btn-save-venda');
+        if (btn) btn.innerText = 'Confirmar Venda';
+
         document.getElementById('venda-date').value = today;
+        document.getElementById('venda-client').value = '';
+        document.getElementById('venda-phone').value = '';
+        document.getElementById('venda-qty').value = '1';
         populateCompoundSelect('venda-compound', 'venda-dose');
         onVendaCompoundChange();
       } else if (modalId === 'modal-perda') {
+        editingPerdaId = null;
+        const title = document.getElementById('modal-perda-title');
+        if (title) title.innerText = '⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)';
+        const btn = document.getElementById('btn-save-perda');
+        if (btn) btn.innerText = 'Registrar Prejuízo';
+
         document.getElementById('perda-date').value = today;
         populateCompoundSelect('perda-compound', 'perda-dose');
         document.getElementById('perda-category').value = 'peptide';
@@ -2000,6 +2025,25 @@
 
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('active');
+      if (modalId === 'modal-compra') {
+        editingCompraId = null;
+        const title = document.getElementById('modal-compra-title');
+        if (title) title.innerText = '🛒 Registrar Nova Compra (Peptídeos & Insumos)';
+        const btn = document.getElementById('btn-save-compra');
+        if (btn) btn.innerText = 'Salvar Compra';
+      } else if (modalId === 'modal-venda') {
+        editingVendaId = null;
+        const title = document.getElementById('modal-venda-title');
+        if (title) title.innerText = '💰 Lançar Nova Venda Manual';
+        const btn = document.getElementById('btn-save-venda');
+        if (btn) btn.innerText = 'Confirmar Venda';
+      } else if (modalId === 'modal-perda') {
+        editingPerdaId = null;
+        const title = document.getElementById('modal-perda-title');
+        if (title) title.innerText = '⚠️ Registrar Perda ou Avaria (Peptídeos & Insumos)';
+        const btn = document.getElementById('btn-save-perda');
+        if (btn) btn.innerText = 'Registrar Prejuízo';
+      }
     }
 
     function showToast(msg) {
@@ -2557,8 +2601,10 @@
         dosage = specText;
       }
 
+      const compraId = editingCompraId || ("CMP-" + String(compras.length + 1).padStart(3, '0'));
+
       const newCompra = {
-        id: "CMP-" + String(compras.length + 1).padStart(3, '0'),
+        id: compraId,
         date: date,
         category: cat,
         isGift: finalIsGift,
@@ -2573,15 +2619,62 @@
         notes: notes
       };
 
-      compras.unshift(newCompra);
+      if (editingCompraId) {
+        const idx = compras.findIndex(c => c.id === editingCompraId);
+        if (idx !== -1) compras[idx] = newCompra;
+        else compras.unshift(newCompra);
+      } else {
+        compras.unshift(newCompra);
+      }
+
       localStorage.setItem('psl_compras', JSON.stringify(compras));
       apiSync('save_compra', newCompra);
+      editingCompraId = null;
 
       closeModal('modal-compra');
-      showToast(finalIsGift ? ("🎁 Brinde registrado com sucesso: " + name + " (" + qty + " un a R$ 0)") : ("Compra registrada: " + name + " (" + qty + " un)"));
+      showToast(finalIsGift ? ("🎁 Brinde salvo com sucesso: " + name) : ("Compra " + compraId + " salva com sucesso!"));
       renderDRE();
       renderComprasTable();
       renderBalancoTable();
+    }
+
+    function editCompra(id) {
+      const c = compras.find(item => item.id === id);
+      if (!c) return;
+      editingCompraId = id;
+
+      const title = document.getElementById('modal-compra-title');
+      if (title) title.innerText = '✏️ Editar Compra #' + c.id;
+      const btn = document.getElementById('btn-save-compra');
+      if (btn) btn.innerText = 'Salvar Alterações';
+
+      document.getElementById('compra-date').value = c.date || '';
+      document.getElementById('compra-category').value = c.category || 'peptide';
+      onCompraCategoryChange();
+
+      if ((c.category || 'peptide') === 'peptide') {
+        populateCompoundSelect('compra-compound', 'compra-dose');
+        if (c.compoundId) document.getElementById('compra-compound').value = c.compoundId;
+        onCompraCompoundChange();
+        if (c.code) document.getElementById('compra-dose').value = c.code;
+        onCompraDoseChange();
+      } else if (c.category === 'other') {
+        document.getElementById('compra-other-desc').value = c.notes || c.dosage || '';
+      }
+
+      const giftCheck = document.getElementById('compra-is-gift');
+      if (giftCheck) {
+        giftCheck.checked = Boolean(c.isGift || c.unitCost === 0);
+        toggleCompraGift(giftCheck.checked);
+      }
+
+      document.getElementById('compra-qty').value = c.qty || 1;
+      document.getElementById('compra-unit-cost').value = c.unitCost !== undefined ? c.unitCost : 0;
+      document.getElementById('compra-total-cost').value = c.totalCost !== undefined ? c.totalCost : 0;
+      document.getElementById('compra-supplier').value = c.supplier || '';
+      document.getElementById('compra-notes').value = c.notes || '';
+
+      document.getElementById('modal-compra').classList.add('active');
     }
 
     function deleteCompra(id) {
@@ -2689,8 +2782,10 @@
       const margin = totalSale > 0 ? ((profit / totalSale) * 100) : 0;
       const unitCost = Number((totalCost / (qty || 1)).toFixed(2));
 
+      const vendaId = editingVendaId || ("VND-" + String(vendas.length + 1).padStart(3, '0'));
+
       const newVenda = {
-        id: "VND-" + String(vendas.length + 1).padStart(3, '0'),
+        id: vendaId,
         date: date,
         clientName: clientName,
         clientPhone: clientPhone,
@@ -2716,16 +2811,79 @@
         }
       };
 
-      vendas.unshift(newVenda);
+      if (editingVendaId) {
+        const idx = vendas.findIndex(v => v.id === editingVendaId);
+        if (idx !== -1) vendas[idx] = newVenda;
+        else vendas.unshift(newVenda);
+      } else {
+        vendas.unshift(newVenda);
+      }
+
       localStorage.setItem('psl_vendas', JSON.stringify(vendas));
       apiSync('save_venda', newVenda);
+      editingVendaId = null;
 
       closeModal('modal-venda');
-      showToast("Venda de R$ " + totalSale.toFixed(2) + " registrada!");
+      showToast("Venda " + vendaId + " salva com sucesso!");
       renderDRE();
       renderVendasTable();
       renderBalancoTable();
       renderStockTable();
+    }
+
+    function editVenda(id) {
+      const v = vendas.find(item => item.id === id);
+      if (!v) return;
+      editingVendaId = id;
+
+      const title = document.getElementById('modal-venda-title');
+      if (title) title.innerText = '✏️ Editar Venda #' + v.id;
+      const btn = document.getElementById('btn-save-venda');
+      if (btn) btn.innerText = 'Salvar Alterações';
+
+      document.getElementById('venda-client').value = v.clientName || '';
+      document.getElementById('venda-phone').value = v.clientPhone || '';
+      document.getElementById('venda-date').value = v.date || '';
+
+      populateCompoundSelect('venda-compound', 'venda-dose');
+      if (v.compoundId) {
+        document.getElementById('venda-compound').value = v.compoundId;
+      }
+      onVendaCompoundChange();
+
+      if (v.code) {
+        document.getElementById('venda-dose').value = v.code;
+        onVendaDoseChange();
+      }
+
+      document.getElementById('venda-qty').value = v.qty || 1;
+      document.getElementById('venda-unit-price').value = v.unitPrice !== undefined ? v.unitPrice : 0;
+
+      if (v.costsDetail && v.costsDetail.vialCost !== undefined) {
+        document.getElementById('venda-compound-unit-cost').value = v.costsDetail.vialCost;
+      }
+
+      if (v.paymentMethod) document.getElementById('venda-pagto').value = v.paymentMethod;
+      if (v.channel) document.getElementById('venda-canal').value = v.channel;
+
+      if (v.costsDetail && Array.isArray(v.costsDetail.items)) {
+        const itemsStr = v.costsDetail.items.join(' ');
+        const boxCheck = document.getElementById('venda-cost-box-check');
+        if (boxCheck) boxCheck.checked = itemsStr.includes('Caixa');
+        const labelCheck = document.getElementById('venda-cost-label-check');
+        if (labelCheck) labelCheck.checked = itemsStr.includes('Etiqueta');
+        const waterCheck = document.getElementById('venda-cost-water-check');
+        if (waterCheck) waterCheck.checked = itemsStr.includes('Água BAC') || itemsStr.includes('Agua BAC');
+        const suppliesCheck = document.getElementById('venda-cost-supplies-check');
+        if (suppliesCheck) suppliesCheck.checked = itemsStr.includes('Seringas');
+        const shippingCheck = document.getElementById('venda-cost-shipping-check');
+        if (shippingCheck) shippingCheck.checked = itemsStr.includes('Frete');
+        const gatewayCheck = document.getElementById('venda-cost-gateway-check');
+        if (gatewayCheck) gatewayCheck.checked = itemsStr.includes('Taxa Cartão');
+      }
+
+      recalcVendaTotals();
+      document.getElementById('modal-venda').classList.add('active');
     }
 
     function clearAllVendas() {
@@ -2793,8 +2951,10 @@
         dosage = item.name;
       }
 
+      const perdaId = editingPerdaId || ("PRD-" + String(perdas.length + 1).padStart(3, '0'));
+
       const newPerda = {
-        id: "PRD-" + String(perdas.length + 1).padStart(3, '0'),
+        id: perdaId,
         date: date,
         category: cat,
         compoundId: compoundId,
@@ -2808,15 +2968,56 @@
         notes: notes
       };
 
-      perdas.unshift(newPerda);
+      if (editingPerdaId) {
+        const idx = perdas.findIndex(p => p.id === editingPerdaId);
+        if (idx !== -1) perdas[idx] = newPerda;
+        else perdas.unshift(newPerda);
+      } else {
+        perdas.unshift(newPerda);
+      }
+
       localStorage.setItem('psl_perdas', JSON.stringify(perdas));
       apiSync('save_perda', newPerda);
+      editingPerdaId = null;
 
       closeModal('modal-perda');
-      showToast("Perda de R$ " + lossTotal.toFixed(2) + " registrada no DRE.");
+      showToast("Perda " + perdaId + " salva com sucesso!");
       renderDRE();
       renderPerdasTable();
       renderBalancoTable();
+    }
+
+    function editPerda(id) {
+      const p = perdas.find(item => item.id === id);
+      if (!p) return;
+      editingPerdaId = id;
+
+      const title = document.getElementById('modal-perda-title');
+      if (title) title.innerText = '✏️ Editar Perda #' + p.id;
+      const btn = document.getElementById('btn-save-perda');
+      if (btn) btn.innerText = 'Salvar Alterações';
+
+      document.getElementById('perda-date').value = p.date || '';
+      document.getElementById('perda-category').value = p.category || 'peptide';
+      onPerdaCategoryChange();
+
+      if ((p.category || 'peptide') === 'peptide') {
+        populateCompoundSelect('perda-compound', 'perda-dose');
+        if (p.compoundId) document.getElementById('perda-compound').value = p.compoundId;
+        onPerdaCompoundChange();
+        if (p.code) document.getElementById('perda-dose').value = p.code;
+        onPerdaDoseChange();
+      } else if (p.category === 'other') {
+        document.getElementById('perda-other-desc').value = p.dosage || '';
+      }
+
+      document.getElementById('perda-qty').value = p.qty || 1;
+      document.getElementById('perda-unit-cost').value = p.unitCost !== undefined ? p.unitCost : 0;
+      document.getElementById('perda-total-cost').value = p.lossTotal !== undefined ? p.lossTotal : 0;
+      document.getElementById('perda-reason').value = p.reason || '';
+      document.getElementById('perda-notes').value = p.notes || '';
+
+      document.getElementById('modal-perda').classList.add('active');
     }
 
     function deletePerda(id) {
@@ -3066,7 +3267,8 @@
             <td>${c.supplier}</td>
             <td style="font-size: 12px; color: var(--gray-600);">${c.notes || '-'}</td>
             <td>
-              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteCompra('${c.id}')">Excluir</button>
+              <button class="btn-sm btn-outline" style="color: #059669; border-color: #A7F3D0; font-weight: 700; margin-right: 6px; padding: 4px 10px; cursor: pointer;" onclick="editCompra('${c.id}')">✏️ Editar</button>
+              <button class="btn-sm btn-outline" style="color: #EF4444; border-color: #FECACA; font-weight: 700; padding: 4px 10px; cursor: pointer;" onclick="deleteCompra('${c.id}')">Excluir</button>
             </td>
           </tr>
         `;
@@ -3104,7 +3306,8 @@
           <td><span class="badge" style="background: #DCFCE7; color: #166534;">${v.margin}%</span></td>
           <td>${v.paymentMethod}</td>
           <td>
-            <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deleteVenda('${v.id}')">Excluir</button>
+            <button class="btn-sm btn-outline" style="color: #059669; border-color: #A7F3D0; font-weight: 700; margin-right: 6px; padding: 4px 10px; cursor: pointer;" onclick="editVenda('${v.id}')">✏️ Editar</button>
+            <button class="btn-sm btn-outline" style="color: #EF4444; border-color: #FECACA; font-weight: 700; padding: 4px 10px; cursor: pointer;" onclick="deleteVenda('${v.id}')">Excluir</button>
           </td>
         </tr>
       `;
@@ -3133,7 +3336,8 @@
             <td style="font-weight: 800; color: #DC2626;">- R$ ${p.lossTotal.toFixed(2)}</td>
             <td style="font-size: 12px; color: var(--gray-600);">${p.notes || '-'}</td>
             <td>
-              <button class="btn-sm btn-outline" style="color: #EF4444;" onclick="deletePerda('${p.id}')">Excluir</button>
+              <button class="btn-sm btn-outline" style="color: #059669; border-color: #A7F3D0; font-weight: 700; margin-right: 6px; padding: 4px 10px; cursor: pointer;" onclick="editPerda('${p.id}')">✏️ Editar</button>
+              <button class="btn-sm btn-outline" style="color: #EF4444; border-color: #FECACA; font-weight: 700; padding: 4px 10px; cursor: pointer;" onclick="deletePerda('${p.id}')">Excluir</button>
             </td>
           </tr>
         `;
