@@ -4,7 +4,7 @@
   "private": true,
   "description": "PSL Labs - Sistema de Gestão e Storefront",
   "scripts": {
-    "build": "node web/generate_web_app.js && node web/generate_admin_app.js"
+    "generate": "node web/generate_web_app.js && node web/generate_admin_app.js"
   },
   "dependencies": {
     "pg": "^8.13.1"
