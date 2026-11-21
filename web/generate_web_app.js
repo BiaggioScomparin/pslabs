@@ -1569,6 +1569,6 @@ ${clientScript}
 </html>
 `;
 
-fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/web/index.html", htmlContent, "utf8");
-fs.writeFileSync("C:/Users/biagg/.gemini/antigravity/scratch/psl-labs/index.html", htmlContent, "utf8");
+fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent, 'utf8');
+fs.writeFileSync(path.join(__dirname, '..', 'index.html'), htmlContent, 'utf8');
 console.log("Mobile-first application successfully generated.");

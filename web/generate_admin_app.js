@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 // Reads compound data from catalog
 const rawProducts = require('../catalog/psl_products.json');
@@ -3807,9 +3808,13 @@ const adminHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-fs.writeFileSync('web/admin.html', adminHtml, 'utf8');
-fs.writeFileSync('admin.html', adminHtml, 'utf8');
-fs.writeFileSync('admin/index.html', adminHtml, 'utf8');
-fs.writeFileSync('web/admin/index.html', adminHtml, 'utf8');
+const rootDir = path.resolve(__dirname, '..');
+fs.mkdirSync(path.join(rootDir, 'admin'), { recursive: true });
+fs.mkdirSync(path.join(rootDir, 'web', 'admin'), { recursive: true });
+
+fs.writeFileSync(path.join(rootDir, 'web', 'admin.html'), adminHtml, 'utf8');
+fs.writeFileSync(path.join(rootDir, 'admin.html'), adminHtml, 'utf8');
+fs.writeFileSync(path.join(rootDir, 'admin', 'index.html'), adminHtml, 'utf8');
+fs.writeFileSync(path.join(rootDir, 'web', 'admin', 'index.html'), adminHtml, 'utf8');
 
 console.log('✅ Admin Panel successfully upgraded with Compras, Vendas, Perdas, and Lucro Real DRE!');
