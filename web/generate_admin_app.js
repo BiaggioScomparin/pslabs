@@ -953,6 +953,28 @@ const adminHtml = `<!DOCTYPE html>
               </div>
             </div>
 
+            <!-- Barra de Busca Rápida, Filtros e Ordenação -->
+            <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; background: #F8FAFC; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--gray-200);">
+              <div style="flex: 1; min-width: 250px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 14px;">🔍</span>
+                <input type="text" id="vendas-search" placeholder="Buscar por cliente, ID (ex: VND-002), peptídeo (ex: Retatrutide, GHK) ou dose (50mg, 60mg)..." oninput="renderVendasTable()" style="width: 100%; padding: 7px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px;">
+              </div>
+              <select id="vendas-filter-compound" onchange="renderVendasTable()" style="padding: 7px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; font-weight: 600; color: #334155; background: #FFFFFF;">
+                <option value="">Todos os Peptídeos</option>
+                <option value="retatrutide">Retatrutide</option>
+                <option value="ghk-cu">GHK-Cu (Blue Copper)</option>
+                <option value="tirzepatide">Tirzepatide</option>
+                <option value="bpc157">BPC-157</option>
+                <option value="tb500">TB-500</option>
+              </select>
+              <select id="vendas-sort-order" onchange="renderVendasTable()" style="padding: 7px 12px; border: 1px solid var(--gray-200); border-radius: 6px; font-size: 13px; font-weight: 600; color: #334155; background: #FFFFFF;">
+                <option value="date-desc">Data (Mais recente primeiro)</option>
+                <option value="date-asc">Data (Mais antiga primeiro)</option>
+                <option value="id-desc">ID (Decrescente: VND-009 ...)</option>
+                <option value="id-asc">ID (Crescente: VND-001 ...)</option>
+              </select>
+            </div>
+
             <div class="table-wrap">
               <table>
                 <thead>
@@ -3424,11 +3446,55 @@ const adminHtml = `<!DOCTYPE html>
 
     function renderVendasTable() {
       const tbody = document.getElementById('vendas-table-body');
-      if (vendas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.</td></tr>';
+      if (!tbody) return;
+
+      const search = (document.getElementById('vendas-search') ? document.getElementById('vendas-search').value : '').toLowerCase().trim();
+      const filterComp = document.getElementById('vendas-filter-compound') ? document.getElementById('vendas-filter-compound').value : '';
+      const sortOrder = document.getElementById('vendas-sort-order') ? document.getElementById('vendas-sort-order').value : 'date-desc';
+
+      let list = [...(vendas || [])];
+
+      // Filter
+      if (filterComp) {
+        list = list.filter(v => (v.compoundId === filterComp || (v.code || '').toLowerCase().startsWith(filterComp.substring(0, 2)) || (v.name || '').toLowerCase().includes(filterComp.toLowerCase())));
+      }
+      if (search) {
+        list = list.filter(v => {
+          const fullText = [v.id, v.date, v.clientName, v.clientPhone, v.name, v.dosage, v.code, v.channel, v.paymentMethod].join(' ').toLowerCase();
+          return fullText.includes(search);
+        });
+      }
+
+      // Sort
+      list.sort((a, b) => {
+        if (sortOrder === 'date-asc') return (a.date || '').localeCompare(b.date || '');
+        if (sortOrder === 'id-desc') {
+          const na = parseInt(String(a.id || '').replace(/\D/g, '') || 0, 10);
+          const nb = parseInt(String(b.id || '').replace(/\D/g, '') || 0, 10);
+          return nb - na;
+        }
+        if (sortOrder === 'id-asc') {
+          const na = parseInt(String(a.id || '').replace(/\D/g, '') || 0, 10);
+          const nb = parseInt(String(b.id || '').replace(/\D/g, '') || 0, 10);
+          return na - nb;
+        }
+        // Default: date-desc, secondary id-desc
+        const dateCmp = (b.date || '').localeCompare(a.date || '');
+        if (dateCmp !== 0) return dateCmp;
+        const na = parseInt(String(a.id || '').replace(/\D/g, '') || 0, 10);
+        const nb = parseInt(String(b.id || '').replace(/\D/g, '') || 0, 10);
+        return nb - na;
+      });
+
+      if (list.length === 0) {
+        const isFiltering = search || filterComp;
+        tbody.innerHTML = \`<tr><td colspan="11" style="text-align: center; color: var(--gray-400); padding: 30px;">
+          \${isFiltering ? 'Nenhuma venda encontrada com os filtros atuais. <button class="btn-sm btn-outline" style="margin-left: 10px; cursor: pointer;" onclick="document.getElementById(\\'vendas-search\\').value=\\'\\'; document.getElementById(\\'vendas-filter-compound\\').value=\\'\\'; renderVendasTable();">Limpar Filtros</button>' : 'Nenhuma venda registrada ainda. Clique em "+ Lançar Nova Venda" para adicionar.'}
+        </td></tr>\`;
         return;
       }
-      tbody.innerHTML = vendas.map(v => {
+
+      tbody.innerHTML = list.map(v => {
         const hasExtras = v.costsDetail && v.costsDetail.items && v.costsDetail.items.length > 0;
         const detailsTooltip = hasExtras
           ? ('Pó: R$ ' + (v.costsDetail.vialCost || 0).toFixed(2) + ' + Insumos: ' + v.costsDetail.items.join(', '))
