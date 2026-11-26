@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 
 let pool;
+let pedidosReady = false;
 function getPool() {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL || "postgresql://postgres.your-tenant-id:dcad519bf34b193c9e81461b097fecf4@184.107.176.201:6543/postgres";
@@ -13,6 +14,34 @@ function getPool() {
     });
   }
   return pool;
+}
+
+async function ensurePedidosTable(p) {
+  if (pedidosReady) return;
+  await p.query(`
+    CREATE TABLE IF NOT EXISTS psl_loja_pedidos (
+      id TEXT PRIMARY KEY,
+      date TEXT NOT NULL DEFAULT '',
+      client_name TEXT NOT NULL DEFAULT '',
+      client_phone TEXT NOT NULL DEFAULT '',
+      compound_id TEXT NOT NULL DEFAULT '',
+      code TEXT NOT NULL DEFAULT '',
+      name TEXT NOT NULL DEFAULT '',
+      dosage TEXT NOT NULL DEFAULT '',
+      qty INTEGER NOT NULL DEFAULT 1,
+      unit_price NUMERIC(10,2) NOT NULL DEFAULT 0,
+      unit_cost NUMERIC(10,2) NOT NULL DEFAULT 0,
+      total NUMERIC(10,2) NOT NULL DEFAULT 0,
+      delivery TEXT NOT NULL DEFAULT '',
+      payment_method TEXT NOT NULL DEFAULT 'Pix',
+      channel TEXT NOT NULL DEFAULT 'WhatsApp Bot',
+      status TEXT NOT NULL DEFAULT 'Aguardando Pagamento',
+      venda_id TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+  pedidosReady = true;
 }
 
 module.exports = async (req, res) => {
@@ -28,13 +57,15 @@ module.exports = async (req, res) => {
   const p = getPool();
 
   try {
+    await ensurePedidosTable(p);
     if (req.method === 'GET') {
-      const [comprasRes, vendasRes, perdasRes, stockRes, settingsRes] = await Promise.all([
+      const [comprasRes, vendasRes, perdasRes, stockRes, settingsRes, pedidosRes] = await Promise.all([
         p.query("SELECT * FROM psl_compras ORDER BY date DESC, created_at DESC;"),
         p.query("SELECT * FROM psl_vendas ORDER BY date DESC, created_at DESC;"),
         p.query("SELECT * FROM psl_perdas ORDER BY date DESC, created_at DESC;"),
         p.query("SELECT * FROM psl_stock_overrides;"),
-        p.query("SELECT * FROM psl_settings;")
+        p.query("SELECT * FROM psl_settings;"),
+        p.query("SELECT * FROM psl_loja_pedidos ORDER BY created_at DESC;")
       ]);
 
       const compras = comprasRes.rows.map(r => ({
@@ -100,12 +131,37 @@ module.exports = async (req, res) => {
         settings[r.key] = r.value;
       });
 
+      const pedidos = pedidosRes.rows.map(r => ({
+        id: r.id,
+        date: r.date || (r.created_at ? new Date(r.created_at).toISOString().split('T')[0] : ''),
+        client: r.client_name,
+        clientName: r.client_name,
+        phone: r.client_phone || '',
+        clientPhone: r.client_phone || '',
+        compoundId: r.compound_id || '',
+        code: r.code || '',
+        name: r.name || '',
+        dosage: r.dosage || '',
+        qty: Number(r.qty) || 1,
+        items: `${Number(r.qty) || 1}x ${r.name || 'Peptídeo'}${r.dosage ? ' ' + r.dosage : ''}`,
+        unitPrice: Number(r.unit_price) || 0,
+        unitCost: Number(r.unit_cost) || 0,
+        total: Number(r.total) || 0,
+        delivery: r.delivery || 'A combinar',
+        paymentMethod: r.payment_method || 'Pix',
+        channel: r.channel || 'WhatsApp Bot',
+        status: r.status || 'Aguardando Pagamento',
+        vendaId: r.venda_id || '',
+        createdAt: r.created_at
+      }));
+
       return res.status(200).json({
         ok: true,
         source: 'vps_postgres',
         compras,
         vendas,
         perdas,
+        pedidos,
         stockOverrides,
         settings
       });
@@ -234,6 +290,65 @@ module.exports = async (req, res) => {
             updated_at = NOW();
         `, [key, JSON.stringify(value)]);
         return res.status(200).json({ ok: true, key });
+      }
+
+      if (action === 'save_pedido') {
+        const o = payload || {};
+        await p.query(`
+          INSERT INTO psl_loja_pedidos (
+            id, date, client_name, client_phone, compound_id, code, name, dosage,
+            qty, unit_price, unit_cost, total, delivery, payment_method, channel, status, venda_id, updated_at
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8,
+            $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW()
+          )
+          ON CONFLICT (id) DO UPDATE SET
+            client_name = EXCLUDED.client_name,
+            client_phone = EXCLUDED.client_phone,
+            delivery = CASE WHEN EXCLUDED.delivery <> '' THEN EXCLUDED.delivery ELSE psl_loja_pedidos.delivery END,
+            payment_method = EXCLUDED.payment_method,
+            status = EXCLUDED.status,
+            venda_id = CASE WHEN EXCLUDED.venda_id <> '' THEN EXCLUDED.venda_id ELSE psl_loja_pedidos.venda_id END,
+            updated_at = NOW();
+        `, [
+          o.id,
+          o.date || new Date().toISOString().split('T')[0],
+          o.clientName || o.client || 'Cliente WhatsApp',
+          o.clientPhone || o.phone || '',
+          o.compoundId || '',
+          o.code || '',
+          o.name || 'Peptídeo',
+          o.dosage || '',
+          Number(o.qty) || 1,
+          Number(o.unitPrice) || 0,
+          Number(o.unitCost) || 0,
+          Number(o.total) || 0,
+          o.delivery || '',
+          o.paymentMethod || 'Pix',
+          o.channel || 'WhatsApp Bot',
+          o.status || 'Aguardando Pagamento',
+          o.vendaId || ''
+        ]);
+        return res.status(200).json({ ok: true, id: o.id });
+      }
+
+      if (action === 'update_pedido_status') {
+        const { id, status, vendaId, paymentMethod } = payload || {};
+        await p.query(`
+          UPDATE psl_loja_pedidos
+          SET status = COALESCE($2, status),
+              venda_id = COALESCE(NULLIF($3, ''), venda_id),
+              payment_method = COALESCE(NULLIF($4, ''), payment_method),
+              updated_at = NOW()
+          WHERE id = $1;
+        `, [id, status || null, vendaId || '', paymentMethod || '']);
+        return res.status(200).json({ ok: true, id, status });
+      }
+
+      if (action === 'delete_pedido') {
+        const { id } = payload || {};
+        await p.query("DELETE FROM psl_loja_pedidos WHERE id = $1", [id]);
+        return res.status(200).json({ ok: true, deleted: id });
       }
 
       return res.status(400).json({ error: "Unknown action" });

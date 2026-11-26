@@ -1857,6 +1857,10 @@
             perdas = data.perdas;
             localStorage.setItem('psl_perdas', JSON.stringify(perdas));
           }
+          if (Array.isArray(data.pedidos)) {
+            orders = data.pedidos;
+            localStorage.setItem('psl_orders', JSON.stringify(orders));
+          }
           if (data.stockOverrides) {
             stockData = Object.assign(stockData || {}, data.stockOverrides);
             localStorage.setItem('psl_stock_data', JSON.stringify(stockData));
@@ -1878,6 +1882,7 @@
           renderPerdasTable();
           renderBalancoTable();
           renderStockTable();
+          renderOrdersTable();
           if (showNotification) showToast("Dados sincronizados com o banco VPS!");
         }
       } catch (err) {
@@ -3695,9 +3700,31 @@
       showToast("Preços restaurados para 75% de margem!");
     }
 
+    const ORDER_STATUS_OPTIONS = [
+      'Aguardando Pagamento',
+      'Pago / Confirmado',
+      'Em Separação / Enviado',
+      'Entregue',
+      'Cancelado'
+    ];
+
+    function getOrderStatusStyle(status) {
+      if (status === 'Pago / Confirmado' || status === 'Entregue') {
+        return 'background: #DCFCE7; color: #166534; border-color: #86EFAC;';
+      }
+      if (status === 'Em Separação / Enviado') {
+        return 'background: #E0F2FE; color: #0369A1; border-color: #7DD3FC;';
+      }
+      if (status === 'Cancelado') {
+        return 'background: #FEE2E2; color: #991B1B; border-color: #FCA5A5;';
+      }
+      return 'background: #FEF3C7; color: #92400E; border-color: #FCD34D;';
+    }
+
     // Orders Tab
     function renderOrdersTable() {
       const tbody = document.getElementById('orders-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
       if (!orders || orders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--gray-400); padding: 20px;">Nenhum pedido pendente no momento.</td></tr>';
@@ -3705,19 +3732,111 @@
       }
       orders.forEach(o => {
         const tr = document.createElement('tr');
+        const currentStatus = o.status || 'Aguardando Pagamento';
+        const statusStyle = getOrderStatusStyle(currentStatus);
+        const optionsHtml = ORDER_STATUS_OPTIONS.concat(
+          ORDER_STATUS_OPTIONS.includes(currentStatus) ? [] : [currentStatus]
+        ).map(st => `<option value="${st}" ${st === currentStatus ? 'selected' : ''}>${st}</option>`).join('');
+        const vendaTag = o.vendaId
+          ? `<div style="font-size: 10px; color: #059669; margin-top: 4px; font-weight: 700;">✅ Venda lançada (${o.vendaId})</div>`
+          : '';
+        const phoneStr = o.phone || o.clientPhone || '';
+        const clientStr = o.client || o.clientName || 'Cliente';
+
         tr.innerHTML = `
-          <td><strong>${o.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${o.date}</span></td>
-          <td><strong>${o.client}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${o.phone}</span></td>
-          <td>${o.items}</td>
-          <td><span class="badge" style="background: #E0F2FE; color: #0369A1;">${o.delivery}</span></td>
-          <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-          <td><span class="badge badge-in-stock">${o.status}</span></td>
+          <td><strong>${o.id}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${o.date || ''}</span></td>
+          <td><strong>${clientStr}</strong><br><span style="font-size: 11px; color: var(--gray-400);">${phoneStr}</span></td>
+          <td><strong>${o.items || ((o.qty || 1) + 'x ' + (o.name || 'Peptídeo') + ' ' + (o.dosage || ''))}</strong><br><span style="font-size: 11px; color: var(--gray-500);">${o.paymentMethod || 'Pix'}</span></td>
+          <td><span class="badge" style="background: #E0F2FE; color: #0369A1; white-space: normal; text-align: left;">${o.delivery || 'A combinar'}</span></td>
+          <td><strong>R$ ${Number(o.total || 0).toFixed(2)}</strong></td>
           <td>
-            <button class="btn-sm btn-success" onclick="notifyOrderWhatsApp('${o.phone}', '${o.id}', '${o.client}')">WhatsApp</button>
+            <select class="form-select" style="font-size: 12px; font-weight: 700; padding: 5px 8px; min-width: 175px; ${statusStyle}" onchange="changeOrderStatus('${o.id}', this.value)">
+              ${optionsHtml}
+            </select>
+            ${vendaTag}
+          </td>
+          <td style="white-space: nowrap;">
+            <button class="btn-sm btn-success" style="margin-right: 6px;" onclick="notifyOrderWhatsApp('${phoneStr}', '${o.id}', '${clientStr.replace(/'/g, '')}')">WhatsApp</button>
+            <button class="btn-sm btn-outline" style="color: #EF4444; border-color: #FECACA; font-weight: 700;" onclick="deleteOrder('${o.id}')">Excluir</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    async function changeOrderStatus(orderId, newStatus) {
+      const idx = orders.findIndex(o => o.id === orderId);
+      if (idx === -1) return;
+      const o = orders[idx];
+      o.status = newStatus;
+
+      const isPaidOrDone = ['Pago / Confirmado', 'Em Separação / Enviado', 'Entregue'].includes(newStatus);
+
+      if (isPaidOrDone && !o.vendaId) {
+        const vendaId = getNextVendaId();
+        const qty = Number(o.qty) || 1;
+        const unitPrice = Number(o.unitPrice) || Number(o.total) || 0;
+        const unitCost = Number(o.unitCost) || 0;
+        const totalSale = Number((unitPrice * qty).toFixed(2));
+        const totalCost = Number((unitCost * qty).toFixed(2));
+        const profit = Number((totalSale - totalCost).toFixed(2));
+        const margin = totalSale > 0 ? Number(((profit / totalSale) * 100).toFixed(1)) : 0;
+
+        const newVenda = {
+          id: vendaId,
+          date: o.date || new Date().toISOString().split('T')[0],
+          clientName: o.client || o.clientName || 'Cliente WhatsApp',
+          clientPhone: o.phone || o.clientPhone || '',
+          compoundId: o.compoundId || '',
+          code: o.code || '',
+          name: o.name || 'Peptídeo',
+          dosage: o.dosage || '',
+          qty: qty,
+          unitPrice: unitPrice,
+          unitCost: unitCost,
+          totalSale: totalSale,
+          totalCost: totalCost,
+          profit: profit,
+          margin: margin,
+          paymentMethod: o.paymentMethod === 'Pix (Aguardando Pagamento)' ? 'Pix' : (o.paymentMethod || 'Pix'),
+          channel: o.channel || 'WhatsApp Bot',
+          status: 'Pago',
+          costsDetail: o.delivery ? { vialCost: unitCost, totalPeptideCost: totalCost, extrasCost: 0, items: [o.delivery] } : {}
+        };
+
+        vendas.unshift(newVenda);
+        o.vendaId = vendaId;
+        localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+        await apiSync('save_venda', newVenda);
+        showToast("Status alterado para '" + newStatus + "' e venda " + vendaId + " lançada em Vendas!");
+      } else if (newStatus === 'Cancelado' && o.vendaId) {
+        const linkedId = o.vendaId;
+        vendas = vendas.filter(v => v.id !== linkedId);
+        o.vendaId = '';
+        localStorage.setItem('psl_vendas', JSON.stringify(vendas));
+        await apiSync('delete_venda', { id: linkedId });
+        showToast("Pedido cancelado e venda " + linkedId + " removida de Vendas.");
+      } else {
+        showToast("Status do pedido " + orderId + " alterado para '" + newStatus + "'!");
+      }
+
+      localStorage.setItem('psl_orders', JSON.stringify(orders));
+      await apiSync('update_pedido_status', { id: orderId, status: newStatus, vendaId: o.vendaId || '' });
+
+      renderOrdersTable();
+      renderVendasTable();
+      renderDRE();
+      renderBalancoTable();
+      renderStockTable();
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm("Remover o pedido " + orderId + " da lista?")) return;
+      orders = orders.filter(o => o.id !== orderId);
+      localStorage.setItem('psl_orders', JSON.stringify(orders));
+      await apiSync('delete_pedido', { id: orderId });
+      renderOrdersTable();
+      showToast("Pedido " + orderId + " excluído.");
     }
 
     function notifyOrderWhatsApp(phone, id, client) {
